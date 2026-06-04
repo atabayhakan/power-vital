@@ -5,7 +5,7 @@ import router from './router'
 import axios from 'axios'
 
 // ═══ GLOBAL AXIOS CONFIG (Antigravity: single config for all API calls) ═══
-axios.defaults.baseURL = '/' // Vite proxy handles /api → localhost:3000
+axios.defaults.baseURL = import.meta.env.VITE_API_URL || '/'; // Uses Render/Railway API URL in production, proxy locally
 
 // Auto-inject auth token on every request
 axios.interceptors.request.use((config) => {
