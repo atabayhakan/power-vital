@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+
+    <!-- Primary SEO (Russian) -->
+    <title>Power Vital — Здоровые витамины и натуральные пищевые добавки | Кыргызстан, Бишкек</title>
+    <meta name="description" content="Power Vital — лидер в области здоровых витаминов, натуральных пищевых добавок и дермокосметики в Кыргызстане. Бишкек. Бесплатная доставка. powervital.kg" />
+    <meta name="keywords" content="здоровые витамины, натуральные пищевые добавки, дермокосметика, Кыргызстан, Бишкек, Power Vital, powervital.kg, витамины Бишкек, БАД Кыргызстан, пищевые добавки Бишкек" />
+    <meta name="author" content="Power Vital LLC" />
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical" href="https://powervital.kg/" />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Power Vital — Здоровые витамины и натуральные добавки" />
+    <meta property="og:description" content="Премиум здоровые витамины, натуральные пищевые добавки и дермокосметика в Кыргызстане. Доставка по всей стране." />
+    <meta property="og:url" content="https://powervital.kg/" />
+    <meta property="og:site_name" content="Power Vital" />
+    <meta property="og:locale" content="ru_KG" />
+    <meta property="og:image" content="https://powervital.kg/favicon.svg" />
+
+    <!-- Twitter Cards -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Power Vital — Здоровые витамины | Кыргызстан" />
+    <meta name="twitter:description" content="Натуральные пищевые добавки и дермокосметика. Бишкек, Кыргызстан." />
+
+    <!-- PWA -->
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="theme-color" content="#18181b" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="PowerVital" />
+    <link rel="apple-touch-icon" href="/favicon.svg" />
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  </head>
+  <body>
+    <div id="app"></div>
+    <script type="module" src="/src/main.ts"></script>
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js').catch(() => {});
+        });
+      }
+    </script>
+  </body>
+</html>

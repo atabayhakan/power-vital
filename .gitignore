@@ -1,0 +1,15 @@
+node_modules
+dist
+.env
+.env.*
+!.env.example
+uploads
+redis
+redis.zip
+dump.rdb
+*.log
+.DS_Store
+backend/node_modules
+backend/dist
+frontend/node_modules
+frontend/dist

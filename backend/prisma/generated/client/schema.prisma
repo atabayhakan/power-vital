@@ -1,0 +1,261 @@
+generator client {
+  provider   = "prisma-client-js"
+  output     = "./generated/client"
+  engineType = "library"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  admin
+  customer
+  dealer
+  distributor
+}
+
+enum OrderType {
+  pos
+  ecommerce
+  b2b
+}
+
+enum OrderStatus {
+  pending
+  paid
+  completed
+  shipped
+  cancelled
+  refunded
+}
+
+enum PaymentMethod {
+  cash
+  credit_card
+  wallet
+  qr_transfer
+}
+
+enum TransactionType {
+  deposit
+  withdrawal
+  bonus
+  purchase
+}
+
+enum Currency {
+  KGS
+  USD
+}
+
+model User {
+  id             String  @id @default(uuid())
+  role           Role    @default(customer)
+  sponsorId      String?
+  sponsor        User?   @relation("Sponsor", fields: [sponsorId], references: [id])
+  sponsoredUsers User[]  @relation("Sponsor")
+
+  name         String
+  email        String @unique
+  passwordHash String
+
+  walletBalanceKgs Decimal @default(0.00) @db.Decimal(12, 2)
+  walletBalanceUsd Decimal @default(0.00) @db.Decimal(12, 2)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  orders          Order[]
+  transactions    Transaction[]
+  userWeeklyStats UserWeeklyStats[]
+}
+
+model Product {
+  id          String  @id @default(uuid())
+  barcode     String  @unique
+  name        String
+  description String?
+
+  basePriceKgs Decimal @db.Decimal(12, 2)
+  basePriceUsd Decimal @db.Decimal(12, 2)
+
+  stockQuantity Int @default(0)
+  minStockAlert Int @default(10)
+
+  categoryId String?
+  category   Category? @relation(fields: [categoryId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  priceRules PriceRule[]
+  orderItems OrderItem[]
+  images     ProductImage[]
+}
+
+model PriceRule {
+  id             String  @id @default(uuid())
+  productId      String
+  product        Product @relation(fields: [productId], references: [id])
+  role           Role
+  customPriceKgs Decimal @db.Decimal(12, 2)
+
+  @@unique([productId, role])
+}
+
+model Order {
+  id     String @id @default(uuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  orderType OrderType
+  status    OrderStatus @default(pending)
+
+  totalKgs Decimal @db.Decimal(12, 2)
+  totalUsd Decimal @db.Decimal(12, 2)
+
+  paymentMethod PaymentMethod
+
+  customerName    String?
+  customerPhone   String?
+  address         String?
+  receiptImageUrl String?
+  ocrResult       Json?
+  verifiedAt      DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  items OrderItem[]
+}
+
+model OrderItem {
+  id      String @id @default(uuid())
+  orderId String
+  order   Order  @relation(fields: [orderId], references: [id])
+
+  productId String
+  product   Product @relation(fields: [productId], references: [id])
+
+  quantity      Int
+  unitPriceKgs  Decimal @db.Decimal(12, 2)
+  totalPriceKgs Decimal @db.Decimal(12, 2)
+}
+
+model Transaction {
+  id     String @id @default(uuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  type        TransactionType
+  amount      Decimal         @db.Decimal(12, 2)
+  currency    Currency
+  description String?
+
+  createdAt DateTime @default(now())
+}
+
+model ExchangeRate {
+  id        String   @id @default(uuid())
+  currency  String   @unique @default("USD")
+  rateToKgs Decimal  @db.Decimal(12, 4)
+  updatedAt DateTime @updatedAt
+}
+
+model SystemConfig {
+  id                String  @id @default(uuid())
+  isMlmEnabled      Boolean @default(true)
+  maxPayoutLimitPct Decimal @default(30.00) @db.Decimal(5, 2)
+
+  isFastStartActive Boolean @default(true)
+  fastStartRates    Json    @default("[10, 5, 2]")
+
+  isUnilevelActive Boolean @default(true)
+  unilevelRates    Json    @default("[5, 5, 5, 5, 5]")
+
+  isOverdriveActive Boolean @default(true)
+  overdrivePoolPct  Decimal @default(5.00) @db.Decimal(5, 2)
+
+  updatedAt DateTime @updatedAt
+}
+
+model WeeklyCycle {
+  id         String    @id @default(uuid())
+  weekNumber Int
+  year       Int
+  startDate  DateTime
+  endDate    DateTime?
+  isClosed   Boolean   @default(false)
+
+  userStats UserWeeklyStats[]
+}
+
+model UserWeeklyStats {
+  id     String @id @default(uuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  cycleId String
+  cycle   WeeklyCycle @relation(fields: [cycleId], references: [id])
+
+  personalVolume  Decimal @default(0.00) @db.Decimal(12, 2)
+  teamVolume      Decimal @default(0.00) @db.Decimal(12, 2)
+  carryOverVolume Decimal @default(0.00) @db.Decimal(12, 2)
+
+  @@unique([userId, cycleId])
+}
+
+// ═══════════ NEW: Clean Commerce Models ═══════════
+
+model HeroSlide {
+  id         String   @id @default(uuid())
+  title      String
+  subtitle   String?
+  buttonText String?
+  buttonLink String?
+  imageUrl   String
+  sortOrder  Int      @default(0)
+  isActive   Boolean  @default(true)
+  createdAt  DateTime @default(now())
+}
+
+model Category {
+  id        String    @id @default(uuid())
+  name      String    @unique
+  slug      String    @unique
+  iconEmoji String?
+  imageUrl  String?
+  sortOrder Int       @default(0)
+  isActive  Boolean   @default(true)
+  products  Product[]
+}
+
+model ProductImage {
+  id        String  @id @default(uuid())
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  imageUrl  String
+  sortOrder Int     @default(0)
+}
+
+model SiteSettings {
+  id            String  @id @default(uuid())
+  companyName   String  @default("Power Vital")
+  logoUrl       String?
+  address       String?
+  phone         String?
+  email         String?
+  mapIframeCode String? @db.Text
+
+  // UI Dynamic Fields
+  topbarShippingMsg String? @default("🚚 1 000 сом üzeri siparişlerde ücretsiz kargo")
+  topbarPhone       String? @default("📞 +996 312 123 456")
+  trustBadges       Json? // Array of { id, icon, title, desc, isActive }
+  partners          Json? // Array of { id, logoUrl, name, link, isActive }
+  footerLinks       Json? // Array of { id, title, url, sortOrder }
+  copyrightText     String? @default("© 2026 Power Vital. Tüm hakları saklıdır.")
+
+  updatedAt DateTime @updatedAt
+}

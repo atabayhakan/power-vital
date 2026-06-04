@@ -1,0 +1,91 @@
+/* Power Vital — Global CSS System */
+/* Dashboard dark theme vars are scoped to .app-layout--dashboard */
+
+:root {
+  --font-main: 'Inter', system-ui, -apple-system, sans-serif;
+  --transition-smooth: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-main);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  /* Neutral — each page controls its own bg/color */
+  background: #ffffff;
+  color: #18181b;
+}
+
+/* ═══ Dashboard Dark Theme (only inside dashboard layout) ═══ */
+.app-layout--dashboard {
+  --color-bg-dark: #0f1115;
+  --color-bg-panel: rgba(25, 28, 36, 0.6);
+  --color-primary: #00d2ff;
+  --color-secondary: #3a7bd5;
+  --color-text-main: #f0f0f0;
+  --color-text-muted: #8b92a5;
+  --color-accent-success: #20d489;
+  --color-accent-danger: #f5365c;
+  --shadow-glass: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  --border-glass: 1px solid rgba(255, 255, 255, 0.05);
+
+  background-color: var(--color-bg-dark);
+  background-image: radial-gradient(circle at 15% 50%, rgba(0, 210, 255, 0.03), transparent 25%),
+                    radial-gradient(circle at 85% 30%, rgba(58, 123, 213, 0.04), transparent 25%);
+  color: var(--color-text-main);
+}
+
+/* Glassmorphism Panel — dashboard only */
+.app-layout--dashboard .glass-panel {
+  background: var(--color-bg-panel);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: var(--border-glass);
+  border-radius: 16px;
+  box-shadow: var(--shadow-glass);
+}
+
+/* Typography */
+h1, h2, h3, h4 {
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.text-gradient {
+  background: linear-gradient(90deg, var(--color-primary), var(--color-secondary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Dashboard buttons */
+.app-layout--dashboard .btn-primary {
+  background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+  color: white;
+  border: none;
+  padding: 10px 24px;
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: var(--transition-smooth);
+  box-shadow: 0 4px 15px rgba(0, 210, 255, 0.2);
+}
+
+.app-layout--dashboard .btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 210, 255, 0.4);
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.4s ease-out forwards;
+}
