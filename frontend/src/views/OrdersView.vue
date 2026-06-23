@@ -179,6 +179,35 @@ const updateStatus = async (id: string, newStatus: string) => {
   }
 };
 
+// Revert an order's progress back to the initial "pending" state so the admin
+// can re-process or delete it. We reset to 'pending' (rather than stepping one
+// status back) on purpose: 'pending' triggers no side effects, whereas
+// re-applying 'paid'/'completed' would re-run bonus/ascension logic.
+// NOTE: bonuses already awarded on earlier paid/completed transitions are NOT
+// auto-reversed — this only resets the workflow state.
+const revertOrder = (order: any) => {
+  if (order.status === 'pending') return;
+  updateStatus(order.id, 'pending');
+};
+
+// Permanently delete an order (admin only) — irreversible, hence the confirm.
+const deleteOrder = async (order: any) => {
+  const shortId = String(order.id).slice(0, 8).toUpperCase();
+  const ok = (globalThis as any).confirm?.(
+    `#${shortId} numaralı sipariş KALICI olarak silinecek. Bu işlem geri alınamaz. Devam edilsin mi?`
+  );
+  if (!ok) return;
+  try {
+    await axios.delete(`/api/v1/orders/${order.id}`, { headers: headers() });
+    orders.value = orders.value.filter(o => o.id !== order.id);
+    selectedIds.value.delete(order.id);
+    triggerToast(`Sipariş #${shortId} kalıcı olarak silindi.`);
+  } catch (e: any) {
+    console.error('Failed to delete order:', e);
+    triggerToast('Silinemedi: ' + (e?.response?.data?.error || e.message));
+  }
+};
+
 const getStatusColor = (status: string) => {
   switch (status) {
     case 'pending': return 'status-pending';
@@ -206,6 +235,36 @@ const getStatusText = (status: string) => {
 const fmtPrice = (n: any) => Math.round(Number(n)).toLocaleString('ru-RU') + ' сом';
 
 const orderCount = computed(() => orders.value.length);
+
+// ─── Order detail modal (customer view) ───────────────────────────────
+const selectedOrder = ref<any | null>(null);
+const detailLoading = ref(false);
+const detailError = ref('');
+
+const openOrder = async (id: string) => {
+  selectedOrder.value = {}; // open the modal immediately with a loading state
+  detailLoading.value = true;
+  detailError.value = '';
+  if (typeof document !== 'undefined') document.body.style.overflow = 'hidden';
+  try {
+    const res = await axios.get(`/api/v1/orders/${id}`, { headers: headers() });
+    selectedOrder.value = res.data;
+  } catch (e: any) {
+    detailError.value = e?.response?.data?.error || e.message;
+    selectedOrder.value = { __error: true };
+  } finally {
+    detailLoading.value = false;
+  }
+};
+const closeDetail = () => {
+  selectedOrder.value = null;
+  if (typeof document !== 'undefined') document.body.style.overflow = '';
+};
+const paymentLabel = (m: string) => {
+  if (m === 'cash') return t('orders.payCash');
+  if (m === 'qr_transfer') return t('orders.payTransfer');
+  return m || '—';
+};
 
 onMounted(() => fetchOrders());
 </script>
@@ -241,7 +300,15 @@ onMounted(() => fetchOrders());
     </div>
 
     <div v-else class="co-list">
-      <div v-for="order in orders" :key="order.id" class="co-order">
+      <div
+        v-for="order in orders"
+        :key="order.id"
+        class="co-order co-order--clickable"
+        role="button"
+        tabindex="0"
+        @click="openOrder(order.id)"
+        @keydown.enter="openOrder(order.id)"
+      >
         <span class="co-order__icon">🧾</span>
         <span class="co-order__main">
           <span class="co-order__id">#{{ order.id.slice(0, 8).toUpperCase() }}</span>
@@ -249,8 +316,65 @@ onMounted(() => fetchOrders());
         </span>
         <span class="co-order__status" :class="getStatusColor(order.status)">{{ statusLabel(order.status) }}</span>
         <span class="co-order__total">{{ fmtPrice(order.totalKgs) }}</span>
+        <span class="co-order__chev" aria-hidden="true">›</span>
       </div>
     </div>
+
+    <!-- ════ Order + payment detail modal ════ -->
+    <Transition name="od-fade">
+      <div v-if="selectedOrder" class="od-overlay" @click.self="closeDetail">
+        <div class="od-modal" role="dialog" aria-modal="true">
+          <button class="od-close" @click="closeDetail" :aria-label="t('orders.close')">✕</button>
+
+          <div v-if="detailLoading" class="od-state">{{ t('orders.loading') }}</div>
+          <div v-else-if="selectedOrder.__error" class="od-state od-state--err">⚠️ {{ detailError }}</div>
+
+          <template v-else>
+            <header class="od-head">
+              <h3>{{ t('orders.detailTitle') }}</h3>
+              <span class="od-id">#{{ String(selectedOrder.id).slice(0, 8).toUpperCase() }}</span>
+            </header>
+            <div class="od-meta">
+              <span class="co-order__status" :class="getStatusColor(selectedOrder.status)">{{ statusLabel(selectedOrder.status) }}</span>
+              <span class="od-date">{{ fmtDate(selectedOrder.createdAt) }}</span>
+            </div>
+
+            <!-- Products -->
+            <div class="od-section">
+              <div class="od-section__title">{{ t('orders.products') }}</div>
+              <div v-for="it in selectedOrder.items" :key="it.id" class="od-item">
+                <img v-if="it.productImage" :src="it.productImage" class="od-item__img" alt="" />
+                <div v-else class="od-item__img od-item__img--ph">📦</div>
+                <div class="od-item__info">
+                  <span class="od-item__name">{{ it.productName || '—' }}</span>
+                  <span class="od-item__sub">{{ it.quantity }} × {{ fmtPrice(it.unitPriceKgs) }}</span>
+                </div>
+                <span class="od-item__total">{{ fmtPrice(it.totalPriceKgs) }}</span>
+              </div>
+            </div>
+
+            <!-- Payment -->
+            <div class="od-section">
+              <div class="od-section__title">{{ t('checkout.paymentTitle') }}</div>
+              <div class="od-row"><span>{{ t('orders.paymentMethod') }}</span><strong>{{ paymentLabel(selectedOrder.paymentMethod) }}</strong></div>
+              <div class="od-row"><span>{{ t('orders.status') }}</span><strong>{{ selectedOrder.verifiedAt ? t('orders.paymentVerified') : t('orders.paymentPending') }}</strong></div>
+              <div v-if="selectedOrder.address" class="od-row"><span>{{ t('orders.deliveryAddress') }}</span><strong class="od-addr">{{ selectedOrder.address }}</strong></div>
+              <div class="od-row od-row--total"><span>{{ t('orders.total') }}</span><strong>{{ fmtPrice(selectedOrder.totalKgs) }}</strong></div>
+
+              <div v-if="selectedOrder.paymentMethod === 'qr_transfer'" class="od-receipt">
+                <div class="od-section__title">{{ t('orders.receipt') }}</div>
+                <a v-if="selectedOrder.receiptImageUrl" :href="selectedOrder.receiptImageUrl" target="_blank" rel="noopener noreferrer">
+                  <img :src="selectedOrder.receiptImageUrl" class="od-receipt__img" alt="receipt" />
+                </a>
+                <p v-else class="od-noreceipt">{{ t('orders.noReceipt') }}</p>
+              </div>
+            </div>
+
+            <button class="od-done" @click="closeDetail">{{ t('orders.close') }}</button>
+          </template>
+        </div>
+      </div>
+    </Transition>
    </div>
   </div>
 
@@ -384,7 +508,17 @@ onMounted(() => fetchOrders());
                   class="btn-action btn-red"
                   @click="updateStatus(order.id, 'cancelled')"
                 >İptal</button>
-                <span v-if="['completed', 'cancelled', 'refunded'].includes(order.status)" class="muted-tag">— İşlem yok</span>
+                <button
+                  v-if="order.status !== 'pending'"
+                  class="btn-action btn-amber"
+                  title="Siparişi 'Bekliyor' durumuna geri al"
+                  @click="revertOrder(order)"
+                >↩ Geri Al</button>
+                <button
+                  class="btn-action btn-dark"
+                  title="Siparişi kalıcı olarak sil (geri alınamaz)"
+                  @click="deleteOrder(order)"
+                >🗑 Sil</button>
               </div>
             </td>
           </tr>
@@ -450,6 +584,47 @@ onMounted(() => fetchOrders());
 .cust-orders .status-cancelled { background: #fee2e2; color: #b91c1c; }
 .cust-orders .status-refunded { background: #f3f4f6; color: #6b7280; }
 
+/* Clickable customer order row + chevron */
+.co-order--clickable { cursor: pointer; }
+.co-order--clickable:focus-visible { outline: 2px solid #BC4A3C; outline-offset: 2px; }
+.co-order__chev { font-size: 1.5rem; color: #c8c2b8; font-weight: 700; flex-shrink: 0; line-height: 1; margin-left: -2px; transition: transform 0.15s, color 0.15s; }
+.co-order--clickable:hover .co-order__chev { color: #BC4A3C; transform: translateX(2px); }
+
+/* ════ Order + payment detail modal ════ */
+.od-overlay { position: fixed; inset: 0; z-index: 2000; background: rgba(17,24,39,0.55); backdrop-filter: blur(3px); display: flex; align-items: center; justify-content: center; padding: 20px; }
+.od-modal { background: #fff; border-radius: 18px; width: 100%; max-width: 460px; max-height: 88vh; overflow-y: auto; padding: 24px; position: relative; box-shadow: 0 24px 60px rgba(0,0,0,0.25); -webkit-overflow-scrolling: touch; }
+.od-close { position: absolute; top: 14px; right: 14px; width: 32px; height: 32px; border: none; background: #f3f0ea; color: #6b7280; border-radius: 50%; font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+.od-close:hover { background: #e7e2d8; color: #1f2937; }
+.od-state { padding: 40px 0; text-align: center; color: #9ca3af; }
+.od-state--err { color: #b91c1c; }
+.od-head { display: flex; align-items: baseline; gap: 10px; margin: 0 0 4px; flex-wrap: wrap; padding-right: 32px; }
+.od-head h3 { font-family: 'Outfit', sans-serif; font-size: 1.3rem; font-weight: 800; margin: 0; color: #111827; }
+.od-id { font-family: monospace; font-size: 0.82rem; color: #9ca3af; }
+.od-meta { display: flex; align-items: center; gap: 10px; margin-bottom: 18px; }
+.od-date { font-size: 0.85rem; color: #6b7280; }
+.od-section { border-top: 1px solid #f0ece4; padding-top: 14px; margin-top: 14px; }
+.od-section:first-of-type { border-top: none; padding-top: 0; margin-top: 0; }
+.od-section__title { font-size: 0.72rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; color: #9ca3af; margin-bottom: 10px; }
+.od-item { display: flex; align-items: center; gap: 12px; padding: 8px 0; }
+.od-item__img { width: 44px; height: 44px; border-radius: 10px; object-fit: cover; background: #f7f4ef; flex-shrink: 0; }
+.od-item__img--ph { display: flex; align-items: center; justify-content: center; font-size: 1.2rem; }
+.od-item__info { display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 0; }
+.od-item__name { font-weight: 700; color: #1f2937; font-size: 0.92rem; }
+.od-item__sub { font-size: 0.8rem; color: #9ca3af; }
+.od-item__total { font-weight: 800; color: #1f2937; font-size: 0.92rem; flex-shrink: 0; }
+.od-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; padding: 7px 0; font-size: 0.9rem; color: #6b7280; }
+.od-row strong { color: #1f2937; font-weight: 700; text-align: right; }
+.od-addr { font-weight: 600 !important; max-width: 60%; }
+.od-row--total { border-top: 1px dashed #e5e1d8; margin-top: 6px; padding-top: 12px; font-size: 1.05rem; }
+.od-row--total strong { color: #BC4A3C; font-size: 1.1rem; }
+.od-receipt { margin-top: 14px; }
+.od-receipt__img { width: 100%; max-height: 320px; object-fit: contain; border-radius: 12px; border: 1px solid #ececec; background: #faf9f6; cursor: zoom-in; }
+.od-noreceipt { color: #9ca3af; font-size: 0.85rem; margin: 0; }
+.od-done { width: 100%; margin-top: 20px; padding: 13px; border: none; border-radius: 12px; background: linear-gradient(135deg, #D4665A, #BC4A3C); color: #fff; font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 0.95rem; cursor: pointer; }
+.od-done:hover { filter: brightness(1.05); }
+.od-fade-enter-active, .od-fade-leave-active { transition: opacity 0.2s ease; }
+.od-fade-enter-from, .od-fade-leave-to { opacity: 0; }
+
 @media (max-width: 560px) {
   .cust-orders__inner { padding: 20px 16px 48px; }
   .co-title { font-size: 1.5rem; }
@@ -512,6 +687,10 @@ onMounted(() => fetchOrders());
 .btn-green:hover { background: #16a34a; }
 .btn-red { background: #ef4444; }
 .btn-red:hover { background: #dc2626; }
+.btn-amber { background: #f59e0b; }
+.btn-amber:hover { background: #d97706; }
+.btn-dark { background: #4b5563; }
+.btn-dark:hover { background: #b91c1c; }
 .empty-state { text-align: center; padding: 40px !important; color: var(--color-text-muted); }
 
 .btn-primary {

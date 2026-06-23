@@ -333,7 +333,18 @@
     "shipped": "Kargolandı",
     "completed": "Tamamlandı",
     "cancelled": "İptal",
-    "refunded": "İade"
+    "refunded": "İade",
+    "detailTitle": "Sipariş Detayı",
+    "products": "Ürünler",
+    "paymentMethod": "Ödeme Yöntemi",
+    "payCash": "Nakit",
+    "payTransfer": "Banka Havalesi / QR",
+    "receipt": "Dekont",
+    "noReceipt": "Dekont yüklenmedi",
+    "deliveryAddress": "Teslimat Adresi",
+    "paymentVerified": "Ödeme onaylandı",
+    "paymentPending": "Ödeme bekleniyor",
+    "close": "Kapat"
   },
   "wallet": {
     "title": "Cüzdan & Ödüller",

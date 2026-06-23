@@ -333,7 +333,18 @@
     "shipped": "Жөнөтүлдү",
     "completed": "Аяктады",
     "cancelled": "Жокко чыгарылды",
-    "refunded": "Кайтарылды"
+    "refunded": "Кайтарылды",
+    "detailTitle": "Буйрутма чоо-жайы",
+    "products": "Товарлар",
+    "paymentMethod": "Төлөм ыкмасы",
+    "payCash": "Накталай",
+    "payTransfer": "Банк которуу / QR",
+    "receipt": "Квитанция",
+    "noReceipt": "Квитанция жүктөлгөн эмес",
+    "deliveryAddress": "Жеткирүү дареги",
+    "paymentVerified": "Төлөм ырасталды",
+    "paymentPending": "Төлөм күтүлүүдө",
+    "close": "Жабуу"
   },
   "wallet": {
     "title": "Капчык жана Сыйлыктар",

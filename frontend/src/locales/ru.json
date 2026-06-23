@@ -333,7 +333,18 @@
     "shipped": "Отправлен",
     "completed": "Выполнен",
     "cancelled": "Отменён",
-    "refunded": "Возврат"
+    "refunded": "Возврат",
+    "detailTitle": "Детали заказа",
+    "products": "Товары",
+    "paymentMethod": "Способ оплаты",
+    "payCash": "Наличные",
+    "payTransfer": "Банковский перевод / QR",
+    "receipt": "Квитанция",
+    "noReceipt": "Квитанция не загружена",
+    "deliveryAddress": "Адрес доставки",
+    "paymentVerified": "Оплата подтверждена",
+    "paymentPending": "Ожидает оплаты",
+    "close": "Закрыть"
   },
   "wallet": {
     "title": "Кошелёк и Награды",
