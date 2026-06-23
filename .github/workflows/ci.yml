@@ -1,0 +1,221 @@
+name: CI
+
+# What runs on every push / PR:
+#   1. Backend: install, prisma generate, lint (tsc), unit tests (vitest)
+#   2. Frontend: install, type-check, build
+#   3. Audit: dependency scan (npm audit) — non-blocking warning
+#
+# The unit tests are split into:
+#   - "db-free" — everything that doesn't need MySQL (logger, openapi,
+#     image, search, backup). Runs on every PR.
+#   - "integration" — tests that need a real DB. Run only when the
+#     `integration` job's MySQL service is up (still always; just slower).
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+# Cancel in-progress runs for the same branch on a new push
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  NODE_VERSION: '20'
+
+jobs:
+  # ───────────────────────────────────────────────────────────────────────
+  # Backend
+  # ───────────────────────────────────────────────────────────────────────
+  backend:
+    name: Backend (lint + test)
+    runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: pv_test
+          MYSQL_USER: pv_test
+          MYSQL_PASSWORD: pv_test_pw
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -u root -proot"
+          --health-interval=5s
+          --health-timeout=5s
+          --health-retries=20
+
+    defaults:
+      run:
+        working-directory: backend
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Prisma generate
+        env:
+          DATABASE_URL: 'mysql://pv_test:pv_test_pw@127.0.0.1:3306/pv_test'
+        run: npx prisma generate
+
+      - name: Apply schema (test DB)
+        env:
+          DATABASE_URL: 'mysql://pv_test:pv_test_pw@127.0.0.1:3306/pv_test'
+        run: npx prisma db push --skip-generate --accept-data-loss
+
+      - name: Apply FULLTEXT migration
+        env:
+          DATABASE_URL: 'mysql://pv_test:pv_test_pw@127.0.0.1:3306/pv_test'
+        run: npx prisma db execute --file prisma/migrations/add_fulltext_search.sql --schema prisma/schema.prisma
+
+      - name: Apply PushSubscription migration
+        env:
+          DATABASE_URL: 'mysql://pv_test:pv_test_pw@127.0.0.1:3306/pv_test'
+        run: npx prisma db execute --file prisma/migrations/add_push_subscriptions.sql --schema prisma/schema.prisma
+
+      - name: Apply BroadcastLog migration
+        env:
+          DATABASE_URL: 'mysql://pv_test:pv_test_pw@127.0.0.1:3306/pv_test'
+        run: npx prisma db execute --file prisma/migrations/add_broadcast_log.sql --schema prisma/schema.prisma
+
+      - name: Verify schema (sanity)
+        env:
+          DATABASE_URL: 'mysql://pv_test:pv_test_pw@127.0.0.1:3306/pv_test'
+        run: |
+          mysql -h 127.0.0.1 -u pv_test -ppv_test_pw pv_test -e \
+            "SHOW TABLES LIKE 'PushSubscription'; SHOW TABLES LIKE 'BroadcastLog'; SHOW INDEX FROM BroadcastLog;" 2>&1 | head -30
+
+      - name: TypeScript check
+        run: npx tsc --noEmit --skipLibCheck
+
+      # DB-free tests run on every PR. Integration tests (auth, checkout,
+      # ocr, i18n) require a real MySQL and live in the dedicated
+      # `backend-integration.yml` workflow — see its `pull_request`
+      # trigger for the file paths that pull it into PR checks.
+      - name: Run unit tests (DB-free)
+        env:
+          NODE_ENV: test
+        run: npm run test:unit -- --reporter=verbose
+
+      - name: Build (compile check)
+        env:
+          DATABASE_URL: 'mysql://user:pass@127.0.0.1:3306/dummy'
+        run: npx tsc --noEmit
+        # Real production build is `npx tsc` (compile to dist/) — skipped in CI
+        # because it produces a 1MB+ artifact and our smoke test is just
+        # type-check + tests.
+
+      - name: Upload coverage (optional)
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage
+          path: backend/coverage
+          retention-days: 7
+
+  # ───────────────────────────────────────────────────────────────────────
+  # Frontend
+  # ───────────────────────────────────────────────────────────────────────
+  frontend:
+    name: Frontend (type-check + test + build)
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: frontend
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: TypeScript check
+        run: npx vue-tsc --noEmit -p tsconfig.json
+
+      # Unit + component tests (Vitest + happy-dom)
+      # No network, no DB — runs in <30s. Blocks PR merge on failure.
+      - name: Unit tests (Vitest)
+        run: npx vitest run --reporter=verbose
+
+      - name: Upload coverage report (Vitest)
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-coverage
+          path: frontend/coverage
+          retention-days: 7
+
+      # i18n parity audit — fails CI if any locale drops below 100% coverage.
+      # Cheap (no DB, no network); runs after unit tests so a JSON parse error
+      # in a locale file shows up here first.
+      - name: i18n coverage audit
+        run: npx tsx scripts/audit-i18n.ts
+
+      - name: Upload i18n report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: i18n-coverage
+          path: frontend/i18n-coverage.json
+          retention-days: 7
+
+      - name: Build
+        env:
+          VITE_API_URL: 'http://localhost:3000/api/v1'
+        run: npm run build
+
+      # Bundle-budget gating — fails CI if main / quill / PageBuilder
+      # chunks grow past their gzip budgets. Run AFTER the build so we
+      # can read the actual emitted asset sizes.
+      - name: Dist smoke test (sizes + routes + cache headers)
+        run: npm run smoke:dist
+
+      - name: Upload dist (optional artifact)
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-dist
+          path: frontend/dist
+          retention-days: 7
+
+  # ───────────────────────────────────────────────────────────────────────
+  # Dependency audit (advisory, doesn't fail the build)
+  # ───────────────────────────────────────────────────────────────────────
+  audit:
+    name: Dependency audit
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - name: Backend audit
+        working-directory: backend
+        run: npm audit --audit-level=high || true
+      - name: Frontend audit
+        working-directory: frontend
+        run: npm audit --audit-level=high || true

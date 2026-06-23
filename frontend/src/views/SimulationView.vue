@@ -62,7 +62,6 @@ const chartGradient = computed(() => {
   
   const fsPct = (fastStartPayout.value / totalCalculatedPayout.value) * 100;
   const unPct = (unilevelPayout.value / totalCalculatedPayout.value) * 100;
-  const odPct = (overdrivePayout.value / totalCalculatedPayout.value) * 100;
   
   return `conic-gradient(
     #ef4444 0% ${fsPct}%, 
@@ -71,9 +70,30 @@ const chartGradient = computed(() => {
   )`;
 });
 
+const isApplying = ref(false);
 const saveConfig = async () => {
-  // Normally this would POST to /api/v1/system/config
-  alert('Simülasyon ayarları gerçek sisteme (Redis & DB) kaydedildi! (Demo)');
+  if (!confirm('Bu simülasyon ayarlarını CANLI sisteme uygulamak istediğinize emin misiniz? Gerçek bonus hesaplamaları bu değerleri kullanacaktır.')) {
+    return;
+  }
+  isApplying.value = true;
+  try {
+    await axios.put('/api/v1/system/config', {
+      isFastStartActive: isFastStartActive.value,
+      fastStartRates: JSON.stringify(fastStartRates.value),
+      isUnilevelActive: isUnilevelActive.value,
+      unilevelRates: JSON.stringify(unilevelRates.value),
+      isOverdriveActive: isOverdriveActive.value,
+      overdrivePoolPct: Number(overdrivePoolPct.value),
+      maxPayoutLimitPct: Number(maxPayoutLimitPct.value)
+    }, { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
+    alert('✅ Ayarlar canlı sisteme başarıyla uygulandı.');
+  } catch (e: any) {
+    console.error('Apply config error:', e);
+    const msg = e?.response?.data?.error || e?.message || 'Bilinmeyen hata';
+    alert('❌ Ayarlar uygulanamadı: ' + msg);
+  } finally {
+    isApplying.value = false;
+  }
 };
 
 const closeWeek = async () => {
@@ -151,7 +171,7 @@ const closeWeek = async () => {
             </label>
           </div>
           <div v-if="isFastStartActive" class="rates-inputs">
-            <div v-for="(rate, idx) in fastStartRates" :key="'fs'+idx" class="rate-box">
+            <div v-for="(_, idx) in fastStartRates" :key="'fs'+idx" class="rate-box">
               <small>{{ idx + 1 }}. Derinlik</small>
               <input type="number" v-model.number="fastStartRates[idx]" min="0" max="100" />
             </div>
@@ -168,7 +188,7 @@ const closeWeek = async () => {
             </label>
           </div>
           <div v-if="isUnilevelActive" class="rates-inputs">
-            <div v-for="(rate, idx) in unilevelRates" :key="'un'+idx" class="rate-box">
+            <div v-for="(_, idx) in unilevelRates" :key="'un'+idx" class="rate-box">
               <small>{{ idx + 1 }}. Derinlik</small>
               <input type="number" v-model.number="unilevelRates[idx]" min="0" max="100" />
             </div>
@@ -210,13 +230,13 @@ const closeWeek = async () => {
         </div>
 
         <div class="chart-section">
-          <div class="pie-chart" :style="{ background: chartGradient }"></div>
+          <div class="pie-chart" :style="{ background: chartGradient }"/>
           <div class="legend">
-            <div class="legend-item"><span class="dot" style="background:#ef4444;"></span> Hızlı Başlangıç (${{ fastStartPayout.toLocaleString() }})</div>
-            <div class="legend-item"><span class="dot" style="background:#3b82f6;"></span> Unilevel (${{ unilevelPayout.toLocaleString() }})</div>
-            <div class="legend-item"><span class="dot" style="background:#eab308;"></span> Overdrive Havuzu (${{ overdrivePayout.toLocaleString() }})</div>
+            <div class="legend-item"><span class="dot" style="background:#ef4444;"/> Hızlı Başlangıç (${{ fastStartPayout.toLocaleString() }})</div>
+            <div class="legend-item"><span class="dot" style="background:#3b82f6;"/> Unilevel (${{ unilevelPayout.toLocaleString() }})</div>
+            <div class="legend-item"><span class="dot" style="background:#eab308;"/> Overdrive Havuzu (${{ overdrivePayout.toLocaleString() }})</div>
             <div class="legend-item" v-if="isSecurityLockActive && isLockBreached">
-               <span class="dot" style="background:#999;"></span> <em>Tıraşlanan Miktar (${{ (totalCalculatedPayout - finalPayout).toLocaleString() }})</em>
+               <span class="dot" style="background:#999;"/> <em>Tıraşlanan Miktar (${{ (totalCalculatedPayout - finalPayout).toLocaleString() }})</em>
             </div>
           </div>
         </div>
@@ -232,6 +252,15 @@ const closeWeek = async () => {
   display: flex;
   flex-direction: column;
   gap: 24px;
+  color: #fff;
+  /* 🛡️ Scroll fix — admin layout (App.vue) is 100vh flex with overflow:hidden
+     on .main-content. Without our own scroll container the long simulation
+     page (network graph + sliders) gets clipped at the bottom. */
+  height: 100vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-gutter: stable;
+  box-sizing: border-box;
 }
 
 .header-row {

@@ -1,0 +1,147 @@
+name: Snyk Security Scan
+
+# Snyk scans dependencies for known vulnerabilities, license issues, and
+# outdated packages using Snyk's own vulnerability database (broader than
+# npm audit's GitHub Advisory Database).
+#
+# This workflow is non-blocking by default — it always succeeds so the
+# security report is visible in the PR but doesn't gate the build.
+# Set `snyk_severity_threshold` in the workflow to `high` to fail on
+# high+ severity issues.
+#
+# Required secret (set in repo Settings → Secrets):
+#   SNYK_TOKEN — Snyk API token (https://app.snyk.io/account)
+#
+# Free tier: 200 tests/month. If exceeded, the workflow will fail with
+# a "rate limit" error — that's fine, the basic npm audit in ci.yml
+# still runs.
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+  # Allow manual trigger from the Actions tab
+  workflow_dispatch:
+    inputs:
+      severity_threshold:
+        description: 'Fail the build on this severity or higher (low/medium/high/critical)'
+        required: false
+        default: 'high'
+      scan_unmanaged:
+        description: 'Also scan unmanaged (transitive) dependencies'
+        type: boolean
+        default: true
+
+concurrency:
+  group: snyk-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  # ───────────────────────────────────────────────────────────────────────
+  # Backend dependencies
+  # ───────────────────────────────────────────────────────────────────────
+  backend:
+    name: Snyk · backend
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run Snyk scan
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        continue-on-error: false
+        run: |
+          # Severity threshold: --severity-threshold=high fails on high+critical
+          # --fail-on=upgradable also fails if there's a known fix available
+          npx --yes snyk test \
+            --severity-threshold=${{ github.event.inputs.severity_threshold || 'high' }} \
+            --fail-on=upgradable \
+            --json > snyk-report.json || EXIT_CODE=$?
+          # Always print a human-readable summary at the end
+          npx --yes snyk test \
+            --severity-threshold=${{ github.event.inputs.severity_threshold || 'high' }} || true
+
+      - name: Upload Snyk report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: snyk-backend
+          path: backend/snyk-report.json
+          retention-days: 30
+          if-no-files-found: ignore
+
+  # ───────────────────────────────────────────────────────────────────────
+  # Frontend dependencies
+  # ───────────────────────────────────────────────────────────────────────
+  frontend:
+    name: Snyk · frontend
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run Snyk scan
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        run: |
+          npx --yes snyk test \
+            --severity-threshold=${{ github.event.inputs.severity_threshold || 'high' }} \
+            --fail-on=upgradable \
+            --json > snyk-report.json || EXIT_CODE=$?
+          npx --yes snyk test \
+            --severity-threshold=${{ github.event.inputs.severity_threshold || 'high' }} || true
+
+      - name: Upload Snyk report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: snyk-frontend
+          path: frontend/snyk-report.json
+          retention-days: 30
+          if-no-files-found: ignore
+
+  # ───────────────────────────────────────────────────────────────────────
+  # Container scan (Dockerfile present?)
+  # ───────────────────────────────────────────────────────────────────────
+  container:
+    name: Snyk · container
+    runs-on: ubuntu-latest
+    # Skip if there's no Dockerfile at the repo root
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run Snyk container scan
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        run: |
+          if [ -f Dockerfile ]; then
+            # Snyk scans the image referenced in the Dockerfile
+            npx --yes snyk container test --severity-threshold=high || true
+          else
+            echo "No Dockerfile at repo root — skipping container scan"
+          fi

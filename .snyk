@@ -1,0 +1,39 @@
+# Snyk policy file
+# https://docs.snyk.io/manage-issues/policies/the-.snyk-file
+#
+# Use this to:
+#   1. Ignore vulnerabilities that the team has reviewed and accepted
+#   2. Patch SNYK-upgradable issues automatically (via PR)
+#   3. Set the global severity threshold for alerts
+#
+# Project ID is set automatically when you run `snyk monitor` the first
+# time (creates a project in the Snyk dashboard for continuous monitoring).
+# Once you have a project ID, add it below so `snyk test` in CI syncs with
+# the dashboard.
+
+# To find your project ID, run:
+#   npx snyk test (and look for "Project: <id>")
+#   OR: Settings → General → Project ID in the Snyk dashboard
+
+project-settings:
+  # Uncomment + paste your project ID once you have one:
+  # project-id: "abc12345-6789-..."
+
+# Patchable vulnerabilities — Snyk will open a PR if possible
+# patch: {}
+
+# Vulnerability ignores — use ONLY for accepted risks.
+# Each ignore has a unique ID (Snyk vulnerability ID like "SNYK-JS-XXXXX-XXXXX")
+# and a clear expiry. We ignore nothing by default.
+ignore:
+  # Example: ignore a dev-only vulnerability for 90 days
+  # 'SNYK-JS-EXAMPLE-1234567':
+  #   - '*':
+  #     reason: 'Dev-only tool, not shipped to production'
+  #     expires: '2025-12-31T00:00:00.000Z'
+  #     created: '2025-10-01T00:00:00.000Z'
+
+# Language-level settings
+org-settings:
+  # Severity threshold for the org (the workflow file overrides this)
+  # severity-threshold: medium

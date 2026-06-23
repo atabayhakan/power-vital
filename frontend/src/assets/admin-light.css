@@ -1,0 +1,605 @@
+/* ═══ ADMIN LIGHT MODE OVERRIDES ═══ */
+
+.admin-light-mode.app-layout--dashboard {
+  background-color: #F8F9FA !important;
+  color: #1F2937 !important;
+}
+
+/* Sidebar Light */
+.admin-light-mode .sidebar {
+  background: rgba(255, 255, 255, 0.85) !important;
+  border-right: 1px solid rgba(0, 0, 0, 0.05) !important;
+}
+.admin-light-mode .sidebar .brand-text { color: #1F2937 !important; }
+.admin-light-mode .sidebar .nav-section-title { color: #6B7280 !important; }
+.admin-light-mode .sidebar .nav-item { color: #4B5563 !important; border: 1px solid transparent !important; }
+.admin-light-mode .sidebar .nav-item:hover, 
+.admin-light-mode .sidebar .nav-item.active {
+  background: rgba(188, 74, 60, 0.08) !important;
+  color: var(--pv-red) !important;
+  border: 1px solid rgba(188, 74, 60, 0.1) !important;
+}
+.admin-light-mode .sidebar .logout-btn { color: #4B5563 !important; }
+.admin-light-mode .sidebar .logout-btn:hover { color: var(--pv-red) !important; background: rgba(188, 74, 60, 0.08) !important; }
+
+/* Dashboard Content */
+.admin-light-mode .page-title { color: #111827 !important; }
+
+.admin-light-mode .glass-panel,
+.admin-light-mode .bento-box {
+  background: rgba(255, 255, 255, 0.8) !important;
+  border: 1px solid rgba(0, 0, 0, 0.06) !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.02) !important;
+  color: #1F2937 !important;
+}
+
+.admin-light-mode .glass-panel::before,
+.admin-light-mode .bento-box::before {
+  display: none !important; /* Hide the dark top-glow line */
+}
+
+/* Typography & Labels */
+.admin-light-mode h2,
+.admin-light-mode h3 {
+  color: #111827 !important;
+}
+
+.admin-light-mode .stat-label { color: #6B7280 !important; }
+.admin-light-mode .stat-value { color: #111827 !important; }
+.admin-light-mode .currency { color: #4B5563 !important; }
+
+/* Buttons */
+.admin-light-mode .action-btn,
+.admin-light-mode .btn-glass,
+.admin-light-mode .btn-secondary {
+  background: #FFFFFF !important;
+  border: 1px solid #E5E7EB !important;
+  color: #374151 !important;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.02) !important;
+}
+.admin-light-mode .action-btn:hover,
+.admin-light-mode .btn-glass:hover,
+.admin-light-mode .btn-secondary:hover {
+  background: #F3F4F6 !important;
+  border-color: #D1D5DB !important;
+}
+
+/* Tables */
+.admin-light-mode table { width: 100%; border-collapse: separate; border-spacing: 0; }
+.admin-light-mode table th {
+  background: #F9FAFB !important;
+  color: #6B7280 !important;
+  border-bottom: 1px solid #E5E7EB !important;
+  padding: 14px 16px !important;
+  font-weight: 600 !important;
+  font-size: 0.85rem !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.5px !important;
+}
+.admin-light-mode table td {
+  border-bottom: 1px solid #F3F4F6 !important;
+  color: #1F2937 !important;
+  padding: 16px !important;
+  font-size: 0.95rem !important;
+}
+.admin-light-mode table tr:hover td {
+  background: rgba(0,0,0,0.01) !important;
+}
+.admin-light-mode table .empty-state { color: #6B7280 !important; }
+
+/* Form Elements */
+.admin-light-mode input,
+.admin-light-mode select,
+.admin-light-mode textarea,
+.admin-light-mode .glass-input {
+  background: #FFFFFF !important;
+  border: 1px solid #D1D5DB !important;
+  color: #1F2937 !important;
+}
+.admin-light-mode input:focus,
+.admin-light-mode select:focus,
+.admin-light-mode textarea:focus,
+.admin-light-mode .glass-input:focus {
+  border-color: var(--pv-red-light) !important;
+  box-shadow: 0 0 0 3px rgba(188, 74, 60, 0.1) !important;
+}
+.admin-light-mode label { color: #4B5563 !important; font-weight: 600 !important; }
+
+/* Status Badges */
+.admin-light-mode .status-badge {
+  font-weight: 600 !important;
+}
+
+/* Quick Fixes for specific elements */
+.admin-light-mode .last-sync { color: #6B7280 !important; }
+.admin-light-mode .alert-item { background: #FFFFFF !important; border: 1px solid #E5E7EB !important; }
+.admin-light-mode .alert-content p { color: #4B5563 !important; }
+
+/* Customer AccountView Overrides */
+.admin-light-mode .gradient-text { background: none !important; -webkit-text-fill-color: initial !important; color: #111827 !important; }
+.admin-light-mode .welcome-text { color: #4B5563 !important; }
+.admin-light-mode .welcome-text .highlight { color: #111827 !important; }
+.admin-light-mode .widget-header h3 { color: #111827 !important; }
+.admin-light-mode .btn-link { color: var(--pv-red) !important; }
+.admin-light-mode .empty-icon { opacity: 0.2 !important; color: #111827 !important; }
+.admin-light-mode .empty-state p { color: #4B5563 !important; }
+.admin-light-mode .order-item { background: #FFFFFF !important; border: 1px solid #E5E7EB !important; box-shadow: 0 2px 4px rgba(0,0,0,0.02) !important; }
+.admin-light-mode .hover-lift:hover { background: #F9FAFB !important; border-color: #D1D5DB !important; }
+.admin-light-mode .order-icon { background: #F3F4F6 !important; }
+.admin-light-mode .order-date { color: #111827 !important; }
+.admin-light-mode .order-id { color: #6B7280 !important; }
+.admin-light-mode .order-total { color: #111827 !important; }
+.admin-light-mode .order-total .currency { color: #6B7280 !important; }
+.admin-light-mode .info-group label { color: #4B5563 !important; }
+
+/* Additional Customer Dashboard Overrides */
+.admin-light-mode .target-level { color: #111827 !important; }
+.admin-light-mode .progress-text { color: #4B5563 !important; }
+.admin-light-mode .glow-text { color: var(--pv-red) !important; text-shadow: none !important; }
+.admin-light-mode .form-group label { color: #4B5563 !important; font-weight: 600 !important; }
+.admin-light-mode .select-input option { background: #fff !important; color: #111827 !important; }
+.admin-light-mode .success-message p { color: #4B5563 !important; }
+.admin-light-mode .faq-item strong { color: #111827 !important; }
+.admin-light-mode .faq-item p { color: #4B5563 !important; }
+.admin-light-mode .emoji-icon { border-color: #E5E7EB !important; background: #FFFFFF !important; }
+.admin-light-mode .progress-bar-bg { background: #E5E7EB !important; border-color: #D1D5DB !important; }
+.admin-light-mode .level-0 { background: #F3F4F6 !important; color: #111827 !important; border-color: #D1D5DB !important; }
+
+/* PageManageView Overrides */
+.admin-light-mode .page-manage-view .header-section h1 { color: #111827 !important; }
+.admin-light-mode .page-manage-view .subtitle { color: #6B7280 !important; }
+.admin-light-mode .page-manage-view .modern-table th { color: #6B7280 !important; border-bottom-color: #E5E7EB !important; background: #F9FAFB !important; }
+.admin-light-mode .page-manage-view .modern-table td { border-color: #E5E7EB !important; background: #FFFFFF !important; }
+.admin-light-mode .page-manage-view .modern-table tbody tr:hover td { background: #F9FAFB !important; }
+.admin-light-mode .page-manage-view .text-white { color: #111827 !important; }
+.admin-light-mode .page-manage-view .mono-text { color: #4B5563 !important; }
+.admin-light-mode .page-manage-view .icon-btn { color: #4B5563 !important; background: #F3F4F6 !important; border: 1px solid #E5E7EB !important; }
+.admin-light-mode .page-manage-view .icon-btn:hover { color: #111827 !important; background: #E5E7EB !important; }
+.admin-light-mode .page-manage-view .icon-btn.delete-btn:hover { color: #EF4444 !important; background: rgba(239, 68, 68, 0.1) !important; }
+.admin-light-mode .page-manage-view .form-group label { color: #374151 !important; }
+.admin-light-mode .page-manage-view .help-text { color: #6B7280 !important; }
+.admin-light-mode .page-manage-view .info-card { background: #F3F4F6 !important; border: 1px solid #E5E7EB !important; }
+.admin-light-mode .page-manage-view .info-card h4 { color: #111827 !important; }
+.admin-light-mode .page-manage-view .info-card p { color: #4B5563 !important; }
+.admin-light-mode .page-manage-view .editor-header h2 { color: #111827 !important; }
+.admin-light-mode .page-manage-view .dark-inset { background: #FFFFFF !important; border: 1px solid #E5E7EB !important; box-shadow: 0 2px 4px rgba(0,0,0,0.02) !important; color: #111827 !important; }
+.admin-light-mode .page-manage-view .empty-state { color: #6B7280 !important; }
+
+/* AdminDashboard Overrides */
+.admin-light-mode .dashboard-content .page-title { color: #111827 !important; }
+.admin-light-mode .dashboard-content .last-sync { color: #6B7280 !important; }
+.admin-light-mode .dashboard-content .action-btn { background: #FFFFFF !important; border: 1px solid #E5E7EB !important; color: #111827 !important; box-shadow: 0 1px 2px rgba(0,0,0,0.05) !important; }
+.admin-light-mode .dashboard-content .action-btn:hover { background: #F9FAFB !important; }
+.admin-light-mode .dashboard-content .kpi-title { color: #4B5563 !important; }
+.admin-light-mode .dashboard-content .kpi-icon { background: #F3F4F6 !important; color: #111827 !important; }
+.admin-light-mode .dashboard-content .kpi-val { color: #111827 !important; }
+.admin-light-mode .dashboard-content .kpi-val span { color: #6B7280 !important; }
+.admin-light-mode .dashboard-content .kpi-sub { color: #6B7280 !important; }
+.admin-light-mode .dashboard-content .kpi-sub strong { color: #111827 !important; }
+.admin-light-mode .dashboard-content .panel-header h2 { color: #111827 !important; }
+.admin-light-mode .dashboard-content .alert-item { background: #FFFFFF !important; border: 1px solid #E5E7EB !important; }
+.admin-light-mode .dashboard-content .alert-content strong { color: #111827 !important; }
+.admin-light-mode .dashboard-content .alert-content p { color: #4B5563 !important; }
+.admin-light-mode .dashboard-content .alert-action { background: #F3F4F6 !important; color: #4B5563 !important; border: 1px solid #E5E7EB !important; }
+.admin-light-mode .dashboard-content .alert-action:hover { background: #E5E7EB !important; color: #111827 !important; }
+.admin-light-mode .dashboard-content .glass-panel { background: #FFFFFF !important; border: 1px solid #E5E7EB !important; box-shadow: 0 2px 4px rgba(0,0,0,0.02) !important; }
+.admin-light-mode .dashboard-content .modern-table th { color: #6B7280 !important; border-bottom-color: #E5E7EB !important; background: #F9FAFB !important; }
+.admin-light-mode .dashboard-content .modern-table td { border-color: #E5E7EB !important; background: #FFFFFF !important; }
+.admin-light-mode .dashboard-content .modern-table tbody tr:hover td { background: #F9FAFB !important; }
+.admin-light-mode .dashboard-content .mono-text { color: #4B5563 !important; }
+.admin-light-mode .dashboard-content .font-medium { color: #374151 !important; }
+.admin-light-mode .dashboard-content .text-white { color: #111827 !important; }
+.admin-light-mode .dashboard-content .text-muted { color: #6B7280 !important; }
+.admin-light-mode .dashboard-content .empty-state { color: #6B7280 !important; background: #F9FAFB !important; border: 1px dashed #E5E7EB !important; }
+
+/* OrdersView Overrides */
+.admin-light-mode .orders-content .panel { background-color: #FFFFFF !important; border: 1px solid #E5E7EB !important; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05) !important; }
+.admin-light-mode .orders-content .orders-table th { background: #F9FAFB !important; color: #6B7280 !important; border-bottom: 1px solid #E5E7EB !important; }
+.admin-light-mode .orders-content .orders-table td { border-bottom: 1px solid #F3F4F6 !important; color: #1F2937 !important; }
+.admin-light-mode .orders-content .orders-table tbody tr:hover { background: #F9FAFB !important; }
+.admin-light-mode .orders-content .orders-table .text-white { color: #111827 !important; }
+.admin-light-mode .orders-content .orders-table .order-id { color: #4B5563 !important; }
+.admin-light-mode .orders-content .filter-tabs { background: #F3F4F6 !important; border: 1px solid #E5E7EB !important; }
+.admin-light-mode .orders-content .filter-tab { color: #6B7280 !important; }
+.admin-light-mode .orders-content .filter-tab.active { background: #FFFFFF !important; color: #BC4A3C !important; box-shadow: 0 1px 2px rgba(0,0,0,0.05), inset 0 0 0 1px rgba(188,74,60,0.3) !important; }
+.admin-light-mode .orders-content .filter-tab:hover:not(.active) { background: #E5E7EB !important; color: #111827 !important; }
+.admin-light-mode .orders-content .empty-state { color: #6B7280 !important; }
+.admin-light-mode .orders-content .subtitle { color: #6B7280 !important; }
+
+/* =========================================================
+   GLOBAL DASHBOARD OVERRIDES FOR LIGHT MODE
+   Applied to all views (Orders, Finance, Products, etc.)
+   ========================================================= */
+
+/* Panels */
+.admin-light-mode .panel,
+.admin-light-mode .glass-panel,
+.admin-light-mode .bento-box {
+  background-color: #FFFFFF !important;
+  border: 1px solid #E5E7EB !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03) !important;
+  color: #111827 !important;
+}
+
+.admin-light-mode .panel::before,
+.admin-light-mode .glass-panel::before,
+.admin-light-mode .bento-box::before {
+  display: none !important;
+}
+
+/* Tables */
+.admin-light-mode .modern-table th,
+.admin-light-mode .admin-data-table th,
+.admin-light-mode .data-table th {
+  background: #F9FAFB !important;
+  color: #6B7280 !important;
+  border-bottom: 1px solid #E5E7EB !important;
+}
+
+.admin-light-mode .modern-table td,
+.admin-light-mode .admin-data-table td,
+.admin-light-mode .data-table td {
+  border: none !important;
+  border-bottom: 1px solid #F3F4F6 !important;
+  background: #FFFFFF !important;
+  color: #1F2937 !important;
+}
+
+.admin-light-mode .modern-table tbody tr:hover td,
+.admin-light-mode .admin-data-table tbody tr:hover td,
+.admin-light-mode .data-table tbody tr:hover td,
+.admin-light-mode .admin-data-table tbody tr:hover,
+.admin-light-mode .data-table tbody tr:hover {
+  background: #F9FAFB !important;
+}
+
+/* Typography */
+.admin-light-mode .text-white { color: #111827 !important; }
+.admin-light-mode .text-muted { color: #6B7280 !important; }
+.admin-light-mode .text-warn { color: #D97706 !important; }
+.admin-light-mode .mono-text { color: #4B5563 !important; }
+.admin-light-mode .font-bold.text-white { color: #111827 !important; }
+.admin-light-mode .subtitle { color: #6B7280 !important; }
+
+/* Empty States */
+.admin-light-mode .empty-state {
+  color: #6B7280 !important;
+  background: #F9FAFB !important;
+  border: 1px dashed #E5E7EB !important;
+  border-radius: 12px;
+}
+.admin-light-mode .empty-state p { color: #6B7280 !important; }
+
+/* Insets and Info Badges */
+.admin-light-mode .dark-inset,
+.admin-light-mode .bank-info {
+  background: #F3F4F6 !important;
+  border: 1px solid #E5E7EB !important;
+  color: #111827 !important;
+}
+
+/* Specific elements */
+.admin-light-mode .user-name { color: #111827 !important; }
+.admin-light-mode .email { color: #6B7280 !important; }
+
+/* Ghost Buttons */
+.admin-light-mode .btn-ghost {
+  background: #FFFFFF !important;
+  color: #4B5563 !important;
+  border: 1px solid #E5E7EB !important;
+}
+.admin-light-mode .btn-ghost:hover {
+  background: #F3F4F6 !important;
+  color: #111827 !important;
+}
+
+/* =========================================================
+   HIGH SPECIFICITY DASHBOARD OVERRIDES
+   To override style.css rules that come after @import
+   ========================================================= */
+
+.admin-light-mode.app-layout--dashboard .panel,
+.admin-light-mode.app-layout--dashboard .glass-panel,
+.admin-light-mode.app-layout--dashboard .bento-box {
+  background-color: #FFFFFF !important;
+  border: 1px solid #E5E7EB !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03) !important;
+  color: #111827 !important;
+}
+
+.admin-light-mode.app-layout--dashboard .panel::before,
+.admin-light-mode.app-layout--dashboard .glass-panel::before,
+.admin-light-mode.app-layout--dashboard .bento-box::before {
+  display: none !important;
+}
+
+.admin-light-mode.app-layout--dashboard .modern-table th,
+.admin-light-mode.app-layout--dashboard .admin-data-table th,
+.admin-light-mode.app-layout--dashboard .data-table th {
+  background: #F9FAFB !important;
+  color: #6B7280 !important;
+  border-bottom: 1px solid #E5E7EB !important;
+}
+
+.admin-light-mode.app-layout--dashboard .modern-table td,
+.admin-light-mode.app-layout--dashboard .admin-data-table td,
+.admin-light-mode.app-layout--dashboard .data-table td {
+  border: none !important;
+  border-bottom: 1px solid #F3F4F6 !important;
+  background: #FFFFFF !important;
+  color: #1F2937 !important;
+}
+
+.admin-light-mode.app-layout--dashboard .modern-table tbody tr:hover td,
+.admin-light-mode.app-layout--dashboard .admin-data-table tbody tr:hover td,
+.admin-light-mode.app-layout--dashboard .data-table tbody tr:hover td {
+  background: #F9FAFB !important;
+}
+
+.admin-light-mode.app-layout--dashboard .empty-state {
+  color: #6B7280 !important;
+  background: #F9FAFB !important;
+  border: 1px dashed #E5E7EB !important;
+  border-radius: 12px;
+}
+.admin-light-mode.app-layout--dashboard .empty-state p { color: #6B7280 !important; }
+
+.admin-light-mode .bulk-action-bar {
+  background: #F9FAFB !important;
+  border: 1px solid #E5E7EB !important;
+  color: #111827 !important;
+}
+.admin-light-mode .bulk-checkbox-wrap { color: #4B5563 !important; }
+.admin-light-mode .bulk-clear { color: #4B5563 !important; border-color: #D1D5DB !important; }
+.admin-light-mode .bulk-clear:hover { background: #E5E7EB !important; color: #111827 !important; }
+
+/* =========================================================
+   POS VIEW LIGHT MODE OVERRIDES
+   ========================================================= */
+.admin-light-mode .pos {
+  background: #F8F9FA !important;
+  color: #111827 !important;
+}
+
+.admin-light-mode .pos-header h1,
+.admin-light-mode .pos-cart-header h2,
+.admin-light-mode .pos-p-name,
+.admin-light-mode .pos-cart-name,
+.admin-light-mode .pos-total,
+.admin-light-mode .pos-receipt h3 {
+  color: #111827 !important;
+}
+
+.admin-light-mode .pos-time,
+.admin-light-mode .pos-cart-unit,
+.admin-light-mode .pos-cart-empty {
+  color: #6B7280 !important;
+}
+
+.admin-light-mode .pos-search {
+  background: #FFFFFF !important;
+  border-color: #E5E7EB !important;
+  color: #111827 !important;
+}
+.admin-light-mode .pos-search::placeholder {
+  color: #9CA3AF !important;
+}
+
+.admin-light-mode .pos-product-btn {
+  background: #FFFFFF !important;
+  border: 1px solid #E5E7EB !important;
+  color: #111827 !important;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05) !important;
+}
+.admin-light-mode .pos-product-btn:hover {
+  background: #F0FDF4 !important;
+  border-color: #22C55E !important;
+}
+
+.admin-light-mode .pos-p-price,
+.admin-light-mode .pos-cart-line-total,
+.admin-light-mode .pos-total b,
+.admin-light-mode .pos-receipt-total {
+  color: #16A34A !important;
+}
+
+.admin-light-mode .pos-p-stock {
+  color: #6B7280 !important;
+}
+
+.admin-light-mode .pos-qty-btn {
+  background: #E5E7EB !important;
+  color: #111827 !important;
+}
+.admin-light-mode .pos-qty-btn:hover {
+  background: #D1D5DB !important;
+}
+.admin-light-mode .pos-qty {
+  color: #111827 !important;
+}
+
+.admin-light-mode .pos-cart-actions {
+  background: #F3F4F6 !important;
+}
+
+.admin-light-mode .pos-pay-method button {
+  background: #FFFFFF !important;
+  border-color: #E5E7EB !important;
+  color: #4B5563 !important;
+}
+.admin-light-mode .pos-pay-method button:hover {
+  background: #F9FAFB !important;
+}
+.admin-light-mode .pos-pay-method button.active {
+  background: #F0FDF4 !important;
+  border-color: #22C55E !important;
+  color: #16A34A !important;
+}
+
+.admin-light-mode .pos-receipt {
+  background: #FFFFFF !important;
+  border: 1px dashed #D1D5DB !important;
+  color: #111827 !important;
+}
+.admin-light-mode .pos-receipt-row {
+  color: #4B5563 !important;
+  border-bottom-color: #E5E7EB !important;
+}
+.admin-light-mode .pos-receipt small {
+  color: #9CA3AF !important;
+}
+
+.admin-light-mode .pos-user-search.dark-inset,
+.admin-light-mode .pos-cart-row.dark-inset {
+  background: #FFFFFF !important;
+  border: 1px solid #E5E7EB !important;
+  color: #111827 !important;
+}
+
+.admin-light-mode .pos-checkout-btn:disabled {
+  background: #E5E7EB !important;
+  color: #9CA3AF !important;
+}
+
+/* =========================================================
+   FINANCE SETTINGS OVERRIDES
+   ========================================================= */
+.admin-light-mode .clay-inset {
+  background-color: #F8F9FA !important;
+  box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.05), inset -2px -2px 5px rgba(255, 255, 255, 1) !important;
+  border: 1px solid #E5E7EB !important;
+}
+
+.admin-light-mode .toggle-field {
+  background: #F9FAFB !important;
+  border-color: #E5E7EB !important;
+}
+
+.admin-light-mode .toggle-track {
+  background: #D1D5DB !important;
+}
+
+.admin-light-mode .toggle-text strong,
+.admin-light-mode .total .lbl,
+.admin-light-mode .rate-meta__source strong,
+.admin-light-mode .rate-meta__time strong {
+  color: #111827 !important;
+}
+
+.admin-light-mode .toggle-text small,
+.admin-light-mode .help-text {
+  color: #6B7280 !important;
+}
+
+.admin-light-mode .field input,
+.admin-light-mode .clay-select {
+  background: #FFFFFF !important;
+  border-color: #D1D5DB !important;
+  color: #111827 !important;
+}
+
+.admin-light-mode .clay-select option {
+  background: #FFFFFF !important;
+  color: #111827 !important;
+}
+
+/* =========================================================
+   SITE SETTINGS & TABS OVERRIDES
+   ========================================================= */
+.admin-light-mode .tabs button.active {
+  background: rgba(0, 0, 0, 0.05) !important;
+  color: #111827 !important;
+}
+.admin-light-mode .tabs button {
+  color: #6B7280 !important;
+}
+.admin-light-mode .tabs button:hover {
+  background: rgba(0, 0, 0, 0.03) !important;
+  color: #111827 !important;
+}
+
+.admin-light-mode .dynamic-row {
+  background: #F3F4F6 !important;
+  border: 1px solid #E5E7EB !important;
+}
+.admin-light-mode .dynamic-row input {
+  background: #FFFFFF !important;
+  border-color: #D1D5DB !important;
+  color: #111827 !important;
+}
+.admin-light-mode .logo-placeholder {
+  background: #F9FAFB !important;
+  border-color: #D1D5DB !important;
+  color: #6B7280 !important;
+}
+
+/* =========================================================
+   MEDIA SELECTOR MODAL OVERRIDES
+   ========================================================= */
+.admin-light-mode .modal-content {
+  background: #FFFFFF !important;
+  border-color: #E5E7EB !important;
+  color: #111827 !important;
+}
+
+.admin-light-mode .modal-header h2,
+.admin-light-mode .modal-header .close-btn,
+.admin-light-mode .folders-header {
+  color: #111827 !important;
+}
+
+.admin-light-mode .modal-header {
+  border-bottom-color: #E5E7EB !important;
+}
+
+.admin-light-mode .folders-sidebar {
+  background: #F9FAFB !important;
+  border-right-color: #E5E7EB !important;
+}
+
+.admin-light-mode .folder-list li {
+  color: #4B5563 !important;
+}
+
+.admin-light-mode .folder-list li:hover {
+  background: rgba(0,0,0,0.05) !important;
+  color: #111827 !important;
+}
+
+.admin-light-mode .folder-list li.active {
+  background: rgba(188,74,60, 0.1) !important;
+  color: #BC4A3C !important;
+}
+
+.admin-light-mode .upload-zone {
+  border-color: #D1D5DB !important;
+  color: #6B7280 !important;
+  background: #FFFFFF !important;
+}
+
+.admin-light-mode .upload-zone:hover,
+.admin-light-mode .upload-zone.is-uploading {
+  border-color: #BC4A3C !important;
+  background: rgba(188,74,60, 0.05) !important;
+}
+
+.admin-light-mode .media-card {
+  background: #F3F4F6 !important;
+  border: 1px solid #E5E7EB !important;
+}
+
+.admin-light-mode .empty-state {
+  color: #6B7280 !important;
+}
+
+.admin-light-mode .new-folder-form input {
+  background: #FFFFFF !important;
+  color: #111827 !important;
+  border-color: #D1D5DB !important;
+}
+
+/* =========================================================
+   PAGE BUILDER — self-themed (light) in PageBuilderView.vue.
+   The previous global overrides here targeted the old dark
+   layout and are no longer needed.
+   ========================================================= */

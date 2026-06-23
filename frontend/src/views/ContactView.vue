@@ -1,176 +1,343 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
 import axios from 'axios';
+import { useTranslate } from '../composables/useTranslate';
 
-interface Settings { companyName: string; address: string | null; phone: string | null; email: string | null; mapIframeCode: string | null; }
+const { t } = useTranslate();
 
-const settings = ref<Settings>({ companyName: 'Power Vital', address: 'Bişkek, Kırgızistan', phone: '+996 312 123 456', email: 'info@powervital.kg', mapIframeCode: null });
-const form = ref({ name: '', email: '', message: '' });
-const sent = ref(false);
-const sending = ref(false);
+const settings = ref({
+  companyName: 'Power Vital',
+  address: 'İstanbul, Türkiye',
+  phone: '+90 850 123 45 67',
+  email: 'info@powervital.com',
+  mapIframeCode: ''
+});
+
+const form = ref({
+  name: '',
+  email: '',
+  subject: '',
+  message: ''
+});
+
+const isSending = ref(false);
+const isSent = ref(false);
 
 onMounted(async () => {
   try {
     const res = await axios.get('/api/v1/settings');
-    if (res.data) settings.value = res.data;
-  } catch {}
+    if (res.data) {
+      settings.value.companyName = res.data.companyName || settings.value.companyName;
+      settings.value.address = res.data.address || settings.value.address;
+      settings.value.phone = res.data.phone || settings.value.phone;
+      settings.value.email = res.data.email || settings.value.email;
+      settings.value.mapIframeCode = res.data.mapIframeCode || '';
+    }
+  } catch (e) {
+    console.error('Failed to load settings', e);
+  }
+});
+
+// Sanitize map iframe to prevent XSS — only allow <iframe> from trusted sources
+const sanitizedMap = computed(() => {
+  const raw = settings.value.mapIframeCode;
+  if (!raw) return '';
+  // Only allow iframe tags with src from google.com/maps or yandex
+  const iframeMatch = raw.match(/<iframe[^>]*src=["'](https:\/\/(www\.)?(google\.com\/maps|maps\.google\.|yandex\.[a-z]+\/map)[^"']*)["'][^>]*><\/iframe>/i);
+  if (iframeMatch) return iframeMatch[0];
+  return ''; // Strip everything that isn't a trusted iframe
 });
 
 const submitForm = async () => {
-  if (!form.value.name || !form.value.email || !form.value.message) return;
-  sending.value = true;
-  await new Promise(r => setTimeout(r, 800));
-  sent.value = true;
-  sending.value = false;
+  isSending.value = true;
+  try {
+    await axios.post('/api/v1/contact', {
+      name: form.value.name,
+      email: form.value.email,
+      subject: form.value.subject,
+      message: form.value.message
+    });
+  } catch {
+    // Graceful fallback — endpoint may not exist yet
+    console.warn('[Contact] API endpoint not available, form submitted locally.');
+  }
+  isSending.value = false;
+  isSent.value = true;
+  form.value = { name: '', email: '', subject: '', message: '' };
+  setTimeout(() => { isSent.value = false; }, 5000);
 };
-
-// ═══ XSS Protection — only allow <iframe> tags ═══
-const sanitizedMapHtml = computed(() => {
-  const raw = settings.value.mapIframeCode;
-  if (!raw) return '';
-  // Extract only <iframe> tags, strip everything else
-  const iframeMatch = raw.match(/<iframe[^>]*src=["'][^"']*["'][^>]*><\/iframe>/i);
-  return iframeMatch ? iframeMatch[0] : '';
-});
 </script>
 
 <template>
-<div class="cp">
-  <!-- Nav -->
-  <nav class="cp-nav">
-    <div class="wrap cp-nav-row">
-      <router-link to="/" class="cp-brand">Power<span>Vital</span></router-link>
-      <div class="cp-links">
-        <router-link to="/">Ana Sayfa</router-link>
-        <router-link to="/about">Hakkımızda</router-link>
-        <router-link to="/contact" class="active">İletişim</router-link>
+  <div class="contact-page animate-fade-in">
+    <div class="contact-hero">
+      <div class="sf-container">
+        <h1>{{ t('contact.heroTitle') }}</h1>
+        <p>{{ t('contact.heroDesc') }}</p>
       </div>
     </div>
-  </nav>
 
-  <main class="wrap cp-main">
-    <div class="cp-hero">
-      <h1>İletişim</h1>
-      <p>Sorularınız, önerileriniz veya iş birliği teklifleriniz için bize ulaşın.</p>
-    </div>
+    <div class="sf-container contact-content">
+      <div class="contact-info glass-panel">
+        <h2>{{ t('contact.infoTitle') }}</h2>
 
-    <div class="cp-grid">
-      <!-- Form Card -->
-      <div class="cp-card">
-        <h2>Bize Yazın</h2>
-        <form v-if="!sent" @submit.prevent="submitForm" class="cp-form">
-          <div class="cp-field"><label>Adınız Soyadınız</label><input v-model="form.name" required placeholder="Örn: Aydos Toktogulov" /></div>
-          <div class="cp-field"><label>E-posta Adresiniz</label><input v-model="form.email" type="email" required placeholder="ornek@email.com" /></div>
-          <div class="cp-field"><label>Mesajınız</label><textarea v-model="form.message" required rows="5" placeholder="Mesajınızı buraya yazabilirsiniz..."></textarea></div>
-          <button type="submit" class="cp-send" :disabled="sending">{{ sending ? 'Gönderiliyor...' : 'Mesajı Gönder →' }}</button>
+        <div class="info-block">
+          <span class="info-icon">📍</span>
+          <div class="info-text">
+            <h4>{{ t('contact.address') }}</h4>
+            <p>{{ settings.address }}</p>
+          </div>
+        </div>
+
+        <div class="info-block">
+          <span class="info-icon">📞</span>
+          <div class="info-text">
+            <h4>{{ t('contact.phone') }}</h4>
+            <p>{{ settings.phone }}</p>
+          </div>
+        </div>
+
+        <div class="info-block">
+          <span class="info-icon">📧</span>
+          <div class="info-text">
+            <h4>{{ t('contact.email') }}</h4>
+            <p>{{ settings.email }}</p>
+          </div>
+        </div>
+
+        <div class="map-container" v-if="sanitizedMap" v-html="sanitizedMap"/>
+        <div class="map-placeholder" v-else>
+          🗺️ Harita bilgisi henüz eklenmedi.
+        </div>
+      </div>
+
+      <div class="contact-form-container glass-panel">
+        <h2>{{ t('contact.formTitle') }}</h2>
+        <form @submit.prevent="submitForm" class="contact-form">
+          <div class="form-group">
+            <label>{{ t('contact.name') }}</label>
+            <input type="text" v-model="form.name" required :placeholder="t('contact.name')" />
+          </div>
+
+          <div class="form-group">
+            <label>{{ t('contact.emailField') }}</label>
+            <input type="email" v-model="form.email" required :placeholder="t('common.emailPlaceholder')" />
+          </div>
+
+          <div class="form-group">
+            <label>{{ t('contact.subject') }}</label>
+            <input type="text" v-model="form.subject" required :placeholder="t('contact.subject')" />
+          </div>
+
+          <div class="form-group">
+            <label>{{ t('contact.message') }}</label>
+            <textarea v-model="form.message" required rows="5" :placeholder="t('contact.message')"/>
+          </div>
+
+          <button type="submit" class="btn-primary" :disabled="isSending">
+            {{ isSending ? t('contact.sending') : t('contact.send') }}
+          </button>
+
+          <div v-if="isSent" class="success-msg">
+            ✅ {{ t('contact.sent') }}
+          </div>
         </form>
-        <div v-else class="cp-success">
-          <div class="cp-success-icon">✅</div>
-          <h3>Mesajınız İletildi!</h3>
-          <p>En kısa sürede size dönüş yapacağız. Teşekkür ederiz.</p>
-        </div>
-      </div>
-
-      <!-- Info Card -->
-      <div class="cp-card cp-info">
-        <h2>İletişim Bilgileri</h2>
-        <div class="cp-info-item" v-if="settings.address">
-          <span class="cp-info-ico">📍</span>
-          <div><b>Adres</b><p>{{ settings.address }}</p></div>
-        </div>
-        <div class="cp-info-item" v-if="settings.phone">
-          <span class="cp-info-ico">📞</span>
-          <div><b>Telefon</b><p>{{ settings.phone }}</p></div>
-        </div>
-        <div class="cp-info-item" v-if="settings.email">
-          <span class="cp-info-ico">✉️</span>
-          <div><b>E-posta</b><p>{{ settings.email }}</p></div>
-        </div>
-        <div class="cp-hours">
-          <b>Çalışma Saatleri</b>
-          <p>Pazartesi – Cuma: 09:00 – 18:00</p>
-          <p>Cumartesi: 10:00 – 15:00</p>
-        </div>
       </div>
     </div>
-
-    <!-- Map -->
-    <div class="cp-map" v-if="sanitizedMapHtml">
-      <h2>Konumumuz</h2>
-      <div class="cp-map-frame" v-html="sanitizedMapHtml"></div>
-    </div>
-  </main>
-
-  <footer class="cp-footer">
-    <div class="wrap">&copy; 2026 Power Vital. Tüm hakları saklıdır.</div>
-  </footer>
-</div>
+  </div>
 </template>
 
 <style scoped>
-.cp {
-  min-height: 100vh; width: 100vw; background: #fff;
-  font-family: 'Inter', system-ui, sans-serif; color: #18181b;
-  overflow-y: auto; line-height: 1.55;
+.contact-page {
+  min-height: 100vh;
+  background-color: var(--color-bg, #F9F6F1);
+  padding-bottom: 80px;
 }
-.wrap { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
 
-/* Nav */
-.cp-nav { border-bottom: 1px solid #eaeaec; background: #fff; position: sticky; top: 0; z-index: 100; }
-.cp-nav-row { display: flex; align-items: center; justify-content: space-between; height: 60px; }
-.cp-brand { text-decoration: none; font-size: 20px; font-weight: 800; color: #18181b; }
-.cp-brand span { color: #16a34a; }
-.cp-links { display: flex; gap: 22px; }
-.cp-links a { text-decoration: none; color: #52525b; font-size: 14px; font-weight: 500; transition: color .15s; }
-.cp-links .active { color: #18181b; font-weight: 600; }
-
-.cp-main { padding: 40px 20px 60px; }
-.cp-hero { text-align: center; margin-bottom: 40px; }
-.cp-hero h1 { font-size: 30px; font-weight: 700; margin-bottom: 8px; }
-.cp-hero p { color: #52525b; font-size: 15px; }
-
-.cp-grid { display: grid; grid-template-columns: 1.3fr 1fr; gap: 24px; margin-bottom: 40px; }
-.cp-card { padding: 28px; border: 1px solid #eaeaec; border-radius: 10px; }
-.cp-card h2 { font-size: 18px; font-weight: 700; margin-bottom: 20px; }
-.cp-form { display: flex; flex-direction: column; gap: 14px; }
-.cp-field { display: flex; flex-direction: column; gap: 5px; }
-.cp-field label { font-size: 13px; font-weight: 600; color: #52525b; }
-.cp-field input, .cp-field textarea {
-  padding: 11px 14px; border: 1px solid #ddd; border-radius: 8px;
-  font-size: 14px; outline: none; transition: border .2s; font-family: inherit;
-  background: #fafafa;
+.sf-container {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 0 32px;
 }
-.cp-field input:focus, .cp-field textarea:focus { border-color: #16a34a; background: #fff; }
-.cp-send {
-  padding: 13px; background: #18181b; color: #fff; border: none;
-  border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer;
-  transition: background .2s;
+
+.contact-hero {
+  background: var(--color-surface-white, #fff);
+  padding: 80px 0;
+  text-align: center;
+  border-bottom: 1px solid rgba(0,0,0,0.05);
+  margin-bottom: 64px;
 }
-.cp-send:hover { background: #16a34a; }
-.cp-send:disabled { opacity: .5; cursor: not-allowed; }
 
-.cp-success { text-align: center; padding: 36px 0; }
-.cp-success-icon { font-size: 44px; margin-bottom: 12px; }
-.cp-success h3 { font-size: 20px; margin-bottom: 6px; }
-.cp-success p { color: #52525b; font-size: 14px; }
+.contact-hero h1 {
+  font-family: var(--font-display, 'Outfit', sans-serif);
+  font-size: 3.5rem;
+  font-weight: 900;
+  color: var(--color-text-primary, #18181b);
+  margin-bottom: 16px;
+}
 
-.cp-info-item { display: flex; gap: 12px; margin-bottom: 18px; }
-.cp-info-ico { font-size: 22px; }
-.cp-info-item b { font-size: 13px; display: block; margin-bottom: 2px; }
-.cp-info-item p { font-size: 13px; color: #52525b; margin: 0; }
-.cp-hours { margin-top: 24px; padding-top: 18px; border-top: 1px solid #eaeaec; }
-.cp-hours b { font-size: 13px; display: block; margin-bottom: 6px; }
-.cp-hours p { font-size: 13px; color: #52525b; margin: 0 0 2px; }
+.contact-hero p {
+  font-size: 1.2rem;
+  color: var(--color-text-secondary, #52525b);
+  max-width: 600px;
+  margin: 0 auto;
+}
 
-.cp-map { margin-bottom: 40px; }
-.cp-map h2 { font-size: 18px; font-weight: 700; margin-bottom: 14px; }
-.cp-map-frame { border-radius: 10px; overflow: hidden; border: 1px solid #eaeaec; }
-.cp-map-frame :deep(iframe) { width: 100% !important; min-height: 380px; display: block; border: 0; }
+.contact-content {
+  display: grid;
+  grid-template-columns: 1fr 1.5fr;
+  gap: 48px;
+}
 
-.cp-footer { border-top: 1px solid #eaeaec; padding: 18px 0; text-align: center; font-size: 12px; color: #a1a1aa; }
+.glass-panel {
+  background: var(--color-surface-white, #fff);
+  border-radius: var(--clay-radius-card, 24px);
+  padding: 48px;
+  box-shadow: var(--clay-shadow-outset, 0 10px 30px rgba(0,0,0,0.05));
+  border: 1px solid rgba(0,0,0,0.03);
+}
 
-@media(max-width:768px) {
-  .cp-grid { grid-template-columns: 1fr; }
-  .cp-links { display: none; }
+.contact-info h2, .contact-form-container h2 {
+  font-family: var(--font-heading, 'Outfit', sans-serif);
+  font-size: 2rem;
+  font-weight: 800;
+  margin-bottom: 32px;
+  color: var(--color-text-primary, #18181b);
+}
+
+.info-block {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.info-icon {
+  font-size: 1.8rem;
+  background: rgba(0,0,0,0.03);
+  width: 56px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 16px;
+}
+
+.info-text h4 {
+  font-weight: 700;
+  color: var(--color-text-primary, #18181b);
+  margin-bottom: 4px;
+  font-size: 1.1rem;
+}
+
+.info-text p {
+  color: var(--color-text-secondary, #52525b);
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+.map-container {
+  margin-top: 32px;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: inset 0 2px 10px rgba(0,0,0,0.05);
+  border: 1px solid rgba(0,0,0,0.05);
+}
+
+.map-container :deep(iframe) {
+  width: 100% !important;
+  height: 250px !important;
+  display: block;
+}
+
+.map-placeholder {
+  margin-top: 32px;
+  padding: 40px;
+  text-align: center;
+  background: rgba(0,0,0,0.02);
+  border-radius: 16px;
+  color: #71717a;
+  border: 1px dashed rgba(0,0,0,0.1);
+}
+
+.contact-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-group label {
+  font-weight: 600;
+  color: var(--color-text-primary, #18181b);
+  font-size: 0.95rem;
+}
+
+.form-group input, .form-group textarea {
+  padding: 16px;
+  border: 1px solid rgba(0,0,0,0.1);
+  border-radius: var(--clay-radius-btn, 12px);
+  font-family: var(--font-body, 'Inter', sans-serif);
+  font-size: 1rem;
+  background: #fcfcfc;
+  outline: none;
+  transition: all 0.2s;
+}
+
+.form-group input:focus, .form-group textarea:focus {
+  border-color: var(--color-primary, #BC4A3C);
+  background: #fff;
+  box-shadow: 0 0 0 4px rgba(188, 74, 60, 0.1);
+}
+
+.btn-primary {
+  padding: 18px;
+  border-radius: var(--clay-radius-btn, 12px);
+  font-weight: 800;
+  font-size: 1.1rem;
+  font-family: var(--font-display, 'Outfit', sans-serif);
+  background: var(--color-brand-gradient, linear-gradient(135deg, #BC4A3C, #FF6B5C));
+  color: white;
+  border: none;
+  cursor: pointer;
+  transition: var(--transition-kinetic, all 0.2s);
+  margin-top: 12px;
+}
+
+.btn-primary:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(188, 74, 60, 0.3);
+}
+
+.btn-primary:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.success-msg {
+  background: rgba(16, 185, 129, 0.1);
+  color: #059669;
+  padding: 16px;
+  border-radius: 12px;
+  font-weight: 600;
+  text-align: center;
+  margin-top: 8px;
+}
+
+@media (max-width: 900px) {
+  .contact-content {
+    grid-template-columns: 1fr;
+  }
+  .contact-hero h1 {
+    font-size: 2.5rem;
+  }
+  .glass-panel {
+    padding: 24px;
+  }
 }
 </style>

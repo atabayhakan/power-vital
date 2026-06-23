@@ -1,10 +1,14 @@
 import { Router, Request, Response } from 'express';
-import { PrismaClient } from '../../prisma/generated/client';
+import prisma from '../lib/prisma';
 import { authenticateJWT } from '../middleware/auth';
 import { addBonusCalculationJob } from '../queues/bonusQueue';
+import { validate, WalletPaySchema, WithdrawSchema, PaginationQuerySchema } from '../validators';
+import { notifyWithdrawalRequest } from '../services/notificationService';
+import { adminEvents } from './adminEvents';
+import { logger } from '../utils/logger';
+import { envelope, parsePagination } from '../utils/paginate';
 
 const router = Router();
-const prisma = new PrismaClient({});
 
 // /api/v1/finance/wallet - Get Wallet Balances
 router.get('/wallet', authenticateJWT, async (req: any, res: Response) => {
@@ -23,14 +27,10 @@ router.get('/wallet', authenticateJWT, async (req: any, res: Response) => {
 });
 
 // /api/v1/finance/wallet/pay - Process Payment via Digital Wallet (POS or E-Commerce)
-router.post('/wallet/pay', authenticateJWT, async (req: any, res: Response) => {
+router.post('/wallet/pay', authenticateJWT, validate({ body: WalletPaySchema }), async (req: any, res: Response) => {
   try {
     const userId = req.user.id;
-    const { orderType, amountKgs, productIds } = req.body;
-
-    if (!amountKgs || amountKgs <= 0) {
-      return res.status(400).json({ error: 'Invalid amount' });
-    }
+    const { orderType, amountKgs, productIds } = req.body as { orderType?: string; amountKgs: number; productIds?: string[] };
 
     // Start a transaction to ensure atomic deduct
     const result = await prisma.$transaction(async (tx) => {
@@ -80,8 +80,97 @@ router.post('/wallet/pay', authenticateJWT, async (req: any, res: Response) => {
 
     res.json({ message: 'Payment successful', data: result });
   } catch (error: any) {
-    console.error('Payment Error:', error);
+    logger.error({ err: error }, 'Payment Error:');
     res.status(400).json({ error: error.message || 'Payment processing failed' });
+  }
+});
+
+// POST /api/v1/finance/withdraw - Create a withdrawal request
+router.post('/withdraw', authenticateJWT, validate({ body: WithdrawSchema }), async (req: any, res: Response) => {
+  try {
+    const userId = req.user.id;
+    const { amount, currency, bankInfo } = req.body as { amount: number; currency?: 'KGS' | 'USD'; bankInfo?: string | null };
+
+    const cur = currency === 'USD' ? 'USD' : 'KGS';
+    const balanceField = cur === 'USD' ? 'walletBalanceUsd' : 'walletBalanceKgs';
+    const withdrawAmount = Number(amount);
+
+    // 🛡️ ATOMIC: Bakiye düşümü ve kayıt oluşturma tek transaction içinde
+    // Bu sayede aynı bakiye ile birden fazla çekim talebi engellenir (double-spend fix)
+    const result = await prisma.$transaction(async (tx) => {
+      const user = await tx.user.findUnique({ where: { id: userId } });
+      if (!user) throw new Error('User not found');
+
+      const currentBalance = Number(user[balanceField]);
+      if (currentBalance < withdrawAmount) {
+        throw new Error('Insufficient balance for withdrawal');
+      }
+
+      // Atomic bakiye düşümü
+      await tx.user.update({
+        where: { id: userId },
+        data: { [balanceField]: { decrement: withdrawAmount } }
+      });
+
+      // Transaction log
+      await tx.transaction.create({
+        data: {
+          userId,
+          type: 'withdrawal',
+          amount: withdrawAmount,
+          currency: cur,
+          description: 'Withdrawal request (pending)'
+        }
+      });
+
+      // Withdrawal request
+      const withdrawal = await tx.withdrawalRequest.create({
+        data: {
+          userId,
+          amount: withdrawAmount,
+          currency: cur,
+          status: 'pending',
+          bankInfo: bankInfo || null
+        }
+      });
+
+      return withdrawal;
+    });
+
+    res.status(201).json({ message: 'Withdrawal request created', withdrawal: result });
+
+    // Notify admins of a new withdrawal request (fire-and-forget)
+    notifyWithdrawalRequest(withdrawAmount, cur).catch(() => {});
+    adminEvents.publish({
+      type: 'withdrawal_request',
+      data: { amount: withdrawAmount, currency: cur, userId: req.user?.id }
+    });
+  } catch (error: any) {
+    logger.error({ err: error }, 'Withdrawal Error:');
+    const status = error.message === 'Insufficient balance for withdrawal' ? 400 : 500;
+    res.status(status).json({ error: error.message || 'Failed to create withdrawal request' });
+  }
+});
+
+// GET /api/v1/finance/transactions - User transaction history
+router.get('/transactions', authenticateJWT, validate({ query: PaginationQuerySchema }), async (req: any, res: Response) => {
+  try {
+    const userId = req.user.id;
+    const { page, limit, skip, take } = parsePagination(req.query as any);
+
+    const [transactions, total] = await Promise.all([
+      prisma.transaction.findMany({
+        where: { userId },
+        orderBy: { createdAt: 'desc' },
+        skip, take
+      }),
+      prisma.transaction.count({ where: { userId } })
+    ]);
+
+    res.json(envelope(transactions, total, page, limit));
+  } catch (error: any) {
+    logger.error({ err: error }, 'Transactions Error:');
+    res.status(500).json({ error: 'Failed to fetch transactions' });
   }
 });
 

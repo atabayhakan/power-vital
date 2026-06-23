@@ -1,9 +1,14 @@
 import { Router, Request, Response } from 'express';
-import { PrismaClient } from '../../prisma/generated/client';
-import { authenticateJWT } from '../middleware/auth';
+import prisma from '../lib/prisma';
+import { authenticateJWT, requireRole } from '../middleware/auth';
+import { validate, AdminUserUpdateSchema, WithdrawalUpdateSchema, IdParamSchema } from '../validators';
+import { notifyWithdrawalApproved, notifyWithdrawalRejected } from '../services/notificationService';
+import { sendToUser } from '../services/pushService';
+import { adminEvents } from './adminEvents';
+import { logger } from '../utils/logger';
+import { envelope, parsePagination } from '../utils/paginate';
 
 const router = Router();
-const prisma = new PrismaClient({});
 
 // GET /api/v1/admin/dashboard — Full dashboard stats (single API call)
 router.get('/dashboard', authenticateJWT, async (req: any, res: Response) => {
@@ -37,9 +42,12 @@ router.get('/dashboard', authenticateJWT, async (req: any, res: Response) => {
           user: { select: { name: true, email: true } }
         }
       }),
-      // Today's orders
+      // Today's orders (excluding cancelled)
       prisma.order.findMany({
-        where: { createdAt: { gte: new Date(new Date().setHours(0, 0, 0, 0)) } },
+        where: {
+          createdAt: { gte: new Date(new Date().setHours(0, 0, 0, 0)) },
+          status: { not: 'cancelled' }
+        },
         select: { totalKgs: true, status: true }
       }),
       // Low stock products
@@ -48,10 +56,15 @@ router.get('/dashboard', authenticateJWT, async (req: any, res: Response) => {
       }).catch(() => [])
     ]);
 
-    // Calculate stats
-    const totalRevenue = orders.reduce((sum, o) => sum + Number(o.totalKgs || 0), 0);
+    // 🛡️ CANCELLED-EXCLUSION: Cancelled orders must NOT inflate revenue
+    // (matches: completed / paid / shipped / processing are "real" revenue;
+    //  pending is reserved separately; cancelled is excluded everywhere).
+    const REVENUE_STATUSES = ['completed', 'paid', 'shipped', 'processing'];
+    const revenueOrders = orders.filter(o => REVENUE_STATUSES.includes(o.status));
+
+    const totalRevenue = revenueOrders.reduce((sum, o) => sum + Number(o.totalKgs || 0), 0);
     const completedRevenue = orders
-      .filter(o => ['completed', 'paid', 'shipped'].includes(o.status))
+      .filter(o => REVENUE_STATUSES.includes(o.status))
       .reduce((sum, o) => sum + Number(o.totalKgs || 0), 0);
 
     const pendingOrders = orders.filter(o => o.status === 'pending').length;
@@ -115,8 +128,182 @@ router.get('/dashboard', authenticateJWT, async (req: any, res: Response) => {
       }))
     });
   } catch (error) {
-    console.error('Dashboard Error:', error);
+    logger.error({ err: error }, 'Dashboard Error:');
     res.status(500).json({ error: 'Failed to load dashboard' });
+  }
+});
+
+// ════════ USER MANAGEMENT ════════
+router.get('/users', authenticateJWT, async (req: any, res: Response) => {
+  if (req.user.role !== 'admin') return res.status(403).json({ error: 'Admin access required' });
+  try {
+    const search = String(req.query.search || '').trim();
+    const { page, limit, skip, take } = parsePagination(req.query as any, { limit: 50 });
+
+    // Optional search by name/email (LIKE — fast on indexed columns for our scale)
+    // MySQL collation is utf8mb4_unicode_ci which is case-insensitive by default.
+    const where = search.length >= 2
+      ? {
+          OR: [
+            { name: { contains: search } },
+            { email: { contains: search } }
+          ]
+        }
+      : {};
+
+    const [users, total] = await Promise.all([
+      prisma.user.findMany({
+        where,
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          role: true,
+          walletBalanceKgs: true,
+          walletBalanceUsd: true,
+          isMonthlyActive: true,
+          createdAt: true,
+          sponsor: { select: { name: true } }
+        },
+        orderBy: { createdAt: 'desc' },
+        skip, take
+      }),
+      prisma.user.count({ where })
+    ]);
+    res.json(envelope(users, total, page, limit));
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to load users' });
+  }
+});
+
+router.put('/users/:id', authenticateJWT, requireRole('admin'), validate({ body: AdminUserUpdateSchema, params: IdParamSchema }), async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params as { id: string };
+    const { role, isMonthlyActive, walletBalanceKgs, walletBalanceUsd } = req.body as { role?: string; isMonthlyActive?: boolean; walletBalanceKgs?: number; walletBalanceUsd?: number };
+    const user = await prisma.user.update({
+      where: { id },
+      data: {
+        role,
+        isMonthlyActive,
+        walletBalanceKgs: walletBalanceKgs !== undefined ? Number(walletBalanceKgs) : undefined,
+        walletBalanceUsd: walletBalanceUsd !== undefined ? Number(walletBalanceUsd) : undefined
+      }
+    });
+    res.json(user);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to update user' });
+  }
+});
+
+// ════════ FINANCE / WITHDRAWALS ════════
+router.get('/withdrawals', authenticateJWT, async (req: any, res: Response) => {
+  if (req.user.role !== 'admin') return res.status(403).json({ error: 'Admin access required' });
+  try {
+    const { page, limit, skip, take } = parsePagination(req.query as any, { limit: 50 });
+    const [requests, total] = await Promise.all([
+      prisma.withdrawalRequest.findMany({
+        include: { user: { select: { name: true, email: true } } },
+        orderBy: { createdAt: 'desc' },
+        skip, take
+      }),
+      prisma.withdrawalRequest.count()
+    ]);
+    res.json(envelope(requests, total, page, limit));
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to load withdrawals' });
+  }
+});
+
+router.put('/withdrawals/:id', authenticateJWT, requireRole('admin'), validate({ body: WithdrawalUpdateSchema, params: IdParamSchema }), async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params as { id: string };
+    const { status } = req.body as { status: 'approved' | 'rejected' };
+    const request = await prisma.withdrawalRequest.findUnique({ where: { id } });
+    if (!request) return res.status(404).json({ error: 'Not found' });
+
+    if (request.status !== 'pending') {
+      return res.status(400).json({ error: 'Cannot change status' });
+    }
+
+    // The wallet was ALREADY debited at creation time (finance.ts), with a
+    // matching `type: 'withdrawal'` Transaction. We must keep the ledger
+    // reconciled with the wallet on both outcomes — and do it atomically.
+    const balanceField = request.currency === 'USD' ? 'walletBalanceUsd' : 'walletBalanceKgs';
+
+    const updated = await prisma.$transaction(async (tx) => {
+      const w = await tx.withdrawalRequest.update({
+        where: { id },
+        data: { status }
+      });
+
+      if (status === 'rejected') {
+        // Refund the wallet AND write a reversing ledger entry so the
+        // transaction history reconciles with the wallet balance.
+        await tx.user.update({
+          where: { id: request.userId },
+          data: { [balanceField]: { increment: request.amount } }
+        });
+        await tx.transaction.create({
+          data: {
+            userId: request.userId,
+            type: 'withdrawal_refund',
+            amount: request.amount,
+            currency: request.currency,
+            description: `Withdrawal request ${request.id.slice(0, 8)} rejected — funds refunded`
+          }
+        });
+      } else if (status === 'approved') {
+        // Funds already debited at creation; record the confirmation so the
+        // ledger clearly shows the payout was completed.
+        await tx.transaction.create({
+          data: {
+            userId: request.userId,
+            type: 'withdrawal_paid',
+            amount: 0,
+            currency: request.currency,
+            description: `Withdrawal request ${request.id.slice(0, 8)} approved & paid out`
+          }
+        });
+      }
+
+      return w;
+    });
+
+    res.json(updated);
+
+    // Fire-and-forget admin confirmation + customer push notification
+    if (status === 'approved') {
+      notifyWithdrawalApproved().catch(() => {});
+      adminEvents.publish({
+        type: 'withdrawal_approved',
+        data: { withdrawalId: request.id, userId: request.userId, amount: Number(request.amount), currency: request.currency }
+      });
+      // Push to the customer who requested the withdrawal
+      sendToUser(request.userId, {
+        title: '✅ Çekim talebiniz onaylandı',
+        body: `${Number(request.amount).toFixed(2)} ${request.currency} tutarındaki çekim talebiniz onaylandı.`,
+        url: '/account/wallet',
+        tag: 'withdrawal',
+        eventKey: 'withdrawal_approved'
+      }).catch(() => {});
+    }
+    if (status === 'rejected') {
+      notifyWithdrawalRejected().catch(() => {});
+      adminEvents.publish({
+        type: 'withdrawal_rejected',
+        data: { withdrawalId: request.id, userId: request.userId, amount: Number(request.amount), currency: request.currency }
+      });
+      sendToUser(request.userId, {
+        title: '⚠️ Çekim talebiniz reddedildi',
+        body: 'Çekim talebiniz reddedildi. Detaylar için cüzdanınızı kontrol edin.',
+        url: '/account/wallet',
+        tag: 'withdrawal',
+        eventKey: 'withdrawal_rejected'
+      }).catch(() => {});
+    }
+  } catch (error) {
+    logger.error({ err: error }, 'Update withdrawal error:');
+    res.status(500).json({ error: 'Failed to update withdrawal' });
   }
 });
 

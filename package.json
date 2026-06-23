@@ -1,0 +1,8 @@
+{
+  "dependencies": {
+    "node-ssh": "^13.2.1"
+  },
+  "devDependencies": {
+    "yaml": "^2.9.0"
+  }
+}

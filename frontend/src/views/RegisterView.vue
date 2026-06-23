@@ -1,58 +1,54 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
-import axios from 'axios';
+import api from '../utils/api';
+import { useAuthStore } from '../stores/useAuthStore';
 import { useMlm } from '../composables/useMlm';
+import { useTranslate } from '../composables/useTranslate';
 
 const router = useRouter();
+const authStore = useAuthStore();
 const { isMlmEnabled, fetchMlmStatus } = useMlm();
+const { t } = useTranslate();
 
 const name = ref('');
 const email = ref('');
 const password = ref('');
 const sponsorId = ref('');
-const role = ref('customer');
 const errorMsg = ref('');
 const isLoading = ref(false);
 
 onMounted(async () => {
   await fetchMlmStatus();
-  // If MLM is off, force customer role
-  if (!isMlmEnabled.value) {
-    role.value = 'customer';
-  }
 });
 
 const register = async () => {
   try {
     isLoading.value = true;
     errorMsg.value = '';
-    
-    await axios.post('/api/v1/auth/register', {
+
+    await api.post('/auth/register', {
       name: name.value,
       email: email.value,
       password: password.value,
       sponsorId: isMlmEnabled.value ? (sponsorId.value || undefined) : undefined,
-      role: isMlmEnabled.value ? role.value : 'customer'
+      role: 'customer'
     });
-    
-    // Auto login after register
-    const loginRes = await axios.post('/api/v1/auth/login', {
+
+    const loginRes = await api.post('/auth/login', {
       email: email.value,
       password: password.value
     });
-    
-    localStorage.setItem('token', loginRes.data.token);
-    localStorage.setItem('userId', loginRes.data.user.id);
-    localStorage.setItem('role', loginRes.data.user.role);
-    
+
+    authStore.setAuth(loginRes.data.user.role, loginRes.data.user, loginRes.data.token, loginRes.data.user.id);
+
     if (loginRes.data.user.role === 'distributor') {
       router.push('/dashboard');
     } else {
-      router.push('/');
+      router.push('/account');
     }
   } catch (err: any) {
-    errorMsg.value = err.response?.data?.error || 'Kayıt başarısız oldu.';
+    errorMsg.value = err.response?.data?.error || t('register.registerFailed');
   } finally {
     isLoading.value = false;
   }
@@ -64,63 +60,39 @@ const register = async () => {
     <div class="auth-card glass-panel-light">
       <div class="auth-header">
         <h2 class="brand-text">POWER <span class="vital">VITAL</span></h2>
-        <p>Aramıza katılın</p>
-      </div>
-      
-      <!-- Role selector: ONLY show when MLM is enabled -->
-      <div class="role-selector" v-if="isMlmEnabled">
-        <button 
-          class="role-btn" 
-          :class="{ active: role === 'customer' }" 
-          @click="role = 'customer'"
-          type="button">
-          🧑‍💼 Müşteri
-        </button>
-        <button 
-          class="role-btn" 
-          :class="{ active: role === 'distributor' }" 
-          @click="role = 'distributor'"
-          type="button">
-          🚀 Distribütör (Bayi)
-        </button>
-      </div>
-
-      <div class="role-description" v-if="isMlmEnabled">
-        <p v-if="role === 'customer'">Sadece ürünleri inceler ve satın alırsınız.</p>
-        <p v-if="role === 'distributor'">Prim kazanır, ekibinizi kurar ve ağınızı yönetirsiniz.</p>
+        <p>{{ t('register.subtitle') }}</p>
       </div>
 
       <form @submit.prevent="register" class="auth-form">
         <div class="form-group">
-          <label>Ad Soyad</label>
-          <input type="text" v-model="name" required placeholder="Adınız Soyadınız" class="light-input" />
+          <label>{{ t('register.name') }}</label>
+          <input type="text" v-model="name" required :placeholder="t('register.namePlaceholder')" class="light-input" />
         </div>
 
         <div class="form-group">
-          <label>E-posta Adresi</label>
-          <input type="email" v-model="email" required placeholder="ornek@email.com" class="light-input" />
+          <label>{{ t('register.email') }}</label>
+          <input type="email" v-model="email" required :placeholder="t('common.emailPlaceholder')" class="light-input" />
         </div>
-        
+
         <div class="form-group">
-          <label>Şifre</label>
+          <label>{{ t('register.password') }}</label>
           <input type="password" v-model="password" required placeholder="••••••••" class="light-input" />
         </div>
 
-        <!-- Sponsor ID: ONLY when MLM enabled AND distributor selected -->
-        <div class="form-group slide-down" v-if="isMlmEnabled && role === 'distributor'">
-          <label>Sponsor Kodu (İsteğe Bağlı)</label>
-          <input type="text" v-model="sponsorId" placeholder="Sponsorunuzun referans kodu" class="light-input" />
+        <div class="form-group slide-down" v-if="isMlmEnabled">
+          <label>{{ t('register.sponsorCode') }}</label>
+          <input type="text" v-model="sponsorId" :placeholder="t('register.sponsorPlaceholder')" class="light-input" />
         </div>
-        
+
         <div v-if="errorMsg" class="error-msg">{{ errorMsg }}</div>
-        
+
         <button type="submit" class="btn-primary auth-btn" :disabled="isLoading">
-          {{ isLoading ? 'İşleniyor...' : 'Kayıt Ol' }}
+          {{ isLoading ? t('register.submitting') : t('register.submit') }}
         </button>
       </form>
-      
+
       <div class="auth-footer">
-        Zaten hesabınız var mı? <router-link to="/login">Giriş Yap</router-link>
+        {{ t('register.hasAccount') }} <router-link to="/login">{{ t('register.signIn') }}</router-link>
       </div>
     </div>
   </div>
@@ -161,45 +133,13 @@ const register = async () => {
 }
 
 .brand-text .vital {
-  color: #b05d5d;
+  color: var(--color-primary);
 }
 
 .auth-header p {
   color: #666;
   font-size: 14px;
   margin-top: 8px;
-}
-
-.role-selector {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 10px;
-}
-
-.role-btn {
-  flex: 1;
-  padding: 10px;
-  border: 1px solid #ddd;
-  background: white;
-  border-radius: 8px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
-  color: #666;
-}
-
-.role-btn.active {
-  border-color: #b05d5d;
-  background: #ffe8e8;
-  color: #b05d5d;
-}
-
-.role-description {
-  text-align: center;
-  font-size: 12px;
-  color: #888;
-  margin-bottom: 20px;
-  height: 18px;
 }
 
 .auth-form {
@@ -232,7 +172,7 @@ const register = async () => {
 }
 
 .light-input:focus {
-  border-color: #b05d5d;
+  border-color: var(--color-primary);
 }
 
 .auth-btn {
@@ -247,7 +187,7 @@ const register = async () => {
 }
 
 .auth-btn:hover {
-  background: #b05d5d;
+  background: var(--color-primary);
 }
 
 .auth-btn:disabled {
@@ -272,7 +212,7 @@ const register = async () => {
 }
 
 .auth-footer a {
-  color: #b05d5d;
+  color: var(--color-primary);
   font-weight: 600;
   text-decoration: none;
 }

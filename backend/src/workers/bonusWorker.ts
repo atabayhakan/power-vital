@@ -1,17 +1,17 @@
 import { Worker, Job } from 'bullmq';
 import IORedis from 'ioredis';
-import { PrismaClient } from '../../prisma/generated/client';
+import prisma from '../lib/prisma';
 import { getCache, setCache } from '../utils/redis';
+import { logger } from '../utils/logger';
 
 const connection = new IORedis(process.env.REDIS_URL || 'redis://127.0.0.1:6379', {
   maxRetriesPerRequest: null
 });
 
-const prisma = new PrismaClient({});
 
 export const bonusWorker = new Worker('bonusCalculationQueue', async (job: Job) => {
   const { orderId, purchaserId, amountKgs, sponsorId: jobSponsorId } = job.data;
-  console.log(`[Worker] Processing Antigravity bonus for order ${orderId}`);
+  logger.info(`[Worker] Processing Antigravity bonus for order ${orderId}`);
 
   try {
     // 1. Fetch System Configuration
@@ -27,15 +27,19 @@ export const bonusWorker = new Worker('bonusCalculationQueue', async (job: Job) 
 
     // ═══ MLM KILL SWITCH ═══
     if (!config.isMlmEnabled) {
-      console.log(`[Worker] MLM is DISABLED. Skipping bonus for order ${orderId}.`);
+      logger.info(`[Worker] MLM is DISABLED. Skipping bonus for order ${orderId}.`);
       return;
     }
 
     const orderAmount = Number(amountKgs);
 
     // 2. Safety Lock Check: Calculate Global 30% Limit
-    // Aggregate total company revenue
-    const revenueAgg = await prisma.order.aggregate({ _sum: { totalKgs: true } });
+    // Aggregate total company revenue (cancelled orders excluded — otherwise
+    // they deflate the payout ratio and can prematurely trip the safety lock).
+    const revenueAgg = await prisma.order.aggregate({
+      where: { status: { not: 'cancelled' } },
+      _sum: { totalKgs: true }
+    });
     const totalRevenue = Number(revenueAgg._sum.totalKgs || 0);
 
     // Aggregate total distributed bonus
@@ -49,7 +53,7 @@ export const bonusWorker = new Worker('bonusCalculationQueue', async (job: Job) 
     const currentPayoutRatio = totalRevenue > 0 ? (totalBonus / totalRevenue) * 100 : 0;
 
     if (currentPayoutRatio >= limitPct) {
-      console.warn(`[Worker] SAFETY LOCK TRIGGERED! Current payout ratio is ${currentPayoutRatio.toFixed(2)}% (Max: ${limitPct}%). Bonus suspended.`);
+      logger.warn(`[Worker] SAFETY LOCK TRIGGERED! Current payout ratio is ${currentPayoutRatio.toFixed(2)}% (Max: ${limitPct}%). Bonus suspended.`);
       // We could store it in a 'pending_bonus' table, but for MVP we skip
       return;
     }
@@ -67,16 +71,17 @@ export const bonusWorker = new Worker('bonusCalculationQueue', async (job: Job) 
     }
 
     if (!sponsorId) {
-      console.log(`[Worker] No sponsor found for purchaser ${purchaserId}. Skip direct bonus.`);
+      logger.info(`[Worker] No sponsor found for purchaser ${purchaserId}. Skip direct bonus.`);
     }
 
     // 4. Calculate Modules based on Toggles
     let totalToDistribute = 0;
 
     await prisma.$transaction(async (tx) => {
-      // Module 1: Direct Referral Bonus (10%)
-      if (config!.isReferralActive && sponsorId) {
-        const directBonus = orderAmount * 0.10;
+      // Module 1: Fast Start / Direct Referral Bonus
+      const fastStartRates: number[] = Array.isArray(config!.fastStartRates) ? config!.fastStartRates : JSON.parse(config!.fastStartRates || '[10, 5, 2]');
+      if (config!.isFastStartActive && sponsorId) {
+        const directBonus = orderAmount * ((fastStartRates[0] || 10) / 100);
         totalToDistribute += directBonus;
 
         const sponsor = await tx.user.findUnique({ where: { id: sponsorId } });
@@ -97,12 +102,13 @@ export const bonusWorker = new Worker('bonusCalculationQueue', async (job: Job) 
         }
       }
 
-      // Module 2: Unilevel Team Bonus (15% spread over 3 levels)
+      // Module 2: Unilevel Team Bonus (spread over configured levels)
+      const unilevelRates: number[] = Array.isArray(config!.unilevelRates) ? config!.unilevelRates : JSON.parse(config!.unilevelRates || '[5, 5, 5, 5, 5]');
       if (config!.isUnilevelActive && sponsorId) {
         let currentSponsorId: string | null = sponsorId;
-        const levels = [0.07, 0.05, 0.03]; // 7%, 5%, 3%
+        const levels = unilevelRates.map((r: number) => r / 100);
         
-        for (let i = 0; i < 3; i++) {
+        for (let i = 0; i < levels.length; i++) {
           if (!currentSponsorId) break;
           const upline: any = await tx.user.findUnique({ where: { id: currentSponsorId }});
           if (!upline) break;
@@ -132,10 +138,10 @@ export const bonusWorker = new Worker('bonusCalculationQueue', async (job: Job) 
     // Module 3: Overdrive Pool is calculated monthly, not per order!
     // We just note that the system will aggregate 5% of this order for the Overdrive Pool at the end of the month.
 
-    console.log(`[Worker] Distributed total ${totalToDistribute} KGS. New Payout Ratio: ${currentPayoutRatio.toFixed(2)}%`);
+    logger.info(`[Worker] Distributed total ${totalToDistribute} KGS. New Payout Ratio: ${currentPayoutRatio.toFixed(2)}%`);
 
   } catch (error) {
-    console.error(`[Worker] Error processing job ${job.id}:`, error);
+    logger.error({ err: error }, `[Worker] Error processing job ${job.id}:`);
     throw error;
   }
 }, { connection: connection as any });

@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue';
 import axios from 'axios';
+import ConfirmModal from '../components/ConfirmModal.vue';
 
 const config = ref<any>(null);
 const stats = ref<any>(null);
 const isLoading = ref(true);
 const isSaving = ref(false);
+const showCloseWeekModal = ref(false);
 
 const fetchConfig = async () => {
   try {
@@ -22,29 +24,51 @@ const fetchConfig = async () => {
   }
 };
 
-const toggleModule = async (moduleName: string) => {
-  config.value[moduleName] = !config.value[moduleName];
+const saveConfig = async () => {
   isSaving.value = true;
   try {
+    let fsr = typeof config.value.fastStartRates === 'string' ? JSON.parse(config.value.fastStartRates) : config.value.fastStartRates;
+    let ur = typeof config.value.unilevelRates === 'string' ? JSON.parse(config.value.unilevelRates) : config.value.unilevelRates;
+    
     await axios.put('/api/v1/system/config', {
       isReferralActive: config.value.isReferralActive,
+      fastStartRates: fsr,
       isUnilevelActive: config.value.isUnilevelActive,
+      unilevelRates: ur,
       isOverdriveActive: config.value.isOverdriveActive,
+      overdrivePoolPct: Number(config.value.overdrivePoolPct),
+      maxPayoutLimitPct: Number(config.value.maxPayoutLimitPct)
     }, { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
-  } catch (e) {
-    console.error('Failed to save module state', e);
-    // Revert on error
-    config.value[moduleName] = !config.value[moduleName];
+    
+    // update local state to reflect parsed
+    config.value.fastStartRates = JSON.stringify(fsr);
+    config.value.unilevelRates = JSON.stringify(ur);
+    
+    alert('Ayarlar başarıyla kaydedildi!');
+  } catch (e: any) {
+    if (e.name === 'SyntaxError' || (e.message && e.message.includes('JSON'))) {
+      alert('Kaydetme hatası. Lütfen JSON formatını (Örn: [10,5,2]) doğru girdiğinizden emin olun.');
+    } else {
+      // Report the real failure — never pretend the save succeeded.
+      console.error('Save bonus config error:', e);
+      const msg = e?.response?.data?.error || e?.message || 'Bilinmeyen hata';
+      alert('Ayarlar kaydedilemedi: ' + msg);
+    }
   } finally {
     isSaving.value = false;
   }
 };
 
+const toggleModule = async (moduleName: string) => {
+  config.value[moduleName] = !config.value[moduleName];
+  await saveConfig();
+};
+
 const closeWeek = async () => {
-  if (!confirm('Haftayı kapatmak istediğinize emin misiniz? Bu işlem bekleyen puanları (hedefleri) gelecek haftaya devredecek ve Olimpiyat Koşusunu sıfırlayacaktır.')) {
-    return;
-  }
-  
+  showCloseWeekModal.value = true;
+};
+
+const performCloseWeek = async () => {
   isSaving.value = true;
   try {
     await axios.post('/api/v1/system/close-week', {}, { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
@@ -55,6 +79,7 @@ const closeWeek = async () => {
     alert('Hafta kapatılırken bir hata oluştu.');
   } finally {
     isSaving.value = false;
+    showCloseWeekModal.value = false;
   }
 };
 
@@ -68,15 +93,50 @@ const progressColor = computed(() => {
   return '#22c55e'; // Green
 });
 
+const theoreticalMaxPayout = computed(() => {
+  if (!config.value) return 0;
+  let total = 0;
+  
+  try {
+    if (config.value.isReferralActive) {
+      let fsr = typeof config.value.fastStartRates === 'string' ? JSON.parse(config.value.fastStartRates) : config.value.fastStartRates;
+      if (Array.isArray(fsr)) total += fsr.reduce((a, b) => Number(a) + Number(b), 0);
+    }
+    if (config.value.isUnilevelActive) {
+      let ur = typeof config.value.unilevelRates === 'string' ? JSON.parse(config.value.unilevelRates) : config.value.unilevelRates;
+      if (Array.isArray(ur)) total += ur.reduce((a, b) => Number(a) + Number(b), 0);
+    }
+    if (config.value.isOverdriveActive) {
+      total += Number(config.value.overdrivePoolPct || 0);
+    }
+  } catch(e) {
+    console.error('JSON parse error for theoretical calculation');
+  }
+  return total;
+});
+
+const isBankruptRisk = computed(() => {
+  if (!config.value) return false;
+  return theoreticalMaxPayout.value > (config.value.maxPayoutLimitPct || 30);
+});
+
 const toggleMlm = async () => {
   const newState = !config.value.isMlmEnabled;
+  const token = localStorage.getItem('token');
+  if (!token) {
+    alert('Oturum bulunamadı. Lütfen /pv-hq-admin adresinden admin olarak giriş yapın.');
+    return;
+  }
   config.value.isMlmEnabled = newState;
   isSaving.value = true;
   try {
-    await axios.put('/api/v1/system/config', { isMlmEnabled: newState }, { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
-  } catch (e) {
+    await axios.put('/api/v1/system/config', { isMlmEnabled: newState }, { headers: { Authorization: `Bearer ${token}` } });
+  } catch (e: any) {
     config.value.isMlmEnabled = !newState; // Revert
-    alert('MLM durumu değiştirilemedi.');
+    const status = e?.response?.status;
+    if (status === 401) alert('Oturum süreniz dolmuş. Lütfen tekrar giriş yapın.');
+    else if (status === 403) alert('Bu işlem için admin yetkisi gerekiyor.');
+    else alert('MLM durumu değiştirilemedi: ' + (e?.response?.data?.error || e.message));
   } finally {
     isSaving.value = false;
   }
@@ -91,24 +151,24 @@ onMounted(() => {
   <div class="bonus-control-content animate-fade-in">
     <div class="header-row">
       <div>
-        <h2>E-Ticaret Sistemi Prim Kontrol Merkezi</h2>
-        <p class="subtitle">Gelir modellerini yönetin ve %30 şirket güvenlik kilidini izleyin.</p>
+        <h2>⚙️ Bonus Kontrol Merkezi</h2>
+        <p class="subtitle">MLM gelir modellerini yönetin ve %30 şirket güvenlik kilidini izleyin.</p>
       </div>
-      <button class="btn-primary" style="background:#ef4444; border:none;" @click="closeWeek" :disabled="isSaving">
+      <button class="btn-danger-solid" @click="closeWeek" :disabled="isSaving">
         🛑 Haftayı Kapat
       </button>
     </div>
 
-    <div v-if="isLoading" class="loading glass-panel">Veriler yükleniyor...</div>
+    <div v-if="isLoading" class="loading panel">Veriler yükleniyor...</div>
     
-    <div v-else-if="config && stats" class="dashboard-grid">
+    <div v-else-if="config && stats" class="admin-panel-grid">
 
       <!-- ═══ MLM MASTER TOGGLE ═══ -->
-      <div class="mlm-master-card glass-panel">
+      <div class="mlm-master-card panel">
         <div class="mlm-master-row">
           <div>
             <h3>🔌 MLM Motor Durumu</h3>
-            <p class="desc">Tüm ağ pazarlama modüllerini (Network, Bonus, Olimpiyat) tek anahtarla kapatabilirsiniz. E-ticaret, POS ve stok yönetimi etkilenmez.</p>
+            <p class="desc">Tüm ağ pazarlama modüllerini (Network, Bonus) tek anahtarla kapatabilirsiniz. E-ticaret, POS ve stok yönetimi etkilenmez.</p>
           </div>
           <button 
             class="mlm-toggle" 
@@ -116,7 +176,7 @@ onMounted(() => {
             @click="toggleMlm" 
             :disabled="isSaving">
             <span class="mlm-toggle-track">
-              <span class="mlm-toggle-dot"></span>
+              <span class="mlm-toggle-dot"/>
             </span>
             <span class="mlm-toggle-label">{{ config.isMlmEnabled ? 'AKTİF' : 'KAPALI' }}</span>
           </button>
@@ -127,10 +187,24 @@ onMounted(() => {
       </div>
       
       <!-- Security Lock Metric -->
-      <div class="metric-card glass-panel limit-card">
-        <h3>%30 Şirket Güvenlik Kilidi (Max Payout)</h3>
-        <p class="desc">Dağıtılan toplam primlerin şirket cirosuna oranı. %30'a ulaşırsa sistem yeni prim dağıtımını durdurur.</p>
+      <div class="metric-card panel limit-card">
+        <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+          <div>
+            <h3>Şirket Güvenlik Kilidi (Max Payout)</h3>
+            <p class="desc">Dağıtılan toplam primlerin şirket cirosuna oranı. Limit aşılırsa prim dağıtımı durur.</p>
+          </div>
+          <div class="limit-input">
+            <label>Limit (%)</label>
+            <input type="number" v-model="config.maxPayoutLimitPct" @change="saveConfig" style="width:70px; background:rgba(0,0,0,0.2); border:1px solid rgba(255,255,255,0.2); color:white; padding:4px 8px; border-radius:4px;" />
+          </div>
+        </div>
         
+        <div v-if="isBankruptRisk && config.isMlmEnabled" class="bankrupt-alert">
+          <strong>⚠️ MATEMATİKSEL İFLAS RİSKİ!</strong>
+          <br/>
+          Seçtiğiniz prim modellerinin toplam teorik dağıtımı (%{{ theoreticalMaxPayout }}) şirket limitini (%{{ config.maxPayoutLimitPct }}) aşıyor! Satışlar arttıkça şirket zarar edecektir. Lütfen prim şalterlerinden bazılarını kapatın.
+        </div>
+
         <div class="stats-row">
           <div class="stat">
             <span>Toplam Ciro</span>
@@ -147,7 +221,7 @@ onMounted(() => {
             <div 
               class="progress-bar-fill" 
               :style="{ width: `${Math.min(payoutRatioNumber, 100)}%`, backgroundColor: progressColor }"
-            ></div>
+            />
           </div>
           <div class="progress-labels">
             <span :style="{ color: progressColor, fontWeight: 'bold' }">%{{ stats.currentPayoutRatio }}</span>
@@ -157,13 +231,17 @@ onMounted(() => {
       </div>
 
       <!-- Income Models Toggles (Only relevant when MLM is ON) -->
-      <div class="modules-card glass-panel" :class="{ 'disabled-card': !config.isMlmEnabled }">
-        <h3>Aktif Gelir Modelleri (Şalterler)</h3>
+      <div class="modules-card panel" :class="{ 'disabled-card': !config.isMlmEnabled }">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 16px;">
+          <h3>Aktif Gelir Modelleri (Şalterler)</h3>
+          <button class="btn-primary" style="padding: 6px 12px; font-size:12px;" @click="saveConfig" :disabled="isSaving">💾 Oranları Kaydet</button>
+        </div>
         
         <div class="module-item">
           <div class="module-info">
-            <h4>1. Referans Primi (%10)</h4>
-            <p>Direkt satışlardan elde edilen anında kazanç modeli.</p>
+            <h4>1. Referans Primi (Derinlik Oranları)</h4>
+            <p>Direkt satışlardan elde edilen anında kazanç modeli. Format: [10, 5, 2]</p>
+            <input type="text" class="rate-input" v-model="config.fastStartRates" placeholder="Örn: [10, 5, 2]" />
           </div>
           <button 
             class="toggle-btn" 
@@ -177,8 +255,9 @@ onMounted(() => {
 
         <div class="module-item">
           <div class="module-info">
-            <h4>2. Derinlik / Unilevel Ekip Primi</h4>
-            <p>Ağın alt katmanlarından gelen hacim bazlı takım primi.</p>
+            <h4>2. Unilevel Ekip Primi (Derinlik Oranları)</h4>
+            <p>Ağın alt katmanlarından gelen hacim bazlı takım primi. Format: [5, 5, 5]</p>
+            <input type="text" class="rate-input" v-model="config.unilevelRates" placeholder="Örn: [5, 5, 5, 5, 5]" />
           </div>
           <button 
             class="toggle-btn" 
@@ -190,10 +269,14 @@ onMounted(() => {
           </button>
         </div>
 
-        <div class="module-item highlight-module">
+        <div class="module-item">
           <div class="module-info">
-            <h4>3. Antigravity "Overdrive" Primi (%5) 🚀</h4>
-            <p>Şirket cirosunun %5'i havuzda birikir. Piramidi yıkan performansa dayalı global ödül.</p>
+            <h4>3. Antigravity "Overdrive" Primi (%) 🚀</h4>
+            <p>Şirket cirosunun belli bir yüzdesi havuzda birikir.</p>
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span style="font-size:14px;">Oran (%):</span>
+              <input type="number" class="rate-input-small" v-model="config.overdrivePoolPct" />
+            </div>
           </div>
           <button 
             class="toggle-btn" 
@@ -208,6 +291,25 @@ onMounted(() => {
       </div>
 
     </div>
+
+    <!-- Haftayı Kapat Onay Modalı -->
+    <ConfirmModal
+      :is-open="showCloseWeekModal"
+      variant="danger"
+      title="Haftayı Kapat — Geri Alınamaz İşlem"
+      message="Bu haftalık MLM döngüsünü kapatmak ve puanları bir sonraki haftaya devretmek üzeresiniz. Tüm distribütör hacim verileri sıfırlanacak ve yeni hafta başlayacaktır."
+      :details="[
+        'Tüm aktif WeeklyCycle kayıtları kapatılır (isClosed=true)',
+        'Kullanıcı haftalık hacimleri (PersonalVolume + TeamVolume) bir sonraki haftaya carry-over olarak devredilir',
+        'Yeni bir WeeklyCycle (weekNumber+1) otomatik oluşturulur',
+        'Bu işlem geri alınamaz — manuel SQL müdahalesi gerekir'
+      ]"
+      confirm-text="HAFTAYI KAPAT"
+      cancel-text="Vazgeç"
+      require-text-confirm="KAPAT"
+      @cancel="showCloseWeekModal = false"
+      @confirm="performCloseWeek"
+    />
   </div>
 </template>
 
@@ -218,22 +320,43 @@ onMounted(() => {
   display: flex;
   flex-direction: column;
   gap: 24px;
+  overflow-y: auto;
 }
 
 .subtitle {
   color: var(--color-text-muted);
   margin-top: 8px;
+  font-size: 12px;
 }
 
-.dashboard-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 24px;
+.btn-danger-solid {
+  padding: 10px 20px;
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-family: 'Outfit', sans-serif;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.15s;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+}
+.btn-danger-solid:hover:not(:disabled) {
+  filter: brightness(1.1);
+  box-shadow: 0 6px 16px rgba(239, 68, 68, 0.5);
+  transform: translateY(-1px);
+}
+.btn-danger-solid:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
-.metric-card, .modules-card {
-  padding: 32px;
-}
+
 
 h3 {
   margin-bottom: 12px;
@@ -323,30 +446,48 @@ h3 {
 }
 
 .toggle-btn {
-  background: rgba(255,255,255,0.1);
-  border: 2px solid rgba(255,255,255,0.2);
-  color: white;
+  background: linear-gradient(145deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02));
+  border: 1px solid rgba(255,255,255,0.1);
+  color: #a1a1aa;
   padding: 8px 24px;
   border-radius: 20px;
   cursor: pointer;
-  font-weight: bold;
-  transition: all 0.3s;
+  font-weight: 700;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 
+    inset 2px 2px 5px rgba(255,255,255,0.05),
+    inset -2px -2px 5px rgba(0,0,0,0.5),
+    0 4px 10px rgba(0,0,0,0.3);
+}
+
+.toggle-btn:hover {
+  transform: translateY(-2px);
+  color: #fff;
+  box-shadow: 
+    inset 2px 2px 5px rgba(255,255,255,0.1),
+    inset -2px -2px 5px rgba(0,0,0,0.5),
+    0 6px 15px rgba(0,0,0,0.4);
 }
 
 .toggle-btn.active {
-  background: #10b981;
-  border-color: #10b981;
-  box-shadow: 0 0 15px rgba(16, 185, 129, 0.4);
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: #fff;
+  border-color: rgba(16, 185, 129, 0.5);
+  box-shadow: 
+    inset 2px 2px 5px rgba(255,255,255,0.3),
+    inset -2px -2px 5px rgba(0,0,0,0.2),
+    0 4px 15px rgba(16, 185, 129, 0.4);
+}
+.toggle-btn.active:hover {
+  box-shadow: 
+    inset 2px 2px 5px rgba(255,255,255,0.4),
+    inset -2px -2px 5px rgba(0,0,0,0.2),
+    0 6px 20px rgba(16, 185, 129, 0.6);
 }
 
-@media (max-width: 1024px) {
-  .dashboard-grid {
-    grid-template-columns: 1fr;
-  }
-}
 
 /* ═══ MLM Master Toggle ═══ */
-.mlm-master-card { grid-column: 1 / -1; padding: 28px 32px; }
+.mlm-master-card { grid-column: 1 / -1; }
 .mlm-master-row { display: flex; justify-content: space-between; align-items: center; gap: 24px; }
 .mlm-toggle { display: flex; align-items: center; gap: 12px; background: none; border: none; cursor: pointer; padding: 8px; }
 .mlm-toggle-track { width: 56px; height: 28px; border-radius: 14px; position: relative; transition: background .3s; }
@@ -362,4 +503,41 @@ h3 {
 
 .disabled-card { opacity: .45; pointer-events: none; position: relative; }
 .disabled-card::after { content: 'MLM Kapalı'; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 18px; font-weight: 800; color: #ef4444; letter-spacing: 2px; }
+.bankrupt-alert {
+  margin-bottom: 24px;
+  padding: 16px;
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  border-radius: 8px;
+  color: #ffb3b3;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.bankrupt-alert strong {
+  color: #ef4444;
+  font-size: 16px;
+}
+
+.rate-input {
+  width: 100%;
+  max-width: 200px;
+  background: rgba(0,0,0,0.2);
+  border: 1px solid rgba(255,255,255,0.2);
+  color: white;
+  padding: 6px 12px;
+  border-radius: 6px;
+  margin-top: 8px;
+  font-family: monospace;
+}
+
+.rate-input-small {
+  width: 60px;
+  background: rgba(0,0,0,0.2);
+  border: 1px solid rgba(255,255,255,0.2);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-family: monospace;
+}
 </style>

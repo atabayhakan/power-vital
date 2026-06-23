@@ -1,9 +1,13 @@
 <script setup lang="ts">
 import { ref } from 'vue';
+import api from '../utils/api';
+import { useAuthStore } from '../stores/useAuthStore';
 import { useRouter } from 'vue-router';
-import axios from 'axios';
+import { useTranslate } from '../composables/useTranslate';
 
+const authStore = useAuthStore();
 const router = useRouter();
+const { t } = useTranslate();
 const email = ref('');
 const password = ref('');
 const errorMsg = ref('');
@@ -13,26 +17,22 @@ const login = async () => {
   try {
     isLoading.value = true;
     errorMsg.value = '';
-    const res = await axios.post('/api/v1/auth/login', {
+    const res = await api.post('/auth/login', {
       email: email.value,
       password: password.value
     });
-    
-    // Setup session
-    localStorage.setItem('token', res.data.token);
-    localStorage.setItem('userId', res.data.user.id);
-    localStorage.setItem('role', res.data.user.role);
-    
-    // Redirect based on role
+
+    authStore.setAuth(res.data.user.role, res.data.user, res.data.token, res.data.user.id);
+
     if (res.data.user.role === 'admin') {
       router.push('/admin');
     } else if (res.data.user.role === 'distributor') {
       router.push('/dashboard');
     } else {
-      router.push('/'); // Customer stays on storefront
+      router.push('/account');
     }
   } catch (err: any) {
-    errorMsg.value = err.response?.data?.error || 'Giriş başarısız oldu.';
+    errorMsg.value = err.response?.data?.error || t('login.loginFailed');
   } finally {
     isLoading.value = false;
   }
@@ -44,29 +44,29 @@ const login = async () => {
     <div class="auth-card glass-panel-light">
       <div class="auth-header">
         <h2 class="brand-text">POWER <span class="vital">VITAL</span></h2>
-        <p>Hesabınıza giriş yapın</p>
+        <p>{{ t('login.subtitle') }}</p>
       </div>
-      
+
       <form @submit.prevent="login" class="auth-form">
         <div class="form-group">
-          <label>E-posta Adresi</label>
-          <input type="email" v-model="email" required placeholder="ornek@email.com" class="light-input" />
+          <label>{{ t('login.email') }}</label>
+          <input type="email" v-model="email" required :placeholder="t('common.emailPlaceholder')" class="light-input" />
         </div>
-        
+
         <div class="form-group">
-          <label>Şifre</label>
+          <label>{{ t('login.password') }}</label>
           <input type="password" v-model="password" required placeholder="••••••••" class="light-input" />
         </div>
-        
+
         <div v-if="errorMsg" class="error-msg">{{ errorMsg }}</div>
-        
+
         <button type="submit" class="btn-primary auth-btn" :disabled="isLoading">
-          {{ isLoading ? 'Giriş Yapılıyor...' : 'Giriş Yap' }}
+          {{ isLoading ? t('login.submitting') : t('login.submit') }}
         </button>
       </form>
-      
+
       <div class="auth-footer">
-        Hesabınız yok mu? <router-link to="/register">Kayıt Ol</router-link>
+        {{ t('login.noAccount') }} <router-link to="/register">{{ t('login.signUp') }}</router-link>
       </div>
     </div>
   </div>
@@ -79,7 +79,7 @@ const login = async () => {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #f8f9fa; /* Light theme background */
+  background: #f8f9fa;
   font-family: 'Poppins', sans-serif;
 }
 
@@ -107,7 +107,7 @@ const login = async () => {
 }
 
 .brand-text .vital {
-  color: #b05d5d; /* Original site maroon accent */
+  color: var(--color-primary);
 }
 
 .auth-header p {
@@ -146,7 +146,7 @@ const login = async () => {
 }
 
 .light-input:focus {
-  border-color: #b05d5d;
+  border-color: var(--color-primary);
 }
 
 .auth-btn {
@@ -155,13 +155,13 @@ const login = async () => {
   font-size: 16px;
   font-weight: 600;
   margin-top: 10px;
-  background: #000; /* Dark premium button */
+  background: #000;
   border-radius: 8px;
   transition: background 0.3s;
 }
 
 .auth-btn:hover {
-  background: #b05d5d;
+  background: var(--color-primary);
 }
 
 .auth-btn:disabled {
@@ -186,7 +186,7 @@ const login = async () => {
 }
 
 .auth-footer a {
-  color: #b05d5d;
+  color: var(--color-primary);
   font-weight: 600;
   text-decoration: none;
 }

@@ -4,56 +4,23 @@ generator client {
   engineType    = "library"
 }
 
+// The datasource URL must live here for Prisma 5 (and prisma.config.ts
+// re-exports it for Prisma 7). Keep both happy by reading from env.
 datasource db {
-  provider = "postgresql"
+  provider = "mysql"
   url      = env("DATABASE_URL")
 }
 
-enum Role {
-  admin
-  customer
-  dealer
-  distributor
-}
-
-enum OrderType {
-  pos
-  ecommerce
-  b2b
-}
-
-enum OrderStatus {
-  pending
-  paid
-  completed
-  shipped
-  cancelled
-  refunded
-}
-
-enum PaymentMethod {
-  cash
-  credit_card
-  wallet
-  qr_transfer
-}
-
-enum TransactionType {
-  deposit
-  withdrawal
-  bonus
-  purchase
-}
-
-enum Currency {
-  KGS
-  USD
-}
+// SQLite enums desteklemez. Rol ve OrderType string olarak tutuluyor.
+// Role degerleri: guest, customer, cashier, dealer, distributor, admin
+// OrderType degerleri: ecommerce, pos, mlm_backoffice, b2b
 
 model User {
   id             String  @id @default(uuid())
-  role           Role    @default(customer)
+  role           String  @default("customer")
   sponsorId      String?
+  placementId    String?
+  legPosition    String?
   sponsor        User?   @relation("Sponsor", fields: [sponsorId], references: [id])
   sponsoredUsers User[]  @relation("Sponsor")
 
@@ -61,8 +28,20 @@ model User {
   email        String @unique
   passwordHash String
 
-  walletBalanceKgs Decimal @default(0.00) @db.Decimal(12, 2)
-  walletBalanceUsd Decimal @default(0.00) @db.Decimal(12, 2)
+  walletBalanceKgs Decimal @default(0.00)
+  walletBalanceUsd Decimal @default(0.00)
+
+  cumulativeSpendUsd  Decimal @default(0.00)
+  loyaltyLevel        Int     @default(0)
+  dynamicDiscountRate Decimal @default(0.00)
+
+  isMonthlyActive Boolean @default(true)
+
+  // Preferred UI/admin locale (used for outgoing notifications too)
+  preferredLocale String  @default("tr")
+
+  // Soft-delete tombstone — bulk delete sets this instead of hard-removing users.
+  deletedAt       DateTime?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -70,16 +49,65 @@ model User {
   orders          Order[]
   transactions    Transaction[]
   userWeeklyStats UserWeeklyStats[]
+  withdrawals     WithdrawalRequest[]
+  reviews         ProductReview[]
+  storeReviews    StoreReview[]
+  refreshTokens   RefreshToken[]
+  pushSubscriptions PushSubscription[]
+  cartAbandonments  CartAbandonment[]
+  clientErrors    ClientError[]
+  broadcastLogsSent BroadcastLog[] @relation("BroadcastSender")
+  broadcastLogsReceived BroadcastLog[] @relation("BroadcastTarget")
+  broadcastJobs BroadcastJob[] @relation("BroadcastJobActor")
+  impersonationsAsAdmin ImpersonationSession[] @relation("ImpersonationAdmin")
+  impersonationsAsTarget ImpersonationSession[] @relation("ImpersonationTarget")
+
+  @@index([sponsorId])
+  @@index([placementId])
+  @@index([isMonthlyActive])
+}
+
+model WithdrawalRequest {
+  id     String @id @default(uuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  amount   Decimal
+  currency String  @default("KGS")
+  status   String  @default("pending")
+  bankInfo String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status])
+  @@index([createdAt])
 }
 
 model Product {
   id          String  @id @default(uuid())
   barcode     String  @unique
   name        String
-  description String?
+  description String?  @db.Text
 
-  basePriceKgs Decimal @db.Decimal(12, 2)
-  basePriceUsd Decimal @db.Decimal(12, 2)
+  // 📦 Product Detail Page accordions (admin-managed, fully dynamic)
+  // Each entry = { key, title, content, isOpen, sortOrder }
+  //   - key:        stable id (e.g. "storage", "usage") — used for icon mapping
+  //   - title:      user-editable accordion header (defaults: "Saklama Koşulları", etc.)
+  //   - content:    plain text body
+  //   - isOpen:     initial state when the page loads (collapsed by default)
+  //   - sortOrder:  display order in the accordion list
+  // Stored as JSON string because MySQL has no native JSON type in this schema
+  accordions   String?  @db.Text
+
+  // Faydaları list (kept as a separate JSON array because the UI is a list
+  // with add/remove/sort buttons rather than a single accordion)
+  benefits     String?  @db.Text
+
+  basePriceKgs Decimal
+  basePriceUsd Decimal
+
+  translations String?  @db.Text
 
   stockQuantity Int @default(0)
   minStockAlert Int @default(10)
@@ -93,55 +121,67 @@ model Product {
   priceRules PriceRule[]
   orderItems OrderItem[]
   images     ProductImage[]
+  reviews    ProductReview[]
+
+  @@index([categoryId])
+  @@index([barcode])
 }
 
 model PriceRule {
   id             String  @id @default(uuid())
   productId      String
-  product        Product @relation(fields: [productId], references: [id])
-  role           Role
-  customPriceKgs Decimal @db.Decimal(12, 2)
+  product        Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  role           String
+  customPriceKgs Decimal
 
   @@unique([productId, role])
 }
 
 model Order {
   id     String @id @default(uuid())
-  userId String
-  user   User   @relation(fields: [userId], references: [id])
+  userId String?
+  user   User?  @relation(fields: [userId], references: [id])
 
-  orderType OrderType
-  status    OrderStatus @default(pending)
+  orderType String @default("ecommerce")
+  status    String @default("pending")
 
-  totalKgs Decimal @db.Decimal(12, 2)
-  totalUsd Decimal @db.Decimal(12, 2)
+  totalKgs Decimal
+  totalUsd Decimal
 
-  paymentMethod PaymentMethod
+  paymentMethod String
 
-  customerName   String?
-  customerPhone  String?
-  address        String?
+  customerName    String?
+  customerPhone   String?
+  customerEmail   String?
+  address         String?  @db.Text
   receiptImageUrl String?
-  ocrResult       Json?
+  ocrResult       String?  @db.Text
   verifiedAt      DateTime?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   items OrderItem[]
+
+  @@index([status])
+  @@index([paymentMethod])
+  @@index([createdAt])
+  @@index([userId, createdAt])
 }
 
 model OrderItem {
   id      String @id @default(uuid())
   orderId String
-  order   Order  @relation(fields: [orderId], references: [id])
+  order   Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
 
   productId String
-  product   Product @relation(fields: [productId], references: [id])
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 
   quantity      Int
-  unitPriceKgs  Decimal @db.Decimal(12, 2)
-  totalPriceKgs Decimal @db.Decimal(12, 2)
+  unitPriceKgs  Decimal
+  totalPriceKgs Decimal
+
+  @@index([orderId, productId])
 }
 
 model Transaction {
@@ -149,36 +189,39 @@ model Transaction {
   userId String
   user   User   @relation(fields: [userId], references: [id])
 
-  type        TransactionType
-  amount      Decimal         @db.Decimal(12, 2)
-  currency    Currency
+  type        String
+  amount      Decimal
+  currency    String
   description String?
 
   createdAt DateTime @default(now())
+
+  @@index([type])
+  @@index([createdAt])
 }
 
 model ExchangeRate {
   id        String   @id @default(uuid())
   currency  String   @unique @default("USD")
-  rateToKgs Decimal  @db.Decimal(12, 4)
+  rateToKgs Decimal
   updatedAt DateTime @updatedAt
 }
 
 model SystemConfig {
-  id                String   @id @default(uuid())
-  isMlmEnabled      Boolean  @default(true)
-  maxPayoutLimitPct Decimal  @default(30.00) @db.Decimal(5, 2)
-  
-  isFastStartActive Boolean  @default(true)
-  fastStartRates    Json     @default("[10, 5, 2]")
-  
-  isUnilevelActive  Boolean  @default(true)
-  unilevelRates     Json     @default("[5, 5, 5, 5, 5]")
-  
-  isOverdriveActive Boolean  @default(true)
-  overdrivePoolPct  Decimal  @default(5.00) @db.Decimal(5, 2)
-  
-  updatedAt         DateTime @updatedAt
+  id                    String   @id @default(uuid())
+  isMlmEnabled          Boolean  @default(true)
+  maxPayoutLimitPct     Decimal  @default(30.00)
+
+  isFastStartActive     Boolean  @default(true)
+  fastStartRates        String   @default("[10, 5, 2]")
+
+  isUnilevelActive      Boolean  @default(true)
+  unilevelRates         String   @default("[5, 5, 5, 5, 5]")
+
+  isOverdriveActive     Boolean  @default(true)
+  overdrivePoolPct      Decimal  @default(5.00)
+
+  updatedAt             DateTime @updatedAt
 }
 
 model WeeklyCycle {
@@ -200,14 +243,12 @@ model UserWeeklyStats {
   cycleId String
   cycle   WeeklyCycle @relation(fields: [cycleId], references: [id])
 
-  personalVolume  Decimal @default(0.00) @db.Decimal(12, 2)
-  teamVolume      Decimal @default(0.00) @db.Decimal(12, 2)
-  carryOverVolume Decimal @default(0.00) @db.Decimal(12, 2)
+  personalVolume  Decimal @default(0.00)
+  teamVolume      Decimal @default(0.00)
+  carryOverVolume Decimal @default(0.00)
 
   @@unique([userId, cycleId])
 }
-
-// ═══════════ NEW: Clean Commerce Models ═══════════
 
 model HeroSlide {
   id         String  @id @default(uuid())
@@ -215,21 +256,30 @@ model HeroSlide {
   subtitle   String?
   buttonText String?
   buttonLink String?
-  imageUrl   String
-  sortOrder  Int     @default(0)
+  imageUrl       String
+  mobileImageUrl String?
+
+  displayMode    String   @default("IMAGE_ONLY")
+  overlayOpacity Int      @default(0)
+  scheduledStart DateTime?
+  scheduledEnd   DateTime?
+
+  sortOrder      Int      @default(0)
+  translations   String?
   isActive   Boolean @default(true)
   createdAt  DateTime @default(now())
 }
 
 model Category {
-  id        String    @id @default(uuid())
-  name      String    @unique
-  slug      String    @unique
-  iconEmoji String?
-  imageUrl  String?
-  sortOrder Int       @default(0)
-  isActive  Boolean   @default(true)
-  products  Product[]
+  id           String    @id @default(uuid())
+  name         String    @unique
+  slug         String    @unique
+  iconEmoji    String?
+  imageUrl     String?
+  translations String?
+  sortOrder    Int       @default(0)
+  isActive     Boolean   @default(true)
+  products     Product[]
 }
 
 model ProductImage {
@@ -247,15 +297,437 @@ model SiteSettings {
   address           String?
   phone             String?
   email             String?
-  mapIframeCode     String?  @db.Text
-  
-  // UI Dynamic Fields
+  mapIframeCode     String?
+
   topbarShippingMsg String?  @default("🚚 1 000 сом üzeri siparişlerde ücretsiz kargo")
   topbarPhone       String?  @default("📞 +996 312 123 456")
-  trustBadges       Json?    // Array of { id, icon, title, desc, isActive }
-  partners          Json?    // Array of { id, logoUrl, name, link, isActive }
-  footerLinks       Json?    // Array of { id, title, url, sortOrder }
+  trustBadges       String?  @db.Text
+  partners          String?  @db.Text
+  footerLinks       String?  @db.Text
+  homepageBlocks    String?  @db.Text
+  themeSettings     String?  @db.Text
+  financeSettings   String?  @db.Text
+  faqItems          String?  @db.Text
   copyrightText     String?  @default("© 2026 Power Vital. Tüm hakları saklıdır.")
+  activeThemeId     String?
+
+  // Hero campaign banner — admin schedules a countdown that
+  // appears at the top of the storefront. `campaignEnabled`
+  // controls visibility, `campaignEndsAt` is the deadline
+  // (after which the banner hides itself). Translatable
+  // strings live under the existing `translations` field
+  // (kg/ru/en/tr) — keys: `campaignTitle`, `campaignCta`.
+  campaignEnabled   Boolean   @default(false)
+  campaignEndsAt    DateTime?
+  campaignTitle     String?   @default("До конца летней акции")
+  campaignCta       String?   @default("Купить")
+  campaignLink      String?   @default("/katalog")
+  translations      String?  @db.Text
+
+  // Runtime overrides for the STATIC UI strings (button labels, nav, system
+  // messages) that otherwise live in the frontend's bundled locale JSON.
+  // Shape: { "tr": { nested keys }, "ru": {...}, "kg": {...} }. Only changed
+  // keys are stored; everything else falls back to the bundled default. The
+  // storefront merges these into vue-i18n at boot so the admin can edit any
+  // on-screen text from the Translation Center without a rebuild.
+  uiTranslations    String?  @db.Text
 
   updatedAt         DateTime @updatedAt
+}
+
+model MediaFolder {
+  id        String   @id @default(uuid())
+  name      String   @unique
+  createdAt DateTime @default(now())
+  media     Media[]
+
+  @@index([createdAt])
+}
+
+model Media {
+  id            String   @id @default(uuid())
+  folderId      String?
+  folder        MediaFolder? @relation(fields: [folderId], references: [id])
+  filename      String
+  originalName  String
+  url           String
+  mimeType      String
+  size          Int
+  createdAt     DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([folderId])
+}
+
+model Page {
+  id        String   @id @default(uuid())
+  slug      String   @unique
+  title     String
+  content   String   @db.LongText
+  translations String?  @db.Text
+  status    String   @default("published")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model ProductReview {
+  id        String   @id @default(uuid())
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  name      String
+  rating    Int
+  text      String   @db.Text
+  translations String?  @db.Text
+  status    String   @default("pending") // pending, published, rejected
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([productId, status])
+  @@index([userId])
+}
+
+model StoreReview {
+  id        String  @id @default(uuid())
+  userId    String?
+  user      User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
+  name      String
+  rating    Int
+  text      String  @db.Text
+  translations String?  @db.Text
+  status    String  @default("pending") // pending, published, rejected
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status])
+  @@index([userId])
+}
+
+// Refresh tokens — short-lived access tokens (15 min) + long-lived refresh
+// tokens (7 days). The refresh token is stored as a SHA-256 hash (so a DB
+// leak doesn't grant access). A "family" groups all tokens in a single
+// login session so we can revoke the whole session on token reuse.
+model RefreshToken {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // SHA-256 of the raw token (32-byte random). The raw token never
+  // touches the DB — only the server can verify the hash on rotation.
+  tokenHash String   @unique
+
+  // Family = the login session. If a refresh token in a family is ever
+  // used twice (replay attack), every token in the family is revoked.
+  family   String
+
+  // The previous token's id in the rotation chain. Lets us audit the
+  // rotation path and detect anomalies.
+  replacedBy String?
+
+  // Set when the token is used (rotated) or explicitly logged out
+  revokedAt DateTime?
+
+  // ip + userAgent at issuance — used to flag suspicious re-use from
+  // a different network or device
+  issuedToIp String?
+  userAgent  String?  @db.Text
+
+  expiresAt DateTime
+  createdAt DateTime  @default(now())
+
+  @@index([userId])
+  @@index([family])
+  @@index([expiresAt])
+}
+
+// Web Push API subscription — one user can have multiple (desktop + phone + tablet).
+// Each subscription holds its own endpoint + key pair (auth/p256dh from the browser).
+model PushSubscription {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // FCM / Mozilla endpoint URL. MySQL cannot index full TEXT,
+  // so we keep endpoint at 512 chars and unique-index the prefix.
+  endpoint  String   @unique @db.VarChar(512)
+
+  // ECIES keys returned by PushManager.subscribe()
+  p256dh    String   @db.Text
+  auth      String   @db.Text
+
+  // Optional UA / device hint — purely for the admin UI
+  userAgent String?  @db.Text
+
+  // Per-event opt-outs. JSON string of { eventKey: bool }.
+  // Empty/{} means subscribed to all (default).
+  preferences String  @db.Text
+
+  // Audit timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  lastSeenAt DateTime @default(now())
+
+  @@index([userId])
+}
+
+// Cart-abandonment tracker.
+//
+// We persist a row every time a visitor (logged in OR identified by
+// a stable guestId) mutates their cart, then a 5-minute scheduler
+// sweeps for rows that are still "pending" past the
+// abandonmentDelay (1h default) and dispatches a push notification.
+// Once notified, status flips to "notified" and we never nag again
+// for the same cart snapshot.
+//
+// `userId` is nullable because most carts belong to anonymous
+// visitors who never logged in. The push fan-out skips those rows
+// (we have no endpoint to send to).
+//
+// `cartItems` is a JSON snapshot of the cart at the moment of
+// abandonment so the push body can include the top product name
+// + thumbnail + cart total — even after the visitor edits or
+// empties the cart.
+model CartAbandonment {
+  id           String   @id @default(uuid())
+  userId       String?
+  user         User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  // Stable cookie id for guest carts (so we can match subsequent
+  // updates to the same abandonment). Optional — guests without
+  // cookies still get a row, just one we can't de-dupe.
+  guestId      String?
+
+  // The product the user last interacted with. Most-cases the
+  // push body is "you left X in your cart, complete the order".
+  lastProductId   String?
+  lastProductName String?
+  lastProductImg  String?
+
+  // JSON: [{ id, name, imageUrl, basePriceUsd, quantity }, ...]
+  cartItems    String   @db.Text
+  cartTotalUsd Float
+  cartTotalKgs Float
+
+  // Lifecycle: pending → notified (push sent) → converted (the
+  // user came back and checked out) | expired (cart is too old).
+  status       String   @default("pending")
+
+  // Timestamp fields used by the sweeper. `lastActivityAt` is
+  // bumped every time the cart changes (so a shopper who keeps
+  // adding items resets the 1-hour clock). `notifiedAt` records
+  // when we last dispatched the push.
+  lastActivityAt DateTime @default(now())
+  notifiedAt     DateTime?
+  convertedAt    DateTime?
+  expiresAt      DateTime?
+
+  // Per-locale subject/headline/body/cta overrides for the
+  // abandoned-cart email + push. Admin can tweak from /admin/i18n
+  // without redeploying. Same shape as Product.translations.
+  translations   String?  @db.Text
+
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([userId, status])
+  @@index([status, lastActivityAt])
+  @@index([guestId])
+}
+
+// Audit log of admin-initiated push broadcasts.
+//
+// One row per (actor, target, eventKey, dispatch time). We deliberately
+// do NOT store the raw notification body — PII / marketing copy can
+// change in retrospect, but the audit trail must be immutable. If you
+// need the original body for compliance, extend with a `bodySnapshot`
+// Text field (encrypt-at-rest recommended).
+model BroadcastLog {
+  id        String   @id @default(uuid())
+
+  // Who sent it (admin user). Nullable so test/dry-run rows survive
+  // user deletion.
+  actorId   String?
+  actor     User?    @relation("BroadcastSender", fields: [actorId], references: [id], onDelete: SetNull)
+
+  // Who received it (customer / distributor).
+  targetId  String
+  target    User     @relation("BroadcastTarget", fields: [targetId], references: [id], onDelete: Cascade)
+
+  // Event key from sendToUser (order_paid, withdrawal_approved, …)
+  eventKey  String
+
+  // Result counts — mirrors pushService.sendToUser() response shape.
+  sent      Int      @default(0)
+  expired   Int      @default(0)
+  failed    Int      @default(0)
+
+  // Optional note (e.g. "dry-run" or skipped reason)
+  note      String?  @db.Text
+
+  // Groups multi-target broadcasts (admin fan-out) so the history view
+  // can collapse all rows from a single request into one row.
+  // Single-target broadcasts leave this null.
+  parentBroadcastId String?
+
+  createdAt DateTime @default(now())
+
+  @@index([actorId, createdAt])
+  @@index([targetId, createdAt])
+  @@index([eventKey])
+  @@index([parentBroadcastId])
+}
+
+// Scheduled broadcast — a job that the scheduler tick will dispatch
+// at `scheduledAt`. Created by admin via POST /push/schedule, edited or
+// cancelled until it transitions to `dispatched`.
+//
+// Job states:
+//   pending    — waiting for scheduledAt
+//   dispatched — scheduler ran it (BroadcastLog rows created)
+//   cancelled  — admin cancelled before dispatch
+//   failed     — scheduler tried but every target errored
+model BroadcastJob {
+  id        String   @id @default(uuid())
+
+  // Admin who scheduled this job. Nullable so deleting an admin
+  // doesn't lose the audit trail.
+  actorId   String?
+  actor     User?    @relation("BroadcastJobActor", fields: [actorId], references: [id], onDelete: SetNull)
+
+  // Free-form note (e.g. "Q3 promo — full send")
+  note      String?  @db.Text
+
+  // Job status. Use a string column rather than enum because
+  // SQLite (used in some test envs) doesn't support enums.
+  status    String   @default("pending")
+
+  // Target spec — same shape as POST /push/broadcast body. We
+  // denormalise into JSON so the scheduler can resolve it without
+  // re-reading the originating request later.
+  targetMode String  // 'single' | 'multi' | 'segment'
+  targetIds  String? @db.Text  // JSON array of user IDs (single/multi)
+  segmentRole String?           // 'customer' | 'distributor' | etc.
+
+  // Push payload
+  title      String   @db.VarChar(120)
+  body       String   @db.Text
+  url        String   @default("/")
+  eventKey   String   @default("custom")
+  tag        String?  @db.VarChar(64)
+
+  // Scheduling
+  scheduledAt DateTime
+  dispatchedAt DateTime?
+  cancelledAt  DateTime?
+
+  // After dispatch, link back to the BroadcastLog parentBroadcastId
+  // so the history view can group the result rows.
+  resultParentBroadcastId String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status, scheduledAt])  // scheduler tick: WHERE pending AND scheduledAt <= now
+  @@index([actorId, createdAt])
+}
+
+// ImpersonationSession — when an admin uses POST /impersonate/:userId,
+// we create one row so every API request can be traced back to
+// "admin X acting as user Y". Auto-expires after `expiresAt` (60 min).
+//
+// The session record is the audit trail. We also log every action
+// (BroadcastLog, Order.status updates, etc.) with the original
+// `actorId` so the operator's identity is preserved.
+//
+// Deletion: sessions are NOT deleted on /impersonate/stop — they
+// stay as immutable audit records. A daily cron could prune them
+// after N days (out of scope here).
+model ImpersonationSession {
+  id           String   @id @default(uuid())
+
+  // Admin who initiated the impersonation
+  adminId      String
+  admin        User     @relation("ImpersonationAdmin", fields: [adminId], references: [id], onDelete: Cascade)
+
+  // User being impersonated
+  targetId     String
+  target       User     @relation("ImpersonationTarget", fields: [targetId], references: [id], onDelete: Cascade)
+
+  // Why the admin is doing this (free-form, max 500 chars)
+  reason       String?  @db.Text
+
+  // IP + UA captured at start for forensic trail
+  ipAddress    String?  @db.VarChar(64)
+  userAgent    String?  @db.Text
+
+  // Lifecycle
+  startedAt    DateTime @default(now())
+  expiresAt    DateTime              // startedAt + 60 minutes
+  endedAt      DateTime?             // set when admin calls /impersonate/stop
+
+  // Bookkeeping — incremented when admin explicitly stops
+  endedByAdmin Boolean  @default(false)
+
+  @@index([adminId, startedAt])
+  @@index([targetId, startedAt])
+  @@index([expiresAt])               // sweeper for expired sessions
+}
+
+// ClientError — front-end errors (uncaught exceptions, ErrorBoundary
+// fallbacks, unhandled promise rejections) reported via
+// /api/v1/errors/report. The admin can browse + resolve them in
+// AdminEventsView (or a dedicated feed view).
+//
+// We deliberately do NOT use Sentry / GlitchTip to keep the dependency
+// surface small and the data fully under our control. This also means
+// PII (user id, route, error message) stays inside the same MySQL
+// instance as the rest of the app.
+model ClientError {
+  id        String   @id @default(uuid())
+
+  // Optional link back to the reporting user. Nullable so anonymous
+  // visitors can report errors too.
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  // What UI surface the error came from. Helps us separate page-level
+  // crashes from background / watcher errors.
+  source    String   // e.g. "ErrorBoundary", "vue-global", "window-unhandledrejection"
+
+  // Short, grep-friendly message — first 500 chars.
+  message   String   @db.VarChar(500)
+
+  // Full stack trace (TEXT allows long stack chains).
+  stack     String?  @db.Text
+
+  // Vue lifecycle phase or wrapper hint (e.g. "render", "watcher",
+  // "setup"). Same as the `tags.phase` we attach on the client.
+  phase     String?  @db.VarChar(80)
+
+  // Current route at the moment of the error (e.g. "/admin/orders").
+  route     String?  @db.VarChar(200)
+
+  // Active locale at the moment of the error (tr/ru/kg).
+  locale    String?  @db.VarChar(8)
+
+  // Browser user agent — useful for diagnosing browser-specific bugs.
+  userAgent String?  @db.VarChar(500)
+
+  // Free-form extra context (component name, button id, etc.). Limited
+  // to 2 KB so a buggy client can't blow up the row size.
+  context   String?  @db.Text
+
+  // True once an admin has acknowledged the error. Unread errors show
+  // up first in the feed view.
+  resolved  Boolean  @default(false)
+  resolvedAt DateTime?
+  resolvedBy String?
+  resolvedNote String? @db.Text
+
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([resolved, createdAt])
+  @@index([userId, createdAt])
+  @@index([source, createdAt])
 }

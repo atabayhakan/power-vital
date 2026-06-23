@@ -13,3 +13,23 @@ backend/node_modules
 backend/dist
 frontend/node_modules
 frontend/dist
+
+# Secrets & local-only files — NEVER commit (contain credentials / large binaries)
+**/SECRETS-ROTATION.md
+Test Account.txt
+**/dev.db
+**/*.tmp
+**/*.tmp[0-9]*
+
+# Rotation tooling + ad-hoc ops scripts — contain plaintext SSH/DB passwords
+ROTATE-SECRETS.md
+rotate-secrets.cjs
+rotate-db-password.cjs
+scripts-archive/
+/*.cjs
+scripts/check-db.cjs
+prod.json
+*.tsbuildinfo
+# Deploy docs currently embed a root password + SSH key — scrub before tracking
+CI-CD.md
+PRODUCTION-DEPLOY.md

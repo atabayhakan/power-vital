@@ -1,5 +1,6 @@
 import { Queue } from 'bullmq';
 import IORedis from 'ioredis';
+import { logger } from '../utils/logger';
 
 // Connect to Redis (assuming a local instance or a cloud URL in env)
 const connection = new IORedis(process.env.REDIS_URL || 'redis://127.0.0.1:6379', {
@@ -19,5 +20,5 @@ export const addBonusCalculationJob = async (orderId: string, purchaserId: strin
     amountKgs,
     sponsorId
   });
-  console.log(`[Queue] Added bonus job for order: ${orderId}`);
+  logger.info(`[Queue] Added bonus job for order: ${orderId}`);
 };

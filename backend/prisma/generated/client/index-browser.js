@@ -126,11 +126,30 @@ exports.Prisma.UserScalarFieldEnum = {
   id: 'id',
   role: 'role',
   sponsorId: 'sponsorId',
+  placementId: 'placementId',
+  legPosition: 'legPosition',
   name: 'name',
   email: 'email',
   passwordHash: 'passwordHash',
   walletBalanceKgs: 'walletBalanceKgs',
   walletBalanceUsd: 'walletBalanceUsd',
+  cumulativeSpendUsd: 'cumulativeSpendUsd',
+  loyaltyLevel: 'loyaltyLevel',
+  dynamicDiscountRate: 'dynamicDiscountRate',
+  isMonthlyActive: 'isMonthlyActive',
+  preferredLocale: 'preferredLocale',
+  deletedAt: 'deletedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.WithdrawalRequestScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  amount: 'amount',
+  currency: 'currency',
+  status: 'status',
+  bankInfo: 'bankInfo',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -140,8 +159,11 @@ exports.Prisma.ProductScalarFieldEnum = {
   barcode: 'barcode',
   name: 'name',
   description: 'description',
+  accordions: 'accordions',
+  benefits: 'benefits',
   basePriceKgs: 'basePriceKgs',
   basePriceUsd: 'basePriceUsd',
+  translations: 'translations',
   stockQuantity: 'stockQuantity',
   minStockAlert: 'minStockAlert',
   categoryId: 'categoryId',
@@ -166,6 +188,7 @@ exports.Prisma.OrderScalarFieldEnum = {
   paymentMethod: 'paymentMethod',
   customerName: 'customerName',
   customerPhone: 'customerPhone',
+  customerEmail: 'customerEmail',
   address: 'address',
   receiptImageUrl: 'receiptImageUrl',
   ocrResult: 'ocrResult',
@@ -238,7 +261,13 @@ exports.Prisma.HeroSlideScalarFieldEnum = {
   buttonText: 'buttonText',
   buttonLink: 'buttonLink',
   imageUrl: 'imageUrl',
+  mobileImageUrl: 'mobileImageUrl',
+  displayMode: 'displayMode',
+  overlayOpacity: 'overlayOpacity',
+  scheduledStart: 'scheduledStart',
+  scheduledEnd: 'scheduledEnd',
   sortOrder: 'sortOrder',
+  translations: 'translations',
   isActive: 'isActive',
   createdAt: 'createdAt'
 };
@@ -249,6 +278,7 @@ exports.Prisma.CategoryScalarFieldEnum = {
   slug: 'slug',
   iconEmoji: 'iconEmoji',
   imageUrl: 'imageUrl',
+  translations: 'translations',
   sortOrder: 'sortOrder',
   isActive: 'isActive'
 };
@@ -273,8 +303,184 @@ exports.Prisma.SiteSettingsScalarFieldEnum = {
   trustBadges: 'trustBadges',
   partners: 'partners',
   footerLinks: 'footerLinks',
+  homepageBlocks: 'homepageBlocks',
+  themeSettings: 'themeSettings',
+  financeSettings: 'financeSettings',
+  faqItems: 'faqItems',
   copyrightText: 'copyrightText',
+  activeThemeId: 'activeThemeId',
+  campaignEnabled: 'campaignEnabled',
+  campaignEndsAt: 'campaignEndsAt',
+  campaignTitle: 'campaignTitle',
+  campaignCta: 'campaignCta',
+  campaignLink: 'campaignLink',
+  translations: 'translations',
+  uiTranslations: 'uiTranslations',
   updatedAt: 'updatedAt'
+};
+
+exports.Prisma.MediaFolderScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  createdAt: 'createdAt'
+};
+
+exports.Prisma.MediaScalarFieldEnum = {
+  id: 'id',
+  folderId: 'folderId',
+  filename: 'filename',
+  originalName: 'originalName',
+  url: 'url',
+  mimeType: 'mimeType',
+  size: 'size',
+  createdAt: 'createdAt'
+};
+
+exports.Prisma.PageScalarFieldEnum = {
+  id: 'id',
+  slug: 'slug',
+  title: 'title',
+  content: 'content',
+  translations: 'translations',
+  status: 'status',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.ProductReviewScalarFieldEnum = {
+  id: 'id',
+  productId: 'productId',
+  userId: 'userId',
+  name: 'name',
+  rating: 'rating',
+  text: 'text',
+  translations: 'translations',
+  status: 'status',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.StoreReviewScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  name: 'name',
+  rating: 'rating',
+  text: 'text',
+  translations: 'translations',
+  status: 'status',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.RefreshTokenScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  tokenHash: 'tokenHash',
+  family: 'family',
+  replacedBy: 'replacedBy',
+  revokedAt: 'revokedAt',
+  issuedToIp: 'issuedToIp',
+  userAgent: 'userAgent',
+  expiresAt: 'expiresAt',
+  createdAt: 'createdAt'
+};
+
+exports.Prisma.PushSubscriptionScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  endpoint: 'endpoint',
+  p256dh: 'p256dh',
+  auth: 'auth',
+  userAgent: 'userAgent',
+  preferences: 'preferences',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  lastSeenAt: 'lastSeenAt'
+};
+
+exports.Prisma.CartAbandonmentScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  guestId: 'guestId',
+  lastProductId: 'lastProductId',
+  lastProductName: 'lastProductName',
+  lastProductImg: 'lastProductImg',
+  cartItems: 'cartItems',
+  cartTotalUsd: 'cartTotalUsd',
+  cartTotalKgs: 'cartTotalKgs',
+  status: 'status',
+  lastActivityAt: 'lastActivityAt',
+  notifiedAt: 'notifiedAt',
+  convertedAt: 'convertedAt',
+  expiresAt: 'expiresAt',
+  translations: 'translations',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.BroadcastLogScalarFieldEnum = {
+  id: 'id',
+  actorId: 'actorId',
+  targetId: 'targetId',
+  eventKey: 'eventKey',
+  sent: 'sent',
+  expired: 'expired',
+  failed: 'failed',
+  note: 'note',
+  parentBroadcastId: 'parentBroadcastId',
+  createdAt: 'createdAt'
+};
+
+exports.Prisma.BroadcastJobScalarFieldEnum = {
+  id: 'id',
+  actorId: 'actorId',
+  note: 'note',
+  status: 'status',
+  targetMode: 'targetMode',
+  targetIds: 'targetIds',
+  segmentRole: 'segmentRole',
+  title: 'title',
+  body: 'body',
+  url: 'url',
+  eventKey: 'eventKey',
+  tag: 'tag',
+  scheduledAt: 'scheduledAt',
+  dispatchedAt: 'dispatchedAt',
+  cancelledAt: 'cancelledAt',
+  resultParentBroadcastId: 'resultParentBroadcastId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.ImpersonationSessionScalarFieldEnum = {
+  id: 'id',
+  adminId: 'adminId',
+  targetId: 'targetId',
+  reason: 'reason',
+  ipAddress: 'ipAddress',
+  userAgent: 'userAgent',
+  startedAt: 'startedAt',
+  expiresAt: 'expiresAt',
+  endedAt: 'endedAt',
+  endedByAdmin: 'endedByAdmin'
+};
+
+exports.Prisma.ClientErrorScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  source: 'source',
+  message: 'message',
+  stack: 'stack',
+  phase: 'phase',
+  route: 'route',
+  locale: 'locale',
+  userAgent: 'userAgent',
+  context: 'context',
+  resolved: 'resolved',
+  resolvedAt: 'resolvedAt',
+  resolvedBy: 'resolvedBy',
+  resolvedNote: 'resolvedNote',
+  createdAt: 'createdAt'
 };
 
 exports.Prisma.SortOrder = {
@@ -282,73 +488,15 @@ exports.Prisma.SortOrder = {
   desc: 'desc'
 };
 
-exports.Prisma.NullableJsonNullValueInput = {
-  DbNull: Prisma.DbNull,
-  JsonNull: Prisma.JsonNull
-};
-
-exports.Prisma.JsonNullValueInput = {
-  JsonNull: Prisma.JsonNull
-};
-
-exports.Prisma.QueryMode = {
-  default: 'default',
-  insensitive: 'insensitive'
-};
-
 exports.Prisma.NullsOrder = {
   first: 'first',
   last: 'last'
 };
 
-exports.Prisma.JsonNullValueFilter = {
-  DbNull: Prisma.DbNull,
-  JsonNull: Prisma.JsonNull,
-  AnyNull: Prisma.AnyNull
-};
-exports.Role = exports.$Enums.Role = {
-  admin: 'admin',
-  customer: 'customer',
-  dealer: 'dealer',
-  distributor: 'distributor'
-};
-
-exports.OrderType = exports.$Enums.OrderType = {
-  pos: 'pos',
-  ecommerce: 'ecommerce',
-  b2b: 'b2b'
-};
-
-exports.OrderStatus = exports.$Enums.OrderStatus = {
-  pending: 'pending',
-  paid: 'paid',
-  completed: 'completed',
-  shipped: 'shipped',
-  cancelled: 'cancelled',
-  refunded: 'refunded'
-};
-
-exports.PaymentMethod = exports.$Enums.PaymentMethod = {
-  cash: 'cash',
-  credit_card: 'credit_card',
-  wallet: 'wallet',
-  qr_transfer: 'qr_transfer'
-};
-
-exports.TransactionType = exports.$Enums.TransactionType = {
-  deposit: 'deposit',
-  withdrawal: 'withdrawal',
-  bonus: 'bonus',
-  purchase: 'purchase'
-};
-
-exports.Currency = exports.$Enums.Currency = {
-  KGS: 'KGS',
-  USD: 'USD'
-};
 
 exports.Prisma.ModelName = {
   User: 'User',
+  WithdrawalRequest: 'WithdrawalRequest',
   Product: 'Product',
   PriceRule: 'PriceRule',
   Order: 'Order',
@@ -361,7 +509,19 @@ exports.Prisma.ModelName = {
   HeroSlide: 'HeroSlide',
   Category: 'Category',
   ProductImage: 'ProductImage',
-  SiteSettings: 'SiteSettings'
+  SiteSettings: 'SiteSettings',
+  MediaFolder: 'MediaFolder',
+  Media: 'Media',
+  Page: 'Page',
+  ProductReview: 'ProductReview',
+  StoreReview: 'StoreReview',
+  RefreshToken: 'RefreshToken',
+  PushSubscription: 'PushSubscription',
+  CartAbandonment: 'CartAbandonment',
+  BroadcastLog: 'BroadcastLog',
+  BroadcastJob: 'BroadcastJob',
+  ImpersonationSession: 'ImpersonationSession',
+  ClientError: 'ClientError'
 };
 
 /**

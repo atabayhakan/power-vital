@@ -1,91 +1,1341 @@
-/* Power Vital — Global CSS System */
-/* Dashboard dark theme vars are scoped to .app-layout--dashboard */
+/* ═══════════════════════════════════════════════════════════
+   POWER VITAL — TACTILE MINIMALISM 2.0 (2026 Edition)
+   Global Design System · Neo-Shopify × Claymorphism Hybrid
+   ═══════════════════════════════════════════════════════════ */
 
+@import './assets/admin-light.css';
+
+/* ═══ ROOT DESIGN TOKENS ═══ */
 :root {
-  --font-main: 'Inter', system-ui, -apple-system, sans-serif;
-  --transition-smooth: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  /* Brand Identity — THE one red. Period. */
+  --pv-red: #BC4A3C;
+  --pv-red-light: #D4665A;
+  --pv-red-dark: #9A3A2E;
+  --pv-red-glow: rgba(188, 74, 60, 0.25);
+  --pv-red-glow-strong: rgba(188, 74, 60, 0.4);
+  --pv-gradient: linear-gradient(135deg, #D4665A 0%, #BC4A3C 50%, #9A3A2E 100%);
+  --pv-gradient-subtle: linear-gradient(135deg, rgba(188,74,60,0.08) 0%, rgba(188,74,60,0.02) 100%);
+  --pv-gradient-bright: linear-gradient(135deg, #FF6B5C 0%, #D8412F 100%);
+
+  /* Secondary Accent (warm gold — 2026 trend) */
+  --pv-gold: #D4A373;
+  --pv-gold-glow: rgba(212, 163, 115, 0.3);
+
+  /* Legacy aliases (for components that still reference old vars) */
+  --color-primary: var(--pv-red);
+  --color-secondary: var(--pv-gold);
+  --color-brand-gradient: var(--pv-gradient);
+
+  /* Surface System (Warm Oatmeal) */
+  --surface-page: #F5F1EB;
+  --surface-card: #F9F6F1;
+  --surface-inset: #EDE8DF;
+  --surface-white: #FFFFFF;
+  --surface-overlay: rgba(245, 241, 235, 0.92);
+  --surface-elevated: #FFFFFF;
+  --surface-rail: rgba(0, 0, 0, 0.04);
+
+  /* Legacy aliases */
+  --color-bg-storefront: var(--surface-page);
+  --color-bg: var(--surface-page);
+  --color-surface-white: var(--surface-white);
+
+  /* ═══ 2026 Ambient Depth System — Dark Surfaces ═══
+     Premium koyu zemin ailesi — atmosferik derinlik hissi için.
+     MLM block, sertifikalar, koyu banner'lar gibi bölümlerde kullanılır. */
+  --surface-dark: #16120E;
+  --surface-dark-card: #1E1814;
+  --surface-dark-elevated: #261E18;
+  --surface-dark-border: rgba(255, 255, 255, 0.07);
+  --surface-dark-inset: rgba(0, 0, 0, 0.25);
+
+  /* Dark text hierarchy */
+  --text-on-dark: #F5F1EB;
+  --text-on-dark-secondary: rgba(245, 241, 235, 0.65);
+  --text-on-dark-muted: rgba(245, 241, 235, 0.38);
+
+  /* Dark claymorphism shadows — inner dark + outer dark, with subtle light */
+  --clay-dark-shadow-md: 8px 8px 24px rgba(0, 0, 0, 0.45), -8px -8px 24px rgba(255, 255, 255, 0.03);
+  --clay-dark-shadow-lg: 12px 12px 32px rgba(0, 0, 0, 0.55), -12px -12px 32px rgba(255, 255, 255, 0.04);
+  --clay-dark-inset: inset 3px 3px 8px rgba(0, 0, 0, 0.4), inset -3px -3px 8px rgba(255, 255, 255, 0.04);
+
+  /* ═══ Section Band Palette — zebra ritim için hafif ton farkları ═══ */
+  --surface-section-alt: #EDE8DF;   /* Açık bej — varsayılan section'ın 1-2 tonu farklısı */
+  --surface-section-warm: #F0EBE2;   /* Ilık krem — bant vurgusu */
+
+  /* Text Hierarchy */
+  --text-primary: #1A1A1A;
+  --text-body: #3D3D3D;
+  --text-secondary: #6B6560;
+  --text-muted: #9E9890;
+  --text-on-brand: #FFFFFF;
+  --text-success: #2D8A56;
+  --text-warning: #B45309;
+
+  /* Legacy aliases */
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+
+  /* Semantic Colors */
+  --color-success: #2D8A56;
+  --color-success-light: #10B981;
+  --color-warning: #F59E0B;
+  --color-error: #C53030;
+  --color-info: #3B82F6;
+  --color-star: #E8A317;
+
+  /* Typography — Two-font system.
+     Montserrat is the Cyrillic-complete fallback: Outfit has no Cyrillic, so
+     KG/RU headings would otherwise fall back to an inconsistent system font. */
+  --font-display: 'Outfit', 'Montserrat', sans-serif;
+  --font-heading: var(--font-display);
+  --font-body: 'Inter', 'Montserrat', system-ui, -apple-system, sans-serif;
+  --font-main: var(--font-body);
+  --font-mono: 'SF Mono', 'Fira Code', monospace;
+  --font-size-base: 15px;
+  --font-size-mobile: 16px; /* iOS no-zoom on input focus */
+
+  /* Dashboard */
+  --color-sidebar: #121214;
+
+  /* Claymorphism Engine (Warm Tone) — 2026 tuned */
+  --clay-warm: rgba(210, 200, 185, 0.45);
+  --clay-light: rgba(255, 255, 255, 0.85);
+  --clay-warm-deep: rgba(180, 165, 145, 0.55);
+  --clay-light-bright: rgba(255, 255, 255, 0.95);
+
+  --clay-shadow-xs: 2px 2px 6px var(--clay-warm), -2px -2px 6px var(--clay-light);
+  --clay-shadow-sm: 4px 4px 12px var(--clay-warm), -4px -4px 12px var(--clay-light);
+  --clay-shadow-md: 8px 8px 24px var(--clay-warm), -8px -8px 24px var(--clay-light);
+  --clay-shadow-lg: 12px 12px 32px var(--clay-warm), -12px -12px 32px var(--clay-light);
+  --clay-shadow-xl: 16px 16px 48px var(--clay-warm), -16px -16px 48px var(--clay-light);
+  --clay-inset: inset 3px 3px 8px var(--clay-warm), inset -3px -3px 8px var(--clay-light);
+  --clay-inset-deep: inset 4px 4px 12px var(--clay-warm-deep), inset -4px -4px 12px var(--clay-light-bright);
+  --clay-brand-inset: inset 2px 2px 4px rgba(255,255,255,0.35), inset -2px -2px 6px rgba(120,20,10,0.3);
+  --clay-glow-ring: 0 0 0 4px var(--pv-red-glow);
+
+  /* Legacy shadow aliases */
+  --clay-shadow-outset: var(--clay-shadow-md);
+  --clay-shadow-hover: var(--clay-shadow-lg);
+
+  /* Glassmorphism (Floating Elements) — 2026 heavier */
+  --glass-bg: rgba(249, 246, 241, 0.88);
+  --glass-bg-heavy: rgba(249, 246, 241, 0.95);
+  --glass-blur: blur(20px) saturate(180%);
+  --glass-blur-heavy: blur(40px) saturate(200%);
+  --glass-border: 1px solid rgba(255, 255, 255, 0.5);
+  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.06);
+  --glass-shadow-heavy: 0 20px 60px rgba(0, 0, 0, 0.12);
+
+  /* Radii Scale */
+  --radius-xs: 8px;
+  --radius-sm: 14px;
+  --radius-md: 18px;
+  --radius-lg: 24px;
+  --radius-xl: 32px;
+  --radius-2xl: 40px;
+  --radius-pill: 100px;
+
+  /* Legacy radius aliases */
+  --clay-radius-card: var(--radius-lg);
+  --clay-radius-btn: var(--radius-pill);
+  --border-radius: var(--radius-md);
+
+  /* Motion System — 2026 snappier */
+  --ease-spring: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  --ease-clay: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-kinetic: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-smooth: cubic-bezier(0.25, 0.8, 0.25, 1);
+  --ease-expo: cubic-bezier(0.87, 0, 0.13, 1);
+  --duration-instant: 0.08s;
+  --duration-fast: 0.15s;
+  --duration-normal: 0.22s;
+  --duration-slow: 0.45s;
+  --duration-page: 0.6s;
+
+  /* Legacy motion aliases */
+  --transition-kinetic: all var(--duration-slow) var(--ease-kinetic);
+  --transition-smooth: all var(--duration-fast) var(--ease-smooth);
+
+  /* Spacing Scale — 2026 tighter */
+  --space-2xs: 2px;
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 12px;
+  --space-lg: 20px;
+  --space-xl: 32px;
+  --space-2xl: 48px;
+  --space-3xl: 64px;
+  --space-4xl: 96px;
+
+  /* Container */
+  --container-max: 1440px;
+  --container-padding: 32px;
+
+  /* Touch Targets (Apple HIG / Material) */
+  --touch-min: 44px;
+  --touch-comfortable: 48px;
+  --touch-large: 56px;
+
+  /* Breakpoints (referenced in @media) */
+  --bp-sm: 480px;
+  --bp-md: 768px;
+  --bp-lg: 1024px;
+  --bp-xl: 1280px;
+  --bp-2xl: 1536px;
+
+  /* Z-Index Scale */
+  --z-base: 1;
+  --z-dropdown: 100;
+  --z-sticky: 200;
+  --z-overlay: 900;
+  --z-modal: 1000;
+  --z-toast: 1100;
+  --z-tooltip: 1200;
+  --z-bottom-nav: 99;
+  --z-fbb: 98;
+
+  /* ═══ AMBIENT DEPTH SYSTEM — Premium 2026 ═══ */
+  /* Dark surfaces for contrast sections */
+  --surface-dark: #16120E;
+  --surface-dark-card: #1E1814;
+  --surface-dark-elevated: #261E18;
+  --surface-dark-border: rgba(255, 255, 255, 0.07);
+  --surface-dark-inset: rgba(0, 0, 0, 0.25);
+  
+  /* Text on dark surfaces */
+  --text-on-dark: #F5F1EB;
+  --text-on-dark-secondary: rgba(245, 241, 235, 0.65);
+  --text-on-dark-muted: rgba(245, 241, 235, 0.38);
+
+  /* Dark clay engine (warm-tinted dark shadows) */
+  --clay-dark-shadow-md: 8px 8px 24px rgba(0,0,0,0.45), -8px -8px 24px rgba(255,255,255,0.03);
+  --clay-dark-shadow-lg: 12px 12px 32px rgba(0,0,0,0.55), -12px -12px 32px rgba(255,255,255,0.04);
+  --clay-dark-inset: inset 3px 3px 8px rgba(0,0,0,0.4), inset -3px -3px 8px rgba(255,255,255,0.04);
+  
+  /* Section alt — slightly different from page bg for zebra rhythm */
+  --surface-section-alt: #EDE8DF;
+  --surface-section-warm: #F0EBE2;
 }
 
-* {
+/* ═══ RESET ═══ */
+*, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
 
+html {
+  /* iOS Safari address bar shrink handling */
+  height: 100%;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  scroll-behavior: smooth;
+  -webkit-tap-highlight-color: transparent;
+}
+
 body {
-  font-family: var(--font-main);
+  font-family: var(--font-body);
+  font-size: var(--font-size-base);
   min-height: 100vh;
+  min-height: 100dvh; /* 2026: dynamic viewport */
   -webkit-font-smoothing: antialiased;
-  /* Neutral — each page controls its own bg/color */
-  background: #ffffff;
-  color: #18181b;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  background: var(--surface-page);
+  /* 🛡️ background-attachment: fixed causes severe scroll jank on most browsers,
+     especially on mobile. We keep the gradients but render them on a
+     GPU-accelerated fixed pseudo-element instead. */
+  color: var(--text-primary);
+  line-height: 1.6;
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior-y: contain;
 }
 
-/* ═══ Dashboard Dark Theme (only inside dashboard layout) ═══ */
-.app-layout--dashboard {
-  --color-bg-dark: #0f1115;
-  --color-bg-panel: rgba(25, 28, 36, 0.6);
-  --color-primary: #00d2ff;
-  --color-secondary: #3a7bd5;
-  --color-text-main: #f0f0f0;
-  --color-text-muted: #8b92a5;
-  --color-accent-success: #20d489;
-  --color-accent-danger: #f5365c;
-  --shadow-glass: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-  --border-glass: 1px solid rgba(255, 255, 255, 0.05);
-
-  background-color: var(--color-bg-dark);
-  background-image: radial-gradient(circle at 15% 50%, rgba(0, 210, 255, 0.03), transparent 25%),
-                    radial-gradient(circle at 85% 30%, rgba(58, 123, 213, 0.04), transparent 25%);
-  color: var(--color-text-main);
+/* Fixed ambient gradient layer — runs on GPU compositor, no repaints during scroll */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 100% 50% at 50% 0%, rgba(188,74,60,0.04) 0%, transparent 55%),
+    radial-gradient(ellipse 70% 40% at 85% 70%, rgba(212,163,115,0.045) 0%, transparent 45%),
+    radial-gradient(ellipse 50% 30% at 12% 45%, rgba(188,74,60,0.025) 0%, transparent 40%);
+  will-change: transform;
 }
 
-/* Glassmorphism Panel — dashboard only */
-.app-layout--dashboard .glass-panel {
-  background: var(--color-bg-panel);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: var(--border-glass);
-  border-radius: 16px;
-  box-shadow: var(--shadow-glass);
+/* ═══ TYPOGRAPHY ═══ */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  color: var(--text-primary);
 }
 
-/* Typography */
-h1, h2, h3, h4 {
-  font-weight: 600;
-  letter-spacing: -0.02em;
+/* ═══ STOREFRONT SCOPE ═══ */
+.app-layout--storefront {
+  background: 
+    radial-gradient(ellipse 80% 40% at 50% 0%, rgba(188,74,60,0.04) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 30% at 90% 60%, rgba(212,163,115,0.05) 0%, transparent 50%),
+    var(--surface-page);
+  color: var(--text-primary);
+  /* Mobile: BottomNav (70px) + safe-area reserve */
+  padding-bottom: calc(70px + env(safe-area-inset-bottom, 0px));
 }
 
+/* 🛡️ QUARANTINE: Strict Reset for Storefront (Overrides Admin globals) */
+.app-layout--storefront * {
+  box-sizing: border-box;
+}
+.app-layout--storefront,
+.app-layout--storefront p,
+.app-layout--storefront span,
+.app-layout--storefront div {
+  font-size: var(--font-size-base, 16px);
+  line-height: var(--line-height-relaxed, 1.6);
+}
+.app-layout--storefront table {
+  border-collapse: separate;
+}
+.app-layout--storefront button,
+.app-layout--storefront input {
+  font-size: 1rem; /* Revert dense 13px admin inputs */
+}
+
+/* ═══ CLAY SURFACE UTILITIES (Single Source of Truth) ═══ */
+.clay-surface {
+  background: var(--surface-card);
+  box-shadow: var(--clay-shadow-md);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: var(--radius-lg);
+  transition: box-shadow var(--duration-normal) var(--ease-smooth),
+              transform var(--duration-normal) var(--ease-spring);
+}
+.clay-surface:hover {
+  box-shadow: var(--clay-shadow-lg);
+  transform: translateY(-3px);
+}
+.clay-surface:active {
+  transform: translateY(0) scale(0.99);
+  box-shadow: var(--clay-shadow-sm);
+}
+
+.clay-inset {
+  background: var(--surface-inset);
+  box-shadow: var(--clay-inset);
+  border-radius: var(--radius-md);
+}
+
+/* ═══ DARK SURFACE UTILITIES ═══ */
+.dark-surface {
+  background: var(--surface-dark);
+  color: var(--text-on-dark);
+}
+
+.dark-card {
+  background: var(--surface-dark-card);
+  box-shadow: var(--clay-dark-shadow-md);
+  border: 1px solid var(--surface-dark-border);
+  border-radius: var(--radius-lg);
+}
+
+.section-alt {
+  background: var(--surface-section-alt);
+}
+
+.section-warm {
+  background: var(--surface-section-warm);
+}
+
+/* ═══ 2026 SF-BAND — Full-bleed section bands for storefront ═══
+   These classes create full-viewport-width coloured bands that
+   contain a bento block. Wrap a `<section class="sf-band sf-band--xxx">`
+   around a bento block to give it its own colour zone.
+   Note: the band itself is full-width, the bento-grid inside
+   controls the content max-width. */
+.sf-band {
+  position: relative;
+  width: 100%;
+  padding: var(--space-2xl) 0;
+}
+.sf-band--dark {
+  background: var(--surface-dark);
+  color: var(--text-on-dark);
+}
+.sf-band--alt {
+  background: var(--surface-section-alt);
+}
+.sf-band--warm {
+  background: var(--surface-section-warm);
+}
+
+/* Dark band: nest clay surfaces get the dark variant automatically */
+.sf-band--dark .clay-surface {
+  background: var(--surface-dark-card);
+  color: var(--text-on-dark);
+  box-shadow: var(--clay-dark-shadow-md);
+  border: 1px solid var(--surface-dark-border);
+}
+.sf-band--dark .clay-inset {
+  background: var(--surface-dark-elevated);
+  box-shadow: var(--clay-dark-inset);
+  color: var(--text-on-dark-secondary);
+}
+
+/* ═══ SECTION WRAPPERS — full-bleed colored bands ═══ */
+.sf-band {
+  width: 100vw;
+  position: relative;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: var(--space-2xl) var(--container-padding);
+}
+
+.sf-band--dark {
+  background: var(--surface-dark);
+  color: var(--text-on-dark);
+}
+
+.sf-band--dark .clay-surface {
+  background: var(--surface-dark-card);
+  box-shadow: var(--clay-dark-shadow-md);
+  border-color: var(--surface-dark-border);
+  color: var(--text-on-dark);
+}
+
+.sf-band--dark .clay-surface:hover {
+  box-shadow: var(--clay-dark-shadow-lg);
+}
+
+.sf-band--dark .clay-inset {
+  background: var(--surface-dark-inset);
+  box-shadow: var(--clay-dark-inset);
+}
+
+.sf-band--alt {
+  background: var(--surface-section-alt);
+}
+
+.sf-band--warm {
+  background: var(--surface-section-warm);
+}
+
+/* ═══ STOREFRONT PAGE AMBIENT ═══ */
+/* 🛡️ Background gradients moved to body::before (fixed GPU layer) to avoid
+   scroll jank. This class only sets min-height now. */
+.storefront-page {
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+/* 2026: Pressed/active state for clickable clay surfaces */
+.clay-surface.is-pressed,
+.clay-surface:active.is-pressed {
+  transform: scale(0.97);
+  box-shadow: var(--clay-inset);
+  transition: transform var(--duration-instant) var(--ease-smooth);
+}
+
+/* ═══ GLASS UTILITIES ═══ */
+.glass-float {
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: var(--glass-border);
+  box-shadow: var(--glass-shadow);
+}
+
+.glass-panel {
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: var(--glass-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--glass-shadow);
+}
+
+/* ═══ BRAND GRADIENT TEXT ═══ */
 .text-gradient {
-  background: linear-gradient(90deg, var(--color-primary), var(--color-secondary));
+  background: var(--pv-gradient);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
-/* Dashboard buttons */
-.app-layout--dashboard .btn-primary {
-  background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
-  color: white;
-  border: none;
-  padding: 10px 24px;
-  border-radius: 8px;
-  font-weight: 500;
+/* ═══ PRIMARY BUTTON — 2026 Glow Ring Edition ═══ */
+.btn-primary {
+  position: relative;
+  background: var(--pv-gradient);
+  color: var(--text-on-brand) !important;
+  border: none !important;
+  outline: none !important;
+  padding: 14px 32px;
+  min-height: var(--touch-comfortable);
+  border-radius: var(--radius-pill);
+  font-family: var(--font-display);
+  font-weight: 800 !important;
+  font-size: 0.95rem;
   cursor: pointer;
-  transition: var(--transition-smooth);
-  box-shadow: 0 4px 15px rgba(0, 210, 255, 0.2);
+  transition: transform var(--duration-fast) var(--ease-clay),
+              box-shadow var(--duration-normal) var(--ease-smooth),
+              filter var(--duration-fast) var(--ease-smooth);
+  box-shadow: var(--clay-brand-inset), 0 4px 16px var(--pv-red-glow);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  letter-spacing: 0.02em;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  overflow: hidden;
+  isolation: isolate;
+}
+/* 2026: Pulsing glow ring */
+.btn-primary::before {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border-radius: inherit;
+  background: var(--pv-gradient);
+  opacity: 0;
+  z-index: -1;
+  filter: blur(12px);
+  transition: opacity var(--duration-normal) var(--ease-smooth);
+}
+.btn-primary:hover {
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: var(--clay-brand-inset), 0 10px 32px var(--pv-red-glow-strong);
+  filter: brightness(1.05);
+}
+.btn-primary:hover::before {
+  opacity: 0.6;
+}
+.btn-primary:active {
+  transform: translateY(1px) scale(0.97);
+  box-shadow: var(--clay-brand-inset);
+  transition-duration: var(--duration-instant);
+}
+.btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  filter: grayscale(0.5);
 }
 
-.app-layout--dashboard .btn-primary:hover {
+/* ═══ SECONDARY BUTTON (2026 — warm gold accent) ═══ */
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 14px 32px;
+  min-height: var(--touch-comfortable);
+  background: var(--surface-card);
+  color: var(--text-primary);
+  border: 2px solid var(--surface-inset);
+  border-radius: var(--radius-pill);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.95rem;
+  cursor: pointer;
+  box-shadow: var(--clay-shadow-sm);
+  transition: all var(--duration-fast) var(--ease-spring);
+}
+.btn-secondary:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(0, 210, 255, 0.4);
+  box-shadow: var(--clay-shadow-md);
+  border-color: var(--pv-red);
+  color: var(--pv-red);
+}
+.btn-secondary:active {
+  transform: scale(0.97);
+  box-shadow: var(--clay-inset);
 }
 
-/* Animations */
+/* ═══ GHOST BUTTON (text + underline hover) ═══ */
+.btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 20px;
+  min-height: var(--touch-min);
+  background: transparent;
+  color: var(--text-primary);
+  border: none;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all var(--duration-fast) var(--ease-smooth);
+}
+.btn-ghost:hover {
+  background: var(--surface-inset);
+  color: var(--pv-red);
+}
+
+/* ═══ ICON BUTTON (44x44 — Apple HIG compliant) ═══ */
+.btn-icon {
+  width: var(--touch-comfortable);
+  height: var(--touch-comfortable);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  border-radius: 50%;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all var(--duration-fast) var(--ease-spring);
+}
+.btn-icon:hover {
+  background: var(--surface-inset);
+  color: var(--pv-red);
+  transform: scale(1.08);
+}
+.btn-icon:active {
+  transform: scale(0.92);
+}
+
+/* ═══ FULL-WIDTH BUTTON (mobile CTAs) ═══ */
+.btn-block {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px 24px;
+  min-height: var(--touch-large);
+  font-size: 1rem;
+}
+
+/* ═══ BENTO GRID SYSTEM ═══ */
+.bento-container {
+  max-width: var(--container-max);
+  margin: 0 auto;
+  padding: 0 var(--container-padding);
+}
+
+.bento-grid {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: var(--space-lg);
+}
+
+.bento-full { grid-column: 1 / -1; }
+.bento-12 { grid-column: 1 / -1; }
+.bento-8 { grid-column: span 8; }
+.bento-7 { grid-column: span 7; }
+.bento-6 { grid-column: span 6; }
+.bento-5 { grid-column: span 5; }
+.bento-4 { grid-column: span 4; }
+
+@media (max-width: 1024px) {
+  /* Tablet: 12-col grid collapses to 2 cols, bento pairs sit side by side */
+  .bento-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .bento-8, .bento-7, .bento-6, .bento-5, .bento-4 {
+    grid-column: span 1;
+  }
+  .bento-full {
+    grid-column: 1 / -1;
+  }
+}
+@media (max-width: 768px) {
+  :root {
+    --container-padding: 16px;
+    --space-lg: 16px;
+  }
+  /* Mobile: single column */
+  .bento-grid {
+    grid-template-columns: 1fr;
+  }
+  .bento-8, .bento-7, .bento-6, .bento-5, .bento-4, .bento-12 {
+    grid-column: 1 / -1;
+  }
+}
+
+/* ═══ SCROLL REVEAL ANIMATION (Kinetic Typography) ═══ */
+@keyframes revealUp {
+  from {
+    opacity: 0;
+    transform: translateY(40px) scale(0.97);
+    filter: blur(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+}
+
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
+  from { opacity: 0; transform: translateY(12px); }
   to { opacity: 1; transform: translateY(0); }
+}
+
+.reveal {
+  opacity: 0;
+  transform: translateY(40px);
+}
+.reveal.revealed {
+  animation: revealUp 0.8s var(--ease-kinetic) forwards;
 }
 
 .animate-fade-in {
   animation: fadeIn 0.4s ease-out forwards;
+}
+
+/* Staggered children reveal */
+.reveal-stagger > * {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.5s var(--ease-kinetic), transform 0.5s var(--ease-kinetic);
+}
+.reveal-stagger.revealed > *:nth-child(1) { transition-delay: 0.05s; }
+.reveal-stagger.revealed > *:nth-child(2) { transition-delay: 0.1s; }
+.reveal-stagger.revealed > *:nth-child(3) { transition-delay: 0.15s; }
+.reveal-stagger.revealed > *:nth-child(4) { transition-delay: 0.2s; }
+.reveal-stagger.revealed > *:nth-child(5) { transition-delay: 0.25s; }
+.reveal-stagger.revealed > *:nth-child(6) { transition-delay: 0.3s; }
+.reveal-stagger.revealed > *:nth-child(7) { transition-delay: 0.35s; }
+.reveal-stagger.revealed > *:nth-child(8) { transition-delay: 0.4s; }
+.reveal-stagger.revealed > * {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ═══ SKELETON LOADERS ═══ */
+@keyframes shimmer {
+  100% { transform: translateX(100%); }
+}
+
+.skeleton {
+  background: var(--surface-inset);
+  border-radius: var(--radius-sm);
+  position: relative;
+  overflow: hidden;
+}
+.skeleton::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent 0, rgba(255,255,255,0.3) 20%, rgba(255,255,255,0.6) 60%, transparent);
+  transform: translateX(-100%);
+  animation: shimmer 2s infinite;
+}
+.skeleton-hero {
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+}
+
+/* ═══ ACCESSIBILITY ═══ */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  .reveal { opacity: 1; transform: none; }
+  .reveal-stagger > * { opacity: 1; transform: none; }
+}
+
+/* Focus-visible for keyboard navigation */
+:focus-visible {
+  outline: 2px solid var(--pv-red);
+  outline-offset: 2px;
+  border-radius: var(--radius-xs);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   DASHBOARD DARK THEME (Admin Panel — Unchanged)
+   ═══════════════════════════════════════════════════════════ */
+
+.app-layout--dashboard {
+  --color-bg-dark: #121214;
+  --color-bg-panel: rgba(30, 30, 35, 0.7);
+  --color-sidebar: #121214; /* Isolate local sidebar override */
+  --color-secondary: #FF0000;
+  --color-text-main: #f8f9fa;
+  --color-text-muted: #a1a1aa;
+  --color-accent-success: #10b981;
+  --color-accent-danger: #ef4444;
+
+  --glass-bg: var(--color-bg-panel);
+  --shadow-glass: 0 8px 32px rgba(0, 0, 0, 0.4);
+  --border-glass: 1px solid rgba(255, 255, 255, 0.08);
+
+  /* Override Claymorphism for Dark Theme — 2026 Bloomberg-grade */
+  --clay-shadow-outset: 6px 6px 16px rgba(0, 0, 0, 0.7), -4px -4px 12px rgba(255, 255, 255, 0.07);
+  --clay-shadow-hover: 8px 8px 20px rgba(0, 0, 0, 0.8), -4px -4px 16px rgba(255, 255, 255, 0.1);
+  --clay-shadow-inset: inset 2px 2px 6px rgba(0, 0, 0, 0.6), inset -2px -2px 6px rgba(255, 255, 255, 0.07);
+  --clay-shadow-md: var(--clay-shadow-outset);
+  --clay-shadow-lg: var(--clay-shadow-hover);
+  --clay-inset: var(--clay-shadow-inset);
+
+  background-color: var(--color-bg-dark);
+  color: var(--color-text-main);
+
+  font-size: 14px !important;
+  line-height: 1.4 !important;
+}
+
+/* 2026 Admin mobile: compact header + horizontal scroll tables */
+.app-layout--dashboard .admin-page {
+  padding: 16px;
+}
+@media (max-width: 768px) {
+  .app-layout--dashboard {
+    font-size: 13px !important;
+  }
+  .app-layout--dashboard .kpi-grid,
+  .app-layout--dashboard .admin-panel-grid {
+    grid-template-columns: 1fr !important;
+  }
+  .app-layout--dashboard .admin-data-table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+    -webkit-overflow-scrolling: touch;
+  }
+  .app-layout--dashboard .topbar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+}
+
+/* Dashboard Form Controls */
+.app-layout--dashboard input,
+.app-layout--dashboard select,
+.app-layout--dashboard button {
+  font-size: 13px;
+}
+.app-layout--dashboard .admin-input {
+  height: 32px;
+  padding: 4px 8px;
+  background: rgba(0,0,0,0.3);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 4px;
+  color: #fff;
+  transition: border 0.2s;
+}
+.app-layout--dashboard .admin-input:focus {
+  border-color: var(--pv-red);
+  outline: none;
+}
+
+/* Inline-flex Form Row */
+.app-layout--dashboard .form-inline-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+.app-layout--dashboard .form-inline-row label {
+  width: 120px;
+  flex-shrink: 0;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  text-align: right;
+}
+.app-layout--dashboard .form-inline-row .input-wrapper {
+  flex: 1;
+}
+
+/* Enterprise Data-Grid (Excel Style) */
+.app-layout--dashboard .table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin-bottom: 16px;
+}
+.app-layout--dashboard .admin-data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  min-width: 800px;
+}
+.app-layout--dashboard .admin-data-table th {
+  height: 32px;
+  padding: 4px 12px;
+  background: rgba(0,0,0,0.6);
+  color: var(--color-text-muted);
+  font-weight: 700;
+  text-align: left;
+  text-transform: uppercase;
+  font-size: 11px;
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid rgba(255,255,255,0.15);
+  border-right: 1px solid rgba(255,255,255,0.05);
+}
+.app-layout--dashboard .admin-data-table td {
+  height: 36px;
+  padding: 4px 12px;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  border-right: 1px solid rgba(255,255,255,0.05);
+  vertical-align: middle;
+}
+.app-layout--dashboard .admin-data-table tr {
+  background: #1A1A1F;
+}
+.app-layout--dashboard .admin-data-table tr:nth-child(even) {
+  background: #1E1E24;
+}
+.app-layout--dashboard .admin-data-table tbody tr:hover {
+  background: #2A2A35 !important;
+}
+
+/* Dashboard Panel */
+.app-layout--dashboard .panel {
+  background-color: var(--color-sidebar, #18181b) !important;
+  border-radius: var(--radius-lg) !important;
+  padding: 24px;
+  box-shadow: var(--shadow-glass) !important;
+  border: 1px solid rgba(63, 63, 70, 0.5) !important;
+  overflow-x: auto;
+}
+
+/* Dashboard Grid */
+.app-layout--dashboard .admin-panel-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 24px;
+  align-items: start;
+}
+
+/* Dashboard skeleton override */
+.app-layout--dashboard .skeleton {
+  background: rgba(255,255,255,0.1);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   BENTO GRID — 2026 Multi-Breakpoint
+   ═══════════════════════════════════════════════════════════ */
+.bento-full { grid-column: span 12; }
+.bento-8    { grid-column: span 8; }
+.bento-7    { grid-column: span 7; }
+.bento-6    { grid-column: span 6; }
+.bento-5    { grid-column: span 5; }
+.bento-4    { grid-column: span 4; }
+.bento-3    { grid-column: span 3; }
+
+@media (max-width: 1024px) {
+  .bento-8, .bento-7 { grid-column: span 12; }
+  .bento-4, .bento-3 { grid-column: span 6; }
+}
+@media (max-width: 640px) {
+  .bento-full, .bento-8, .bento-7, .bento-6, .bento-5, .bento-4, .bento-3 {
+    grid-column: span 12;
+  }
+}
+
+/* ═══ GLOBAL SKELETON (loading state) ═══ */
+.skeleton {
+  background: linear-gradient(90deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.1) 50%, rgba(255,255,255,0.05) 100%);
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.5s ease-in-out infinite;
+  border-radius: 8px;
+}
+
+@keyframes skeleton-shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   2026 MOBILE-FIRST UTILITIES (Touch-UX)
+   ═══════════════════════════════════════════════════════════ */
+
+/* iOS-style safe-area wrapper for any sticky element */
+.safe-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 0);
+}
+.safe-top {
+  padding-top: env(safe-area-inset-top, 0);
+}
+
+/* Hide on mobile / desktop only */
+.show-mobile { display: none !important; }
+.show-desktop { display: initial; }
+@media (max-width: 768px) {
+  .show-mobile { display: initial !important; }
+  .show-desktop { display: none !important; }
+}
+
+/* Touch-friendly inputs (iOS no-zoom + Android) */
+input, select, textarea {
+  font-size: var(--font-size-mobile);
+  min-height: var(--touch-comfortable);
+  border-radius: var(--radius-sm);
+}
+@media (min-width: 768px) {
+  input, select, textarea {
+    font-size: 0.9rem;
+  }
+}
+
+/* Hide scrollbar but keep functional (chip filters) */
+.scroll-x-hide {
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+}
+.scroll-x-hide::-webkit-scrollbar {
+  display: none;
+}
+.scroll-x-hide > * {
+  scroll-snap-align: start;
+  flex-shrink: 0;
+}
+
+/* Stock urgency pulse (CRO) */
+@keyframes pulse-urgency {
+  0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
+  50% { transform: scale(1.02); box-shadow: 0 0 0 8px rgba(239, 68, 68, 0); }
+}
+.urgency-pulse {
+  animation: pulse-urgency 1.5s ease-in-out infinite;
+}
+
+/* Active state dot indicator (BottomNav) */
+@keyframes pulse-dot {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.4); opacity: 0.6; }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   2026 ADMIN MOBILE — Stacked Card-View for Datatables
+   ═══════════════════════════════════════════════════════════ */
+@media (max-width: 768px) {
+  .mobile-card-view thead {
+    display: none;
+  }
+  .mobile-card-view tbody,
+  .mobile-card-view tr,
+  .mobile-card-view td {
+    display: block;
+    width: 100% !important;
+    min-width: 0 !important;
+    white-space: normal;
+  }
+  .mobile-card-view tr {
+    background: var(--surface-card, #fff) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: var(--radius-md);
+    margin-bottom: 12px;
+    padding: 12px;
+    box-shadow: var(--clay-shadow-sm);
+  }
+  .mobile-card-view td {
+    padding: 6px 0 !important;
+    border: none !important;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+  }
+  .mobile-card-view td::before {
+    content: attr(data-label);
+    font-weight: 700;
+    font-size: 11px;
+    text-transform: uppercase;
+    color: var(--color-text-muted, #a1a1aa);
+    letter-spacing: 0.5px;
+    flex-shrink: 0;
+  }
+  .mobile-card-view td.col-check {
+    justify-content: flex-end;
+    padding: 0 !important;
+  }
+  .mobile-card-view td.col-check::before {
+    display: none;
+  }
+}
+
+/* ═══ Tap highlight (mobile native disable) ═══ */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* ═══ LIGHT MODE OVERRIDE ═══
+   Triggered by [data-theme="light"] on <html>, set by themeInjector.
+   Stores the storefront/light palette while keeping the brand primary. */
+[data-theme="light"] {
+  --color-bg-storefront: #FFFFFF;
+  --color-bg: #F4F4F5;
+  --color-text-primary: #18181B;
+  --color-text-secondary: #52525B;
+  --surface-page: #FFFFFF;
+  --surface-card: #FFFFFF;
+  --surface-soft: #F4F4F5;
+  --text-primary: #18181B;
+  --text-secondary: #52525B;
+  --text-muted: #71717A;
+  --border-subtle: rgba(0, 0, 0, 0.08);
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.1);
+  /* Lighter clay shadows on light bg */
+  --clay-warm: rgba(180, 180, 180, 0.25);
+  --clay-light: rgba(255, 255, 255, 0.95);
+  --clay-warm-deep: rgba(140, 140, 140, 0.35);
+  --clay-light-bright: #FFFFFF;
+  --clay-shadow-xs: 1px 1px 3px rgba(0, 0, 0, 0.08), -1px -1px 3px rgba(255, 255, 255, 0.7);
+  --clay-shadow-sm: 2px 2px 6px rgba(0, 0, 0, 0.08), -2px -2px 6px rgba(255, 255, 255, 0.7);
+  --clay-shadow-md: 4px 4px 12px rgba(0, 0, 0, 0.1), -4px -4px 12px rgba(255, 255, 255, 0.7);
+  --clay-shadow-lg: 8px 8px 20px rgba(0, 0, 0, 0.12), -8px -8px 20px rgba(255, 255, 255, 0.7);
+  --clay-shadow-xl: 12px 12px 32px rgba(0, 0, 0, 0.14), -12px -12px 32px rgba(255, 255, 255, 0.7);
+  --clay-inset: inset 2px 2px 5px rgba(0, 0, 0, 0.06), inset -2px -2px 5px rgba(255, 255, 255, 0.7);
+  --clay-inset-deep: inset 3px 3px 8px rgba(0, 0, 0, 0.1), inset -3px -3px 8px rgba(255, 255, 255, 0.7);
+  --glass-bg: rgba(255, 255, 255, 0.85);
+  --glass-border: rgba(0, 0, 0, 0.08);
+  --shadow-glass: 0 4px 24px rgba(0, 0, 0, 0.08);
+}
+
+/* Admin panel needs special handling for light mode - DELETED to isolate God Mode */
+
+/* ═══ LIGHT MODE — GLOBAL HARDCODE OVERRIDES ═══
+   Most scoped components use hardcoded hex values (#fff, #18181b, etc.)
+   which can't be affected by CSS variable changes alone. These rules
+   override the most common hardcoded values so the theme toggle is
+   visible across the entire site. `!important` is required to beat
+   Vue scoped style specificity (data-v-xxxxx selectors). */
+[data-theme="light"] {
+  --hardcoded-bg-page: #F4F4F5;
+  --hardcoded-bg-panel: #FFFFFF;
+  --hardcoded-bg-inset: #ECECEE;
+  --hardcoded-text-primary: #18181B;
+  --hardcoded-text-secondary: #52525B;
+  --hardcoded-text-muted: #71717A;
+  --hardcoded-border: rgba(0, 0, 0, 0.1);
+  --hardcoded-border-strong: rgba(0, 0, 0, 0.2);
+  --hardcoded-overlay: rgba(0, 0, 0, 0.04);
+  --hardcoded-overlay-hover: rgba(0, 0, 0, 0.08);
+}
+
+/* Backgrounds */
+[data-theme="light"] body { background-color: var(--hardcoded-bg-page) !important; color: var(--hardcoded-text-primary) !important; }
+[data-theme="light"] .admin-page,
+[data-theme="light"] .storefront-page,
+[data-theme="light"] .user-management,
+[data-theme="light"] .finance-payouts,
+[data-theme="light"] .media-library-view { background: var(--hardcoded-bg-page) !important; color: var(--hardcoded-text-primary) !important; }
+
+/* Panel / surface backgrounds */
+[data-theme="light"] .panel,
+[data-theme="light"] .clay-surface,
+[data-theme="light"] .clay-inset,
+[data-theme="light"] .admin-card,
+[data-theme="light"] .stats-card,
+[data-theme="light"] .gm-logic-pane,
+[data-theme="light"] .gm-settings-pane { background-color: var(--hardcoded-bg-panel) !important; }
+
+/* Inset / dark wells (input wells, dark cards) */
+[data-theme="light"] .clay-inset,
+[data-theme="light"] .clay-dark,
+[data-theme="light"] .clay-dark-inset,
+[data-theme="light"] .img-preview { background-color: var(--hardcoded-bg-inset) !important; }
+[data-theme="light"] .gm-list { background-color: var(--hardcoded-bg-inset) !important; }
+
+/* Text colors */
+[data-theme="light"] h1, [data-theme="light"] h2, [data-theme="light"] h3, [data-theme="light"] h4,
+[data-theme="light"] .pb-title, [data-theme="light"] .gm-sec-title,
+[data-theme="light"] strong, [data-theme="light"] .label,
+[data-theme="light"] .field label,
+[data-theme="light"] .hex-val { color: var(--hardcoded-text-primary) !important; }
+
+/* Muted / secondary text */
+[data-theme="light"] .subtitle, [data-theme="light"] .help-text, [data-theme="light"] .text-muted,
+[data-theme="light"] .field label, [data-theme="light"] .preset-desc,
+[data-theme="light"] .pv-mini-p, [data-theme="light"] .stat-label,
+[data-theme="light"] .mode-toggle__text small { color: var(--hardcoded-text-muted) !important; }
+
+/* Borders & dividers */
+[data-theme="light"] .field input, [data-theme="light"] .clay-select,
+[data-theme="light"] .bulk-action-bar, [data-theme="light"] .folder-list li,
+[data-theme="light"] .upload-zone, [data-theme="light"] .media-card,
+[data-theme="light"] .panel, [data-theme="light"] .gm-list-header,
+[data-theme="light"] .gm-item { border-color: var(--hardcoded-border) !important; }
+
+/* Inputs / selects */
+[data-theme="light"] .field input,
+[data-theme="light"] .clay-select,
+[data-theme="light"] .input-with-button input { background-color: #fff !important; color: var(--hardcoded-text-primary) !important; border-color: var(--hardcoded-border-strong) !important; }
+[data-theme="light"] .clay-select option { background-color: #fff !important; color: var(--hardcoded-text-primary) !important; }
+
+/* Tables */
+[data-theme="light"] .data-table th { color: var(--hardcoded-text-muted) !important; }
+[data-theme="light"] .data-table td { color: var(--hardcoded-text-primary) !important; border-color: var(--hardcoded-border) !important; }
+[data-theme="light"] .data-table tr:hover { background-color: var(--hardcoded-overlay) !important; }
+
+/* Toggles, switches (ThemeManager mode toggle) */
+[data-theme="light"] .mode-toggle { background-color: #fff !important; border-color: var(--hardcoded-border-strong) !important; }
+[data-theme="light"] .mode-toggle__switch { background-color: rgba(0, 0, 0, 0.15) !important; }
+
+/* Hover background for list items */
+[data-theme="light"] .folder-list li:hover,
+[data-theme="light"] .bulk-clear:hover,
+[data-theme="light"] .nav-item:hover { background-color: var(--hardcoded-overlay) !important; }
+
+/* Page-builder canvas */
+[data-theme="light"] .god-mode-workspace { background-color: #FAFAFA !important; }
+[data-theme="light"] .gm-canvas-container { background-color: #FAFAFA !important; }
+[data-theme="light"] .canvas-toolbar { background-color: #fff !important; border-color: var(--hardcoded-border) !important; }
+[data-theme="light"] .toolbar-title { color: var(--hardcoded-text-primary) !important; }
+[data-theme="light"] .pb-header h1, [data-theme="light"] .pb-desc { color: var(--hardcoded-text-primary) !important; }
+[data-theme="light"] .pb-desc { color: var(--color-primary, #BC4A3C) !important; }
+[data-theme="light"] .pb-tabs { background-color: var(--hardcoded-bg-inset) !important; }
+[data-theme="light"] .pb-tab { color: var(--hardcoded-text-muted) !important; }
+
+/* Save bar */
+[data-theme="light"] .pb-save-bar { background-color: #fff !important; color: var(--hardcoded-text-primary) !important; border-color: var(--hardcoded-border) !important; }
+[data-theme="light"] .pb-save-bar.is-pending { background-color: rgba(245, 158, 11, 0.08) !important; }
+[data-theme="light"] .pb-save-bar.is-saving  { background-color: rgba(59, 130, 246, 0.08) !important; }
+[data-theme="light"] .pb-save-bar.is-saved   { background-color: rgba(16, 185, 129, 0.08) !important; }
+[data-theme="light"] .pb-save-bar.is-error   { background-color: rgba(239, 68, 68, 0.08) !important; }
+[data-theme="light"] .pb-save-bar__time { color: var(--hardcoded-text-muted) !important; }
+
+/* Theme manager preset panel background override */
+[data-theme="light"] .admin-panel-grid { background: transparent !important; }
+
+/* Media library upload zone */
+[data-theme="light"] .upload-zone { background-color: var(--hardcoded-overlay) !important; border-color: var(--hardcoded-border-strong) !important; }
+[data-theme="light"] .media-info { background-color: var(--hardcoded-bg-panel) !important; }
+[data-theme="light"] .media-preview { background: linear-gradient(135deg, #ECECEE 0%, #F4F4F5 100%) !important; }
+
+/* Save status in topbar */
+[data-theme="light"] .save-status.idle { background-color: var(--hardcoded-overlay) !important; color: var(--hardcoded-text-muted) !important; border-color: var(--hardcoded-border) !important; }
+[data-theme="light"] .save-status.saved { color: #10b981 !important; }
+[data-theme="light"] .save-status.saving { color: #f59e0b !important; }
+[data-theme="light"] .save-status.error { color: #ef4444 !important; }
+
+/* Buttons (borders + ghost states) */
+[data-theme="light"] .btn-ghost,
+[data-theme="light"] .action-btn { background-color: var(--hardcoded-overlay) !important; color: var(--hardcoded-text-primary) !important; border-color: var(--hardcoded-border-strong) !important; }
+[data-theme="light"] .btn-ghost:hover,
+[data-theme="light"] .action-btn:hover { background-color: var(--hardcoded-overlay-hover) !important; }
+
+/* Stat cards in dashboards */
+[data-theme="light"] .stat-card { background-color: var(--hardcoded-bg-panel) !important; }
+
+/* Toggle field wrapper */
+[data-theme="light"] .toggle-field { background-color: var(--hardcoded-overlay) !important; border-color: var(--hardcoded-border) !important; }
+[data-theme="light"] .toggle-track { background-color: rgba(0, 0, 0, 0.15) !important; }
+[data-theme="light"] .toggle-text strong { color: var(--hardcoded-text-primary) !important; }
+
+/* Icon buttons in header rows */
+[data-theme="light"] .btn-new-folder { color: #fff !important; }
+
+/* Login page (HQ) */
+[data-theme="light"] .admin-login-page { background-color: #F4F4F5 !important; color: var(--hardcoded-text-primary) !important; }
+[data-theme="light"] .admin-login-page .field input { color: var(--hardcoded-text-primary) !important; }
+[data-theme="light"] .admin-login-page .field label { color: var(--hardcoded-text-muted) !important; }
+[data-theme="light"] .clay-dark, [data-theme="light"] .clay-dark-inset { background-color: #fff !important; border-color: var(--hardcoded-border) !important; }
+
+/* Login page subtitle */
+[data-theme="light"] .hq-subtitle, [data-theme="light"] .field { color: var(--hardcoded-text-muted) !important; }
+
+/* Empty states */
+[data-theme="light"] .empty-state, [data-theme="light"] .loading { color: var(--hardcoded-text-muted) !important; }
+
+/* Smooth theme transition */
+:root, [data-theme] {
+  transition: background-color 0.3s ease, color 0.2s ease;
+}
+.clay-surface, .panel, .admin-layout, body {
+  transition: background-color 0.3s ease, color 0.2s ease, box-shadow 0.3s ease;
+}
+
+/* --- HYPER-DESIGN ANIMATIONS --- */
+
+/* Button Animations */
+[data-btn-anim="bounce"] .pv-mini-cta, [data-btn-anim="bounce"] .glow-btn, [data-btn-anim="bounce"] .btn-success { transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+[data-btn-anim="bounce"] .pv-mini-cta:hover, [data-btn-anim="bounce"] .glow-btn:hover, [data-btn-anim="bounce"] .btn-success:hover {
+  transform: scale(1.05) translateY(-2px);
+  box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+}
+
+[data-btn-anim="glow"] .pv-mini-cta, [data-btn-anim="glow"] .glow-btn, [data-btn-anim="glow"] .btn-success { transition: all 0.3s ease; }
+[data-btn-anim="glow"] .pv-mini-cta:hover, [data-btn-anim="glow"] .glow-btn:hover, [data-btn-anim="glow"] .btn-success:hover {
+  box-shadow: 0 0 20px var(--color-primary);
+  filter: brightness(1.2);
+}
+
+[data-btn-anim="lift"] .pv-mini-cta, [data-btn-anim="lift"] .glow-btn, [data-btn-anim="lift"] .btn-success { transition: transform 0.2s ease, box-shadow 0.2s ease; }
+[data-btn-anim="lift"] .pv-mini-cta:hover, [data-btn-anim="lift"] .glow-btn:hover, [data-btn-anim="lift"] .btn-success:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px rgba(0,0,0,0.4);
+}
+
+/* Card Animations */
+[data-card-anim="lift"] .pv-mini-card, [data-card-anim="lift"] .glass-panel, [data-card-anim="lift"] .product-card { transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.3s cubic-bezier(0.2, 0.8, 0.2, 1); }
+[data-card-anim="lift"] .pv-mini-card:hover, [data-card-anim="lift"] .glass-panel:hover, [data-card-anim="lift"] .product-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+}
+
+[data-card-anim="glow"] .pv-mini-card, [data-card-anim="glow"] .glass-panel, [data-card-anim="glow"] .product-card { transition: all 0.3s ease; }
+[data-card-anim="glow"] .pv-mini-card:hover, [data-card-anim="glow"] .glass-panel:hover, [data-card-anim="glow"] .product-card:hover {
+  box-shadow: 0 0 20px rgba(255,255,255,0.1), inset 0 0 20px rgba(255,255,255,0.05);
+  border-color: rgba(255,255,255,0.3);
+}
+  
+/* GOD MODE GLOBAL UX */  
+.god-mode-header { display: flex; justify-content: space-between; align-items: flex-start; position: sticky; top: -32px; background: var(--bg-default); z-index: 10; padding: 16px 0; border-bottom: 1px solid var(--border-light); margin-bottom: 16px; }  
+.god-mode-tabs { display: flex; gap: 8px; border-bottom: 2px solid var(--border-light); margin-bottom: 16px; }  
+  
+/* GOD MODE GLOBAL UX */  
+.god-mode-header { display: flex; justify-content: space-between; align-items: flex-start; position: sticky; top: -32px; background: var(--bg-default); z-index: 10; padding: 16px 0; border-bottom: 1px solid var(--border-light); margin-bottom: 16px; }  
+.god-mode-tabs { display: flex; gap: 8px; border-bottom: 2px solid var(--border-light); margin-bottom: 16px; }  
+.gm-tab { background: none; border: none; padding: 12px 24px; font-weight: 600; color: var(--text-muted); cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -2px; transition: all 0.2s ease; }  
+.gm-tab:hover { color: var(--text-primary); }  
+.gm-tab.active { color: var(--primary-color); border-bottom-color: var(--primary-color); } 
+  
+/* PERFORMANCE: Hardware Acceleration */  
+.hw-accelerate, 
+[style*="overflow-x: auto"], 
+[style*="overflow-x: scroll"], 
+.product-grid, 
+.category-grid, 
+.pdp-gallery__thumbs { 
+  transform: translateZ(0); 
+  will-change: transform; 
+  -webkit-overflow-scrolling: touch; 
+}
+
+/* Mobile White Background Overrides */
+@media (max-width: 768px) {
+  :root {
+    --surface-page: #FFFFFF;
+    --surface-card: #FFFFFF;
+    --color-bg-storefront: #FFFFFF;
+    --color-bg: #FFFFFF;
+    --surface-section-alt: #F9F6F1;
+    --surface-section-warm: #F9F6F1;
+  }
+}
+
+/* Fix for dark modals in light mode */
+[data-theme='light'] .glass-modal h1, 
+[data-theme='light'] .glass-modal h2, 
+[data-theme='light'] .glass-modal h3, 
+[data-theme='light'] .glass-modal h4, 
+[data-theme='light'] .glass-modal label, 
+[data-theme='light'] .glass-modal .accordion-section-divider span { 
+  color: #ffffff !important; 
+}
+
+[data-theme='light'] .glass-modal input, 
+[data-theme='light'] .glass-modal textarea, 
+[data-theme='light'] .glass-modal select { 
+  background-color: rgba(0,0,0,0.2) !important; 
+  color: #ffffff !important; 
+  border-color: rgba(255,255,255,0.1) !important; 
 }

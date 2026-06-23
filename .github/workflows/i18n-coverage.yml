@@ -1,0 +1,43 @@
+# i18n coverage CI — verifies every locale file has 100% parity with TR
+# (the canonical locale). Run on every PR that touches locale files.
+# On failure, the i18n-coverage.json artifact is uploaded so the author
+# can see which keys need translation.
+name: i18n-coverage
+
+on:
+  pull_request:
+    paths:
+      - 'frontend/src/locales/**'
+      - 'frontend/src/**/*.{vue,ts}'   # catch new t() calls even if locale file is unchanged
+  push:
+    branches: [main]
+    paths:
+      - 'frontend/src/locales/**'
+
+jobs:
+  audit:
+    name: parity check (tr/ru/kg)
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+      - name: Install dependencies
+        run: npm ci --legacy-peer-deps --no-audit --no-fund
+      - name: Run i18n coverage audit
+        id: audit
+        run: npm run smoke:i18n
+      - name: Upload coverage report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: i18n-coverage-report
+          path: frontend/i18n-coverage.json
+          if-no-files-found: ignore

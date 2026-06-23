@@ -1,0 +1,77 @@
+# Backend integration test CI — runs against a real MySQL 8 container.
+# This is the heavy job: it spins up a fresh database, applies the
+# schema, runs every integration test (auth, checkout, ocr, adminI18n),
+# then tears down. Used as a nightly + on-demand check, NOT on every PR
+# (those run only `test:unit` via the main ci.yml workflow).
+name: backend-integration
+
+on:
+  # Nightly at 04:00 UTC — catches regressions against a live MySQL.
+  schedule:
+    - cron: '0 4 * * *'
+  # Manual trigger from the Actions tab.
+  workflow_dispatch:
+  # PRs touching integration-only files run the full suite automatically.
+  pull_request:
+    paths:
+      - 'backend/tests/auth.test.ts'
+      - 'backend/tests/checkout.test.ts'
+      - 'backend/tests/ocr.test.ts'
+      - 'backend/tests/adminI18n.test.ts'
+      - 'backend/prisma/**'
+      - 'backend/src/**'
+
+jobs:
+  integration:
+    name: vitest + MySQL 8
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: backend
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: testrootpw
+          MYSQL_DATABASE: powervital_test
+          MYSQL_USER: pvtest
+          MYSQL_PASSWORD: pvtestpw
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd "mysqladmin ping -h 127.0.0.1 -u root -ptestrootpw"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      DATABASE_URL: mysql://pvtest:pvtestpw@127.0.0.1:3306/powervital_test
+      JWT_SECRET: integration-test-secret-do-not-use-in-prod
+      NODE_ENV: test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: backend/package-lock.json
+      - name: Install dependencies
+        run: npm ci --legacy-peer-deps --no-audit --no-fund
+      - name: Generate Prisma client
+        run: npx prisma generate
+      - name: Wait for MySQL
+        run: |
+          for i in $(seq 1 30); do
+            if mysql -h 127.0.0.1 -u pvtest -ppvtestpw -e "SELECT 1" powervital_test 2>/dev/null; then
+              echo "MySQL is up."
+              exit 0
+            fi
+            echo "Waiting for MySQL... ($i)"
+            sleep 2
+          done
+          echo "MySQL failed to start in time."
+          exit 1
+      - name: Push schema to test DB
+        run: npx prisma db push --skip-generate --accept-data-loss
+      - name: Run full test suite (unit + integration)
+        run: npm test

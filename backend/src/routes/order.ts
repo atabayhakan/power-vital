@@ -1,98 +1,95 @@
 import { Router, Request, Response } from 'express';
-import { PrismaClient } from '../../prisma/generated/client';
-import { addBonusCalculationJob } from '../queues/bonusQueue';
+import { authenticateJWT, requireRole } from '../middleware/auth';
+import prisma from '../lib/prisma';
+import { handleOrderPaidAscension } from '../services/ascensionService';
+import { sendToUser } from '../services/pushService';
+import { validate, OrderStatusUpdateSchema, OrderListQuerySchema, IdParamSchema } from '../validators';
+import { logger } from '../utils/logger';
+import { envelope, parsePagination } from '../utils/paginate';
 
 const router = Router();
-const prisma = new PrismaClient({});
 
-// POST /api/v1/orders/checkout - Public E-Commerce Checkout
-router.post('/checkout', async (req: Request, res: Response) => {
+// NOTE: Legacy POST /checkout has been removed.
+// The canonical checkout endpoint lives in src/routes/checkout.ts
+// which properly creates OrderItems, deducts stock, and generates QR codes.
+
+// GET /api/v1/orders - Admin Order Listing (with optional status filter)
+router.get('/', authenticateJWT, requireRole('admin'), validate({ query: OrderListQuerySchema }), async (req: Request, res: Response) => {
   try {
-    const { customerName, customerPhone, address, cart, sponsorId } = req.body;
-
-    if (!cart || cart.length === 0) {
-      return res.status(400).json({ error: 'Cart is empty' });
+    const { status, includeCancelled } = req.query as { status?: string; includeCancelled?: boolean };
+    const where: any = {};
+    // If status is explicitly provided, filter by it
+    if (status && typeof status === 'string') {
+      where.status = status;
+    } else if (includeCancelled !== true) {
+      // Default: hide cancelled orders unless user asks to see them
+      where.status = { not: 'cancelled' };
     }
+    const { page, limit, skip, take } = parsePagination(req.query as any, { limit: 50 });
 
-    // Calculate total
-    let totalKgs = 0;
-    for (const item of cart) {
-      totalKgs += parseFloat(item.price) * (item.quantity || 1);
-    }
-
-    // Get a valid userId since it is required in the schema
-    let orderUserId = sponsorId;
-    if (!orderUserId) {
-      const fallbackUser = await prisma.user.findFirst();
-      if (!fallbackUser) return res.status(400).json({ error: 'No users exist in DB to attach guest order' });
-      orderUserId = fallbackUser.id;
-    }
-
-    // Create Order in Database
-    const order = await prisma.order.create({
-      data: {
-        userId: orderUserId,
-        orderType: 'ecommerce',
-        status: 'pending',
-        totalKgs: totalKgs,
-        totalUsd: 0,
-        paymentMethod: 'cash',
-        // We will store customer details as a JSON field or link to a guest user in a real prod env.
-        // For MVP, we just track the order.
-      }
-    });
-
-    // If a Sponsor ID was provided by the customer, trigger the Bonus Worker!
-    if (sponsorId) {
-      // Create a dummy user context for the purchaser or pass the guest id
-      // Since our addBonusCalculationJob expects a purchaserId, we can pass a dummy string for guest
-      await addBonusCalculationJob(order.id, `GUEST_${customerName}`, totalKgs, sponsorId);
-      console.log(`[Checkout] Order ${order.id} placed with Sponsor: ${sponsorId}`);
-    }
-
-    res.json({ message: 'Order placed successfully', orderId: order.id });
+    const [orders, total] = await Promise.all([
+      prisma.order.findMany({
+        where,
+        orderBy: { createdAt: 'desc' },
+        skip,
+        take
+      }),
+      prisma.order.count({ where })
+    ]);
+    res.json(envelope(orders, total, page, limit));
   } catch (error: any) {
-    console.error('Checkout Error:', error);
-    res.status(500).json({ error: 'Failed to place order' });
-  }
-});
-
-// GET /api/v1/orders - Admin Order Listing
-router.get('/', async (req: Request, res: Response) => {
-  try {
-    const orders = await prisma.order.findMany({
-      orderBy: { createdAt: 'desc' },
-      take: 50 // Limit for MVP
-    });
-    res.json(orders);
-  } catch (error: any) {
-    console.error('List Orders Error:', error);
+    logger.error({ err: error }, 'List Orders Error:');
     res.status(500).json({ error: 'Failed to fetch orders' });
   }
 });
 
 // PUT /api/v1/orders/:id/status - Update Order Status
-router.put('/:id/status', async (req: Request, res: Response) => {
+router.put('/:id/status', authenticateJWT, requireRole('admin'), validate({ body: OrderStatusUpdateSchema, params: IdParamSchema }), async (req: Request, res: Response) => {
   try {
-    const { id } = req.params;
-    const { status } = req.body;
-
-    // ═══ STATUS VALIDATION ═══
-    const VALID_STATUSES = ['pending', 'paid', 'shipped', 'completed', 'cancelled', 'refunded'];
-    if (!status || !VALID_STATUSES.includes(status)) {
-      return res.status(400).json({
-        error: `Invalid status. Valid values: ${VALID_STATUSES.join(', ')}`
-      });
-    }
+    const { id } = req.params as { id: string };
+    const { status } = req.body as { status: string };
 
     const order = await prisma.order.update({
       where: { id: id as string },
       data: { status }
     });
 
+    if (status === 'paid' || status === 'completed') {
+      await handleOrderPaidAscension(order.id);
+    }
+
+    // Push notification to the customer about the status change.
+    const userId = (order as any).userId;
+    if (userId && status !== 'pending') {
+      const titles: Record<string, string> = {
+        paid: '💳 Ödemeniz onaylandı',
+        shipped: '📦 Siparişiniz kargoda',
+        completed: '✅ Siparişiniz tamamlandı',
+        cancelled: '❌ Siparişiniz iptal edildi',
+        refunded: '↩️ İade işlemi başlatıldı'
+      };
+      const urls: Record<string, string> = {
+        paid: '/orders',
+        shipped: '/orders',
+        completed: '/orders',
+        cancelled: '/orders',
+        refunded: '/orders'
+      };
+      const title = titles[status];
+      if (title) {
+        sendToUser(userId, {
+          title,
+          body: `Sipariş #${(order as any).orderNumber || id.slice(0, 8)} — ${status}`,
+          url: urls[status],
+          tag: `order-${status}`,
+          eventKey: `order_${status}`
+        }).catch(() => {});
+      }
+    }
+
     res.json({ message: 'Order status updated', order });
   } catch (error: any) {
-    console.error('Update Order Status Error:', error);
+    logger.error({ err: error }, 'Update Order Status Error:');
     res.status(500).json({ error: 'Failed to update order status' });
   }
 });

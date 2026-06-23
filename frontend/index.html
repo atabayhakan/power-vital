@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="ru">
+<html lang="kg">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
@@ -35,18 +35,40 @@
     <meta name="apple-mobile-web-app-title" content="PowerVital" />
     <link rel="apple-touch-icon" href="/favicon.svg" />
 
-    <!-- Fonts -->
+    <!-- Performance: preconnect to every external origin we touch.
+         preconnect warms TCP+TLS; dns-prefetch is the cheap fallback for
+         older browsers. crossorigin only when the request will carry
+         credentials (e.g. font fetches). -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://cdn.myikas.com" crossorigin>
+    <link rel="preconnect" href="https://cdn-icons-png.flaticon.com" crossorigin>
+    <link rel="dns-prefetch" href="https://images.unsplash.com">
+    <link rel="dns-prefetch" href="https://www.google.com">
+
+    <!-- Fonts -->
+    <!-- Outfit has NO Cyrillic glyphs, so Kyrgyz/Russian headings fell back to a
+         system font (inconsistent letter sizes). Montserrat is a geometric sans
+         with full Cyrillic (incl. ң ө ү) used as the Cyrillic fallback. -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Montserrat:wght@400;500;600;700;800;900&family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   </head>
   <body>
     <div id="app"></div>
     <script type="module" src="/src/main.ts"></script>
     <script>
+      // 🛡️ Cleanup: only unregister stale workers from the DISABLED
+      // VitePWA era — the current /sw.js is registered on demand by
+      // usePushSubscription.ts and must NOT be touched.
       if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-          navigator.serviceWorker.register('/sw.js').catch(() => {});
+        navigator.serviceWorker.getRegistrations().then(regs => {
+          regs.forEach(reg => {
+            // The active push worker lives at scope / and is named
+            // 'push-worker' (or has a scriptURL ending in /sw.js).
+            const isPvPushWorker = (reg.active?.scriptURL || reg.installing?.scriptURL || reg.waiting?.scriptURL || '').endsWith('/sw.js');
+            if (!isPvPushWorker) {
+              reg.unregister();
+            }
+          });
         });
       }
     </script>

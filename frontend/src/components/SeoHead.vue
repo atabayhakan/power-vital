@@ -38,6 +38,18 @@ const SEO_DEFAULTS: Record<string, { title: string; description: string }> = {
   }
 };
 
+// Extract origin from the API base URL so the browser can warm
+// TCP+TLS while the JS bundle is still parsing. Falls back to a
+// relative same-origin (no preconnect needed).
+const API_ORIGIN = (() => {
+  const raw = import.meta.env.VITE_API_URL || '';
+  try {
+    return raw ? new URL(raw).origin : '';
+  } catch {
+    return '';
+  }
+})();
+
 const applyMeta = () => {
   const path = route.path;
   const defaults = SEO_DEFAULTS[path] || SEO_DEFAULTS['/'];
@@ -70,6 +82,21 @@ const applyMeta = () => {
   setMeta('twitter:title', title);
   setMeta('twitter:description', description);
   setMeta('twitter:image', image);
+
+  // LCP / preconnect — only if we're calling a cross-origin API.
+  // (index.html already covers same-origin via the browser's preload
+  // scanner, so this matters only when VITE_API_URL points elsewhere.)
+  if (API_ORIGIN && API_ORIGIN !== window.location.origin) {
+    let link = document.querySelector<HTMLLinkElement>('link[data-pv-api-preconnect]');
+    if (!link) {
+      link = document.createElement('link');
+      link.rel = 'preconnect';
+      link.href = API_ORIGIN;
+      link.crossOrigin = 'anonymous';
+      link.dataset.pvApiPreconnect = '1';
+      document.head.appendChild(link);
+    }
+  }
 };
 
 const setMeta = (name: string, content: string, attr: string = 'name') => {
@@ -89,4 +116,5 @@ watch(() => props.title, applyMeta);
 
 <template>
   <!-- SEO Head — renders nothing visible -->
+  <div v-if="false" />
 </template>

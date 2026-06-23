@@ -1,9 +1,11 @@
 import { Router, Request, Response } from 'express';
-import { PrismaClient } from '../../prisma/generated/client';
+import { authenticateJWT, requireRole } from '../middleware/auth';
+import prisma from '../lib/prisma';
 import { setCache, getCache } from '../utils/redis';
+import { validate, SystemConfigUpdateSchema } from '../validators';
+import { logger } from '../utils/logger';
 
 const router = Router();
-const prisma = new PrismaClient({});
 
 // ═══ GET /api/v1/system/mlm-status — Public (Redis-cached) ═══
 router.get('/mlm-status', async (req: Request, res: Response) => {
@@ -25,7 +27,7 @@ router.get('/mlm-status', async (req: Request, res: Response) => {
 });
 
 // GET /api/v1/system/config - Fetch limits and toggles
-router.get('/config', async (req: Request, res: Response) => {
+router.get('/config', authenticateJWT, requireRole('admin'), async (req: Request, res: Response) => {
   try {
     let config = await prisma.systemConfig.findFirst();
     if (!config) {
@@ -33,7 +35,13 @@ router.get('/config', async (req: Request, res: Response) => {
     }
 
     // Get aggregated stats for the dashboard
-    const revenueAgg = await prisma.order.aggregate({ _sum: { totalKgs: true } });
+    // 🛡️ CANCELLED-EXCLUSION: cancelled orders must NOT count as revenue,
+    // otherwise the payout ratio (bonus / revenue) is artificially deflated
+    // and safety lock limits are miscalculated.
+    const revenueAgg = await prisma.order.aggregate({
+      where: { status: { not: 'cancelled' } },
+      _sum: { totalKgs: true }
+    });
     const totalRevenue = Number(revenueAgg._sum.totalKgs || 0);
 
     const bonusAgg = await prisma.transaction.aggregate({
@@ -54,13 +62,13 @@ router.get('/config', async (req: Request, res: Response) => {
     });
 
   } catch (error: any) {
-    console.error('Fetch System Config Error:', error);
+    logger.error({ err: error }, 'Fetch System Config Error:');
     res.status(500).json({ error: 'Failed to fetch system config' });
   }
 });
 
 // PUT /api/v1/system/config
-router.put('/config', async (req: Request, res: Response) => {
+router.put('/config', authenticateJWT, requireRole('admin'), validate({ body: SystemConfigUpdateSchema }), async (req: Request, res: Response) => {
   try {
     const {
       isMlmEnabled,
@@ -71,7 +79,19 @@ router.put('/config', async (req: Request, res: Response) => {
       unilevelRates,
       isOverdriveActive,
       overdrivePoolPct
-    } = req.body;
+    } = req.body as {
+      isMlmEnabled?: boolean; maxPayoutLimitPct?: number;
+      isFastStartActive?: boolean; fastStartRates?: string | number[];
+      isUnilevelActive?: boolean; unilevelRates?: string | number[];
+      isOverdriveActive?: boolean; overdrivePoolPct?: number;
+    };
+
+    // DB stores the rate arrays as JSON strings — coerce here so the API can
+    // accept either a JSON string ("[10,5,2]") or a raw number array.
+    const toRatesString = (v: string | number[] | undefined, fallback: string): string => {
+      if (v === undefined) return fallback;
+      return Array.isArray(v) ? JSON.stringify(v) : v;
+    };
 
     const existing = await prisma.systemConfig.findFirst();
     let config;
@@ -81,13 +101,13 @@ router.put('/config', async (req: Request, res: Response) => {
         where: { id: existing.id },
         data: {
           isMlmEnabled: isMlmEnabled !== undefined ? isMlmEnabled : existing.isMlmEnabled,
-          maxPayoutLimitPct,
-          isFastStartActive,
-          fastStartRates: fastStartRates || [10, 5, 2],
-          isUnilevelActive,
-          unilevelRates: unilevelRates || [5, 5, 5, 5, 5],
-          isOverdriveActive,
-          overdrivePoolPct
+          maxPayoutLimitPct: maxPayoutLimitPct !== undefined ? maxPayoutLimitPct : existing.maxPayoutLimitPct,
+          isFastStartActive: isFastStartActive !== undefined ? isFastStartActive : existing.isFastStartActive,
+          fastStartRates: fastStartRates !== undefined ? toRatesString(fastStartRates, existing.fastStartRates) : existing.fastStartRates,
+          isUnilevelActive: isUnilevelActive !== undefined ? isUnilevelActive : existing.isUnilevelActive,
+          unilevelRates: unilevelRates !== undefined ? toRatesString(unilevelRates, existing.unilevelRates) : existing.unilevelRates,
+          isOverdriveActive: isOverdriveActive !== undefined ? isOverdriveActive : existing.isOverdriveActive,
+          overdrivePoolPct: overdrivePoolPct !== undefined ? overdrivePoolPct : existing.overdrivePoolPct
         }
       });
     } else {
@@ -96,9 +116,9 @@ router.put('/config', async (req: Request, res: Response) => {
           isMlmEnabled: isMlmEnabled !== undefined ? isMlmEnabled : true,
           maxPayoutLimitPct: maxPayoutLimitPct || 30.00,
           isFastStartActive: isFastStartActive !== undefined ? isFastStartActive : true,
-          fastStartRates: fastStartRates || [10, 5, 2],
+          fastStartRates: toRatesString(fastStartRates, '[10, 5, 2]'),
           isUnilevelActive: isUnilevelActive !== undefined ? isUnilevelActive : true,
-          unilevelRates: unilevelRates || [5, 5, 5, 5, 5],
+          unilevelRates: toRatesString(unilevelRates, '[5, 5, 5, 5, 5]'),
           isOverdriveActive: isOverdriveActive !== undefined ? isOverdriveActive : true,
           overdrivePoolPct: overdrivePoolPct || 5.00
         }
@@ -111,67 +131,13 @@ router.put('/config', async (req: Request, res: Response) => {
 
     res.json(config);
   } catch (error) {
-    console.error('Update System Config Error:', error);
+    logger.error({ err: error }, 'Update System Config Error:');
     res.status(500).json({ error: 'Failed to update system config' });
   }
 });
 
-// GET /api/v1/system/leaderboard - Olympics Run
-router.get('/leaderboard', async (req: Request, res: Response) => {
-  try {
-    // Get the current open cycle
-    let activeCycle = await prisma.weeklyCycle.findFirst({
-      where: { isClosed: false },
-      orderBy: { startDate: 'desc' }
-    });
-
-    if (!activeCycle) {
-      // Create week 1 if none exists
-      activeCycle = await prisma.weeklyCycle.create({
-        data: { weekNumber: 1, year: new Date().getFullYear(), startDate: new Date() }
-      });
-    }
-
-    // Fetch user stats for this cycle, sorted by total volume (pv + gv + carryover)
-    const stats = await prisma.userWeeklyStats.findMany({
-      where: { cycleId: activeCycle.id },
-      include: {
-        user: { select: { id: true, name: true, role: true } }
-      }
-    });
-
-    // Map and sort locally (since we need to sum decimal fields)
-    const leaderboard = stats.map(s => {
-      const pv = Number(s.personalVolume);
-      const gv = Number(s.teamVolume);
-      const carry = Number(s.carryOverVolume);
-      return {
-        userId: s.userId,
-        name: s.user.name,
-        role: s.user.role,
-        score: pv + gv + carry,
-        pv, gv, carry
-      };
-    }).sort((a, b) => b.score - a.score).slice(0, 5);
-
-    // If empty (no sales yet), return some dummy data to show off the UI
-    if (leaderboard.length === 0) {
-      return res.json([
-        { userId: '1', name: 'Nurlan B.', role: 'distributor', score: 15400, pv: 400, gv: 15000, carry: 0 },
-        { userId: '2', name: 'Almaz K.', role: 'dealer', score: 12200, pv: 1200, gv: 11000, carry: 0 },
-        { userId: '3', name: 'Aigerim T.', role: 'distributor', score: 9800, pv: 800, gv: 9000, carry: 0 },
-      ]);
-    }
-
-    res.json(leaderboard);
-  } catch (error: any) {
-    console.error('Leaderboard Fetch Error:', error);
-    res.status(500).json({ error: 'Failed to fetch leaderboard' });
-  }
-});
-
 // POST /api/v1/system/close-week - Weekly Closing
-router.post('/close-week', async (req: Request, res: Response) => {
+router.post('/close-week', authenticateJWT, requireRole('admin'), async (req: Request, res: Response) => {
   try {
     const activeCycle = await prisma.weeklyCycle.findFirst({
       where: { isClosed: false },
@@ -219,7 +185,7 @@ router.post('/close-week', async (req: Request, res: Response) => {
 
     res.json({ message: 'Week closed successfully. New week started. Points carried over.' });
   } catch (error: any) {
-    console.error('Close Week Error:', error);
+    logger.error({ err: error }, 'Close Week Error:');
     res.status(500).json({ error: 'Failed to close week' });
   }
 });

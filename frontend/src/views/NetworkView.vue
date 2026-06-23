@@ -5,24 +5,10 @@ import axios from 'axios';
 const rootNetwork = ref<any>(null);
 const isLoading = ref(true);
 
-// We will add dummy children if the database has less than 2 levels to show the beautiful design
-const dummyData = [
-  { id: 'd1', name: 'Almaz K.', role: 'dealer', walletBalanceUsd: '240' },
-  { id: 'd2', name: 'Nurlan B.', role: 'distributor', walletBalanceUsd: '1500' },
-  { id: 'd3', name: 'Aigerim T.', role: 'dealer', walletBalanceUsd: '60' },
-];
-
 const fetchNetwork = async () => {
   try {
     const res = await axios.get('/api/v1/auth/network', { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
-    let data = res.data;
-    
-    // Inject mock data for visualization if the DB tree is too sparse
-    if (data && data.children && data.children.length === 0) {
-      data.children = dummyData;
-    }
-    
-    rootNetwork.value = data;
+    rootNetwork.value = res.data;
   } catch (e) {
     console.error('Failed to fetch network:', e);
   } finally {
@@ -38,8 +24,11 @@ onMounted(() => {
 <template>
   <div class="network-content animate-fade-in">
     <div class="header-row">
-      <h2>Ağım (Distribütör Downline)</h2>
-      <button class="btn-primary">Yeni Kayıt Linki Oluştur 🔗</button>
+      <div>
+        <h2>🌲 Distribütör Ağacı</h2>
+        <p class="text-muted">MLM ağ yapısı, ekip hacmi ve alt distribütörler.</p>
+      </div>
+      <button class="btn-primary">+ Yeni Kayıt Linki Oluştur 🔗</button>
     </div>
 
     <div v-if="isLoading" class="loading glass-panel">Ağ verileri yükleniyor...</div>
@@ -99,6 +88,15 @@ onMounted(() => {
   display: flex;
   flex-direction: column;
   gap: 24px;
+  color: #fff;
+  /* 🛡️ Scroll fix — admin layout (App.vue) is 100vh flex with overflow:hidden
+     on .main-content. Without our own scroll container the long
+     distributor tree + sidebar get clipped at the bottom. */
+  height: 100vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-gutter: stable;
+  box-sizing: border-box;
 }
 
 .header-row {

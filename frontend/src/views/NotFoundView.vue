@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n';
+const { t } = useI18n();
 </script>
 
 <template>
@@ -6,9 +8,9 @@
     <div class="nf-card">
       <div class="nf-icon">🔍</div>
       <h1>404</h1>
-      <h2>Страница не найдена</h2>
-      <p>Запрашиваемая вами страница не существует или была перемещена.</p>
-      <router-link to="/" class="nf-btn">🏠 Вернуться на главную</router-link>
+      <h2>{{ t('notFound.title') }}</h2>
+      <p>{{ t('notFound.description') }}</p>
+      <router-link to="/" class="nf-btn">🏠 {{ t('notFound.button') }}</router-link>
     </div>
   </div>
 </template>

@@ -1,21 +1,46 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
 import axios from 'axios';
+import MediaSelectorModal from '../components/MediaSelectorModal.vue';
+import CountdownPreview from '../components/admin/CountdownPreview.vue';
 
 const activeTab = ref('general');
+const isMediaModalOpen = ref(false);
+const activeTargetField = ref<{ type: string, index?: number } | null>(null);
 
-const settings = ref({ 
+const settings = ref({
   companyName: '', address: '', phone: '', email: '', mapIframeCode: '', logoUrl: '',
   topbarShippingMsg: '', topbarPhone: '',
   trustBadges: [] as any[],
   partners: [] as any[],
-  footerLinks: [] as any[],
-  copyrightText: ''
+  footerLinks: {
+    description: 'Sağlık ve enerjinin yeni adresi. Doğadan gelen mucize formüllerle bağışıklığınızı güçlendirin.',
+    socials: [
+      { id: '1', icon: '📷', url: '#' },
+      { id: '2', icon: '🐦', url: '#' },
+      { id: '3', icon: '📘', url: '#' }
+    ],
+    columns: [
+      { id: '1', title: 'Hızlı Menü', links: [] },
+      { id: '2', title: 'Sözleşmeler', links: [] }
+    ]
+  } as any,
+  faqItems: [] as any[],
+  copyrightText: '',
+  // Hero campaign banner — admin schedules a countdown that
+  // appears at the top of the storefront. `endsAt` is a full
+  // ISO-8601 string so the input[type=datetime-local] can read
+  // it back directly. `enabled` toggles visibility.
+  campaignEnabled: false,
+  campaignEndsAt: '' as string | null,
+  campaignTitle: '',
+  campaignCta: '',
+  campaignLink: '/katalog',
+  translations: {} as Record<string, any>
 });
 
 const loading = ref(false);
 const saved = ref(false);
-const uploading = ref(false);
 
 const sanitizedMapPreview = computed(() => {
   const raw = settings.value.mapIframeCode;
@@ -40,73 +65,170 @@ const fetchSettings = async () => {
       topbarShippingMsg: res.data.topbarShippingMsg || '',
       topbarPhone: res.data.topbarPhone || '',
       trustBadges: res.data.trustBadges || [],
-      partners: res.data.partners || [],
-      footerLinks: res.data.footerLinks || [],
-      copyrightText: res.data.copyrightText || ''
+      partners: (res.data.partners || []).map((p: any, idx: number) => {
+        if (typeof p === 'string') {
+          return { id: Date.now().toString() + idx, logoUrl: p, name: 'Partner', link: '', isActive: true };
+        }
+        return p;
+      }),
+      footerLinks: {
+        description: 'Sağlık ve enerjinin yeni adresi. Doğadan gelen mucize formüllerle bağışıklığınızı güçlendirin.',
+        socials: [
+          { id: '1', icon: '📷', url: '#' },
+          { id: '2', icon: '🐦', url: '#' },
+          { id: '3', icon: '📘', url: '#' }
+        ],
+        columns: [
+          { id: '1', title: 'Hızlı Menü', links: [] },
+          { id: '2', title: 'Sözleşmeler', links: [] }
+        ]
+      },
+      faqItems: Array.isArray(res.data.faqItems) ? res.data.faqItems : [],
+      copyrightText: res.data.copyrightText || '',
+      campaignEnabled: !!res.data.campaignEnabled,
+      campaignEndsAt: res.data.campaignEndsAt
+        ? new Date(res.data.campaignEndsAt).toISOString().slice(0, 16)
+        : '',
+      campaignTitle: res.data.campaignTitle || '',
+      campaignCta: res.data.campaignCta || '',
+      campaignLink: res.data.campaignLink || '/katalog',
+      translations: (typeof res.data.translations === 'string' ? JSON.parse(res.data.translations) : res.data.translations) || {}
     };
+
+    let parsedFooter = res.data.footerLinks;
+    if (typeof parsedFooter === 'string') parsedFooter = JSON.parse(parsedFooter);
+
+    if (Array.isArray(parsedFooter)) {
+      settings.value.footerLinks.columns[0].links = parsedFooter;
+    } else if (parsedFooter && typeof parsedFooter === 'object' && parsedFooter.columns) {
+      settings.value.footerLinks = parsedFooter;
+    }
     
     // Default fallback if empty
     if (settings.value.trustBadges.length === 0) {
       settings.value.trustBadges = [
-        { id: 1, icon: '🚚', title: 'Hızlı Kargo', desc: '1-3 iş günü teslimat', isActive: true },
-        { id: 2, icon: '🔒', title: 'Güvenli Ödeme', desc: '256-bit SSL koruması', isActive: true }
+        { id: '1', icon: '🚚', title: 'Hızlı Kargo', desc: '1-3 iş günü teslimat', isActive: true },
+        { id: '2', icon: '🔒', title: 'Güvenli Ödeme', desc: '256-bit SSL koruması', isActive: true }
       ];
     }
-  } catch {}
+    if (settings.value.faqItems.length === 0) {
+      settings.value.faqItems = [
+        { id: '1', q: 'Kargo kaç günde ulaşır?', a: 'Siparişleriniz genellikle 1-3 iş günü içerisinde kargoya teslim edilmektedir.' },
+        { id: '2', q: 'İade koşulları nelerdir?', a: 'Kullanılmamış ürünleri 14 gün içerisinde iade edebilirsiniz.' },
+        { id: '3', q: 'Sadakat seviyesi nasıl artar?', a: 'Toplam harcama tutarınız arttıkça seviyeniz ve kalıcı indirim oranınız otomatik olarak yükselir.' }
+      ];
+    }
+  } catch {
+    const local = localStorage.getItem('pv_settings');
+    if (local) {
+      settings.value = JSON.parse(local);
+    } else {
+      if (settings.value.trustBadges.length === 0) {
+        settings.value.trustBadges = [
+          { id: '1', icon: '🚚', title: 'Hızlı Kargo', desc: '1-3 iş günü teslimat', isActive: true },
+          { id: '2', icon: '🔒', title: 'Güvenli Ödeme', desc: '256-bit SSL koruması', isActive: true }
+        ];
+      }
+    }
+  }
 };
 
 const saveSettings = async () => {
   loading.value = true;
   saved.value = false;
   try {
-    await axios.put('/api/v1/settings', settings.value, { headers: headers() });
+    // The HTML datetime-local input gives us "2026-12-31T23:59"
+    // (no seconds, no timezone). The backend Zod schema expects
+    // an ISO-8601 string with timezone offset, so we coerce here.
+    const payload: any = { ...settings.value };
+    if (payload.campaignEndsAt) {
+      // Append seconds + a UTC offset so the server can parse it
+      // unambiguously regardless of the admin's local timezone.
+      payload.campaignEndsAt = new Date(payload.campaignEndsAt).toISOString();
+    } else {
+      payload.campaignEndsAt = null;
+    }
+    await axios.put('/api/v1/settings', payload, { headers: headers() });
     saved.value = true;
     setTimeout(() => { saved.value = false; }, 3000);
-  } catch (e: any) { alert('Hata: ' + (e.response?.data?.error || e.message)); }
+  } catch (e: any) {
+    // Report the real failure — never pretend the save succeeded.
+    console.error('Save settings error:', e);
+    const msg = e?.response?.data?.error || e?.message || 'Bilinmeyen hata';
+    alert('Ayarlar kaydedilemedi: ' + msg);
+  }
   loading.value = false;
 };
 
-const uploadLogo = async (e: Event) => {
-  const input = e.target as HTMLInputElement;
-  if (!input.files?.[0]) return;
-  uploading.value = true;
-  try {
-    const fd = new FormData();
-    fd.append('file', input.files[0]);
-    const res = await axios.post('/api/v1/upload', fd, {
-      headers: { ...headers(), 'Content-Type': 'multipart/form-data' }
-    });
-    settings.value.logoUrl = res.data.url;
-  } catch (e: any) { alert('Yükleme hatası: ' + (e.response?.data?.error || e.message)); }
-  uploading.value = false;
-};
+// Settings translations (companyName, address, topbar message, copyright) are
+// generated automatically server-side on save + continuous TranslationSweeper.
+// No manual translate action needed.
 
 // CRUD Helpers
-const addTrustBadge = () => settings.value.trustBadges.push({ id: Date.now(), icon: '🏷️', title: 'Yeni Özellik', desc: 'Açıklama', isActive: true });
+const openMediaSelector = (type: string, index?: number) => {
+  activeTargetField.value = { type, index };
+  isMediaModalOpen.value = true;
+};
+
+const handleMediaSelect = (url: string) => {
+  if (!activeTargetField.value) return;
+  const { type, index } = activeTargetField.value;
+
+  if (type === 'logo') settings.value.logoUrl = url;
+  else if (type === 'trustBadge' && index !== undefined) settings.value.trustBadges[index].icon = url;
+  else if (type === 'partner' && index !== undefined) settings.value.partners[index].logoUrl = url;
+  else if (type === 'social' && index !== undefined) settings.value.footerLinks.socials[index].icon = url;
+
+  activeTargetField.value = null;
+};
+
+const addTrustBadge = () => settings.value.trustBadges.push({ id: Date.now().toString(), icon: '', title: 'Yeni Özellik', desc: 'Açıklama', isActive: true });
 const removeTrustBadge = (i: number) => settings.value.trustBadges.splice(i, 1);
 
-const addPartner = () => settings.value.partners.push({ id: Date.now(), logoUrl: '', name: 'Partner', link: '', isActive: true });
+const addPartner = () => settings.value.partners.push({ id: Date.now().toString(), logoUrl: '', name: 'Partner', link: '', isActive: true });
 const removePartner = (i: number) => settings.value.partners.splice(i, 1);
 
-const addFooterLink = () => settings.value.footerLinks.push({ id: Date.now(), title: 'Yeni Link', url: '/', section: 'Genel' });
-const removeFooterLink = (i: number) => settings.value.footerLinks.splice(i, 1);
+const addSocial = () => settings.value.footerLinks.socials.push({ id: Date.now().toString(), icon: '🔗', url: '#' });
+const removeSocial = (i: number) => settings.value.footerLinks.socials.splice(i, 1);
+
+const addFaq = () => settings.value.faqItems.push({ id: Date.now().toString(), q: 'Yeni Soru', a: 'Cevap' });
+const removeFaq = (i: number) => settings.value.faqItems.splice(i, 1);
+const moveFaq = (i: number, dir: number) => {
+  const arr = settings.value.faqItems; const j = i + dir;
+  if (j < 0 || j >= arr.length) return;
+  [arr[i], arr[j]] = [arr[j], arr[i]];
+};
+
+const addFooterCol = () => settings.value.footerLinks.columns.push({ id: Date.now().toString(), title: 'Yeni Sütun', links: [] });
+const removeFooterCol = (i: number) => settings.value.footerLinks.columns.splice(i, 1);
+
+const addFooterLink = (colIndex: number) => settings.value.footerLinks.columns[colIndex].links.push({ id: Date.now().toString(), title: 'Yeni Link', url: '/' });
+const removeFooterLink = (colIndex: number, linkIndex: number) => settings.value.footerLinks.columns[colIndex].links.splice(linkIndex, 1);
 
 onMounted(fetchSettings);
 </script>
 
 <template>
   <div class="admin-page animate-fade-in">
-    <header class="topbar"><h2>🏢 Site & İletişim Ayarları</h2></header>
+    <header class="topbar">
+      <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+        <h2>🏢 Site & İletişim Ayarları</h2>
+        <span style="font-size: 0.8rem; color: #6B7280; font-weight: 500;">🌐 Çeviriler otomatik oluşturulur (RU/KG)</span>
+      </div>
+    </header>
 
     <div class="tabs">
       <button :class="{ active: activeTab === 'general' }" @click="activeTab = 'general'">Genel Ayarlar</button>
       <button :class="{ active: activeTab === 'topbar' }" @click="activeTab = 'topbar'">Üst Çubuk (Topbar)</button>
+      <button :class="{ active: activeTab === 'campaign' }" @click="activeTab = 'campaign'">🔥 Kampanya Sayacı</button>
       <button :class="{ active: activeTab === 'trust' }" @click="activeTab = 'trust'">Güven Rozetleri</button>
+      <button :class="{ active: activeTab === 'certificates' }" @click="activeTab = 'certificates'">Sertifikalar</button>
       <button :class="{ active: activeTab === 'partners' }" @click="activeTab = 'partners'">Partnerler</button>
+      <button :class="{ active: activeTab === 'faq' }" @click="activeTab = 'faq'">Sıkça Sorulan Sorular</button>
       <button :class="{ active: activeTab === 'footer' }" @click="activeTab = 'footer'">Alt Bilgi (Footer)</button>
     </div>
 
-    <div class="settings-card glass-panel">
+    <div class="settings-card panel">
       <form @submit.prevent="saveSettings" class="settings-form">
         
         <!-- GENERAL SETTINGS -->
@@ -118,9 +240,7 @@ onMounted(fetchSettings);
               <div class="logo-preview" v-if="settings.logoUrl"><img :src="settings.logoUrl" alt="Logo" /></div>
               <div class="logo-placeholder" v-else>Logo yüklenmemiş</div>
               <div class="logo-actions">
-                <label class="upload-btn">{{ uploading ? '⏳ Yükleniyor...' : '📤 Logo Yükle' }}
-                  <input type="file" accept="image/*" @change="uploadLogo" :disabled="uploading" hidden />
-                </label>
+                <button type="button" class="upload-btn" @click="openMediaSelector('logo')">🖼️ Medya Kütüphanesinden Seç</button>
                 <button type="button" v-if="settings.logoUrl" class="clear-btn" @click="settings.logoUrl = ''">✕ Kaldır</button>
               </div>
             </div>
@@ -141,8 +261,8 @@ onMounted(fetchSettings);
           <div class="form-section">
             <h3>Harita Embed Kodu</h3>
             <p class="help-text">Google Maps veya Yandex Maps iframe kodunu yapıştırın.</p>
-            <textarea v-model="settings.mapIframeCode" rows="3"></textarea>
-            <div class="map-preview" v-if="sanitizedMapPreview" v-html="sanitizedMapPreview"></div>
+            <textarea v-model="settings.mapIframeCode" rows="3"/>
+            <div class="map-preview" v-if="sanitizedMapPreview" v-html="sanitizedMapPreview"/>
           </div>
         </div>
 
@@ -158,19 +278,88 @@ onMounted(fetchSettings);
           </div>
         </div>
 
+        <!-- HERO CAMPAIGN BANNER -->
+        <div v-show="activeTab === 'campaign'">
+          <div class="form-section">
+            <h3>🔥 Hero Kampanya Sayacı</h3>
+            <p class="help-text">
+              Ana sayfanın en üstünde görünen kırmızı şerit — geri sayım
+              + başlık + CTA butonu. Kampanya bittiğinde otomatik
+              gizlenir (süre sonu geçtiğinde banner'ı tekrar açmak
+              için yeni bir bitiş tarihi girin).
+            </p>
+
+            <label class="toggle toggle--big">
+              <input type="checkbox" v-model="settings.campaignEnabled" />
+              <span>🎯 Banner'ı aktifleştir</span>
+            </label>
+
+            <div class="form-row" style="margin-top: 16px;">
+              <div class="field">
+                <label>Bitiş Tarihi & Saati</label>
+                <input v-model="settings.campaignEndsAt" type="datetime-local" :disabled="!settings.campaignEnabled" />
+                <small class="help-text">Yerel saat diliminde. Sunucu UTC'ye çevirir.</small>
+              </div>
+              <div class="field">
+                <label>Bağlantı (CTA tıklaması)</label>
+                <input v-model="settings.campaignLink" placeholder="/katalog" :disabled="!settings.campaignEnabled" />
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="field">
+                <label>Başlık (TR)</label>
+                <input v-model="settings.campaignTitle" placeholder="Yaz kampanyası bitimine" :disabled="!settings.campaignEnabled" />
+                <small class="help-text">RU/KG/EN çevirileri otomatik oluşturulur (TranslationSweeper).</small>
+              </div>
+              <div class="field">
+                <label>CTA Buton Metni (TR)</label>
+                <input v-model="settings.campaignCta" placeholder="Satın Al" :disabled="!settings.campaignEnabled" />
+              </div>
+            </div>
+
+            <div v-if="settings.campaignEnabled && settings.campaignEndsAt" class="campaign-preview">
+              <h4 style="margin-bottom: 10px; font-size: 13px; color: var(--color-text-muted);">CANLI ÖNİZLEME</h4>
+              <CountdownPreview
+                :ends-at="settings.campaignEndsAt"
+                :title="settings.campaignTitle"
+                :cta="settings.campaignCta"
+              />
+            </div>
+          </div>
+        </div>
+
         <!-- TRUST BADGES -->
         <div v-show="activeTab === 'trust'">
           <div class="form-section">
             <h3>Güven Rozetleri</h3>
             <p class="help-text">Ana sayfa ürün listesinin altındaki bar.</p>
             <div v-for="(badge, i) in settings.trustBadges" :key="badge.id" class="dynamic-row">
-              <input v-model="badge.icon" class="w-small" placeholder="İkon (Emoji/Text)" />
+              <button type="button" @click="openMediaSelector('trustBadge', Number(i))" class="btn-media">🖼️ Medya Seç</button>
+              <input v-model="badge.icon" class="w-small" placeholder="İkon URL / Text" />
               <input v-model="badge.title" placeholder="Başlık" />
               <input v-model="badge.desc" placeholder="Açıklama" />
-              <label class="toggle"><input type="checkbox" v-model="badge.isActive"> Aktif</label>
-              <button type="button" @click="removeTrustBadge(i)" class="btn-del">🗑️</button>
+              <label class="toggle"><input type="checkbox" v-model="badge.isActive"/> Aktif</label>
+              <button type="button" @click="removeTrustBadge(Number(i))" class="btn-del">🗑️</button>
             </div>
             <button type="button" class="btn-add" @click="addTrustBadge">+ Rozet Ekle</button>
+          </div>
+        </div>
+
+        <!-- SERTIFIKALAR -->
+        <div v-show="activeTab === 'certificates'">
+          <div class="form-section">
+            <h3>📜 Sertifikalar</h3>
+            <p class="help-text">Ana sayfada görüntülenecek sertifika logoları ve isimleri. Sertifika görseli için medya kütüphanesinden .png/.webp yükleyin.</p>
+            <div v-for="(badge, i) in settings.trustBadges" :key="badge.id" class="dynamic-row">
+              <button type="button" @click="openMediaSelector('trustBadge', Number(i))" class="btn-media">🖼️ Logo Seç</button>
+              <input v-model="badge.icon" placeholder="Logo URL" />
+              <input v-model="badge.title" placeholder="Sertifika Adı" />
+              <input v-model="badge.desc" placeholder="Açıklama (opsiyonel)" />
+              <label class="toggle"><input type="checkbox" v-model="badge.isActive"/> Aktif</label>
+              <button type="button" @click="removeTrustBadge(Number(i))" class="btn-del">🗑️</button>
+            </div>
+            <button type="button" class="btn-add" @click="addTrustBadge">+ Sertifika Ekle</button>
           </div>
         </div>
 
@@ -182,11 +371,34 @@ onMounted(fetchSettings);
             <div v-for="(partner, i) in settings.partners" :key="partner.id" class="dynamic-row">
               <input v-model="partner.name" class="w-medium" placeholder="Partner Adı" />
               <input v-model="partner.link" placeholder="Tıklama Linki (İsteğe bağlı)" />
+              <button type="button" @click="openMediaSelector('partner', Number(i))" class="btn-media">🖼️ Logo Seç</button>
               <input v-model="partner.logoUrl" placeholder="Logo Resim URL'si" />
-              <label class="toggle"><input type="checkbox" v-model="partner.isActive"> Aktif</label>
-              <button type="button" @click="removePartner(i)" class="btn-del">🗑️</button>
+              <label class="toggle"><input type="checkbox" v-model="partner.isActive"/> Aktif</label>
+              <button type="button" @click="removePartner(Number(i))" class="btn-del">🗑️</button>
             </div>
             <button type="button" class="btn-add" @click="addPartner">+ Partner Ekle</button>
+          </div>
+        </div>
+
+        <!-- FAQ (SSS) -->
+        <div v-show="activeTab === 'faq'">
+          <div class="form-section">
+            <h3>❓ Sıkça Sorulan Sorular</h3>
+            <p class="help-text">Müşteri Destek sayfasında görünen S.S.S. listesini buradan yönetin. Sıralamak için okları kullanın.</p>
+            <div v-for="(faq, i) in settings.faqItems" :key="faq.id" class="faq-edit-row">
+              <div class="faq-edit-order">
+                <button type="button" class="btn-ord" :disabled="i === 0" @click="moveFaq(Number(i), -1)" title="Yukarı">▲</button>
+                <span class="faq-num">{{ Number(i) + 1 }}</span>
+                <button type="button" class="btn-ord" :disabled="i === settings.faqItems.length - 1" @click="moveFaq(Number(i), 1)" title="Aşağı">▼</button>
+              </div>
+              <div class="faq-edit-fields">
+                <input v-model="faq.q" placeholder="Soru (örn: Kargo kaç günde ulaşır?)" />
+                <textarea v-model="faq.a" rows="2" placeholder="Cevap"/>
+              </div>
+              <button type="button" @click="removeFaq(Number(i))" class="btn-del" title="Sil">🗑️</button>
+            </div>
+            <div v-if="settings.faqItems.length === 0" class="help-text" style="padding: 12px 0;">Henüz soru eklenmemiş.</div>
+            <button type="button" class="btn-add" @click="addFaq">+ Soru Ekle</button>
           </div>
         </div>
 
@@ -200,13 +412,38 @@ onMounted(fetchSettings);
                 <input v-model="settings.copyrightText" />
               </div>
             </div>
-            <h4 style="margin-top:20px;">Hızlı Linkler</h4>
-            <div v-for="(link, i) in settings.footerLinks" :key="link.id" class="dynamic-row">
-              <input v-model="link.title" placeholder="Link Metni" />
-              <input v-model="link.url" placeholder="URL (/about vb.)" />
-              <button type="button" @click="removeFooterLink(i)" class="btn-del">🗑️</button>
+            <div class="form-row">
+              <div class="field">
+                <label>Marka Altı Açıklama</label>
+                <textarea v-model="settings.footerLinks.description" rows="3"/>
+              </div>
             </div>
-            <button type="button" class="btn-add" @click="addFooterLink">+ Link Ekle</button>
+
+            <h4 style="margin-top:20px; color:var(--color-primary);">Sosyal Medya Logoları/İkonları</h4>
+            <div v-for="(social, i) in settings.footerLinks.socials" :key="social.id" class="dynamic-row">
+              <button type="button" @click="openMediaSelector('social', Number(i))" class="btn-media">🖼️ İkon Seç</button>
+              <input v-model="social.icon" class="w-small" placeholder="İkon URL" />
+              <input v-model="social.url" placeholder="Profil URL'si" />
+              <button type="button" @click="removeSocial(Number(i))" class="btn-del">🗑️</button>
+            </div>
+            <button type="button" class="btn-add" @click="addSocial">+ Sosyal Medya Ekle</button>
+
+            <h4 style="margin-top:40px; color:var(--color-primary); border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:8px;">Menü Sütunları</h4>
+            <div v-for="(col, colIdx) in settings.footerLinks.columns" :key="col.id" style="background:rgba(255,255,255,0.02); padding:16px; border-radius:12px; margin-top:16px; border:1px solid rgba(255,255,255,0.05);">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                <input v-model="col.title" placeholder="Sütun Başlığı" style="background:transparent; border:none; color:#fff; font-size:16px; font-weight:bold; border-bottom:1px dashed rgba(255,255,255,0.3); padding-bottom:4px; outline:none;" />
+                <button type="button" @click="removeFooterCol(Number(colIdx))" class="btn-del" style="padding:4px 8px;">🗑️ Sütunu Sil</button>
+              </div>
+              
+              <div v-for="(link, linkIdx) in col.links" :key="link.id" class="dynamic-row" style="background:rgba(0,0,0,0.3);">
+                <input v-model="link.title" placeholder="Link Metni" />
+                <input v-model="link.url" placeholder="URL (/about vb.)" />
+                <button type="button" @click="removeFooterLink(Number(colIdx), Number(linkIdx))" class="btn-del">✕</button>
+              </div>
+              <button type="button" class="btn-add" @click="addFooterLink(Number(colIdx))">+ Link Ekle</button>
+            </div>
+            <button type="button" class="btn-add" style="margin-top:16px; background:rgba(255,255,255,0.1);" @click="addFooterCol">+ Yeni Sütun Ekle</button>
+
           </div>
         </div>
 
@@ -216,6 +453,15 @@ onMounted(fetchSettings);
         </div>
       </form>
     </div>
+
+    <!-- Media Selector Modal -->
+    <Teleport to="body">
+      <MediaSelectorModal 
+        :is-open="isMediaModalOpen" 
+        @close="isMediaModalOpen = false" 
+        @select="handleMediaSelect" 
+      />
+    </Teleport>
   </div>
 </template>
 
@@ -229,7 +475,6 @@ onMounted(fetchSettings);
 .tabs button:hover { background: rgba(255,255,255,.05); }
 .tabs button.active { background: rgba(255,255,255,.1); color: var(--color-text-main); }
 
-.settings-card { padding: 28px; }
 .settings-form { display: flex; flex-direction: column; gap: 28px; }
 .form-section h3 { font-size: 16px; margin-bottom: 14px; color: var(--color-text-main); }
 .form-row { display: flex; gap: 16px; margin-bottom: 12px; }
@@ -241,16 +486,61 @@ onMounted(fetchSettings);
 textarea { width: 100%; padding: 12px; background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.1); border-radius: 8px; color: var(--color-text-main); font-size: 13px; font-family: monospace; outline: none; resize: vertical; }
 
 /* Dynamic Rows */
-.dynamic-row { display: flex; gap: 10px; margin-bottom: 10px; align-items: center; background: rgba(0,0,0,.2); padding: 12px; border-radius: 8px; }
-.dynamic-row input { flex: 1; padding: 8px 12px; background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.1); border-radius: 6px; color: #fff; font-size: 13px; outline: none; }
+.dynamic-row { display: flex; gap: 10px; margin-bottom: 10px; align-items: center; background: var(--surface-card, rgba(0,0,0,.02)); padding: 12px; border-radius: 8px; border: 1px solid var(--surface-inset, rgba(0,0,0,0.05)); }
+.dynamic-row input { flex: 1; padding: 8px 12px; background: var(--surface-page, rgba(255,255,255,.9)); border: 1px solid var(--surface-inset, rgba(0,0,0,.1)); border-radius: 6px; color: var(--text-primary, #333); font-size: 13px; outline: none; }
 .dynamic-row .w-small { flex: 0 0 100px; }
 .dynamic-row .w-medium { flex: 0 0 150px; }
-.btn-del { background: rgba(245,54,92,.1); border: 1px solid rgba(245,54,92,.3); border-radius: 6px; cursor: pointer; padding: 8px 12px; font-size: 14px; transition: .2s; }
+.btn-del { background: rgba(245,54,92,.1); border: 1px solid rgba(245,54,92,.3); color: #f5365c; border-radius: 6px; cursor: pointer; padding: 8px 12px; font-size: 14px; transition: .2s; }
 .btn-del:hover { background: rgba(245,54,92,.2); }
-.btn-add { background: rgba(255,255,255,.05); border: 1px dashed rgba(255,255,255,.2); color: var(--color-text-main); padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 13px; transition: .2s; margin-top: 4px; }
-.btn-add:hover { background: rgba(255,255,255,.1); }
+.btn-media { background: rgba(0, 150, 255, 0.1); border: 1px solid rgba(0, 150, 255, 0.3); color: #007bff; border-radius: 6px; cursor: pointer; padding: 8px 12px; font-size: 13px; font-weight: 600; white-space: nowrap; transition: .2s; }
+.btn-media:hover { background: rgba(0, 150, 255, 0.2); }
+.btn-add { background: var(--surface-card, rgba(0,0,0,.02)); border: 1px dashed var(--surface-inset, rgba(0,0,0,.2)); color: var(--text-primary, #333); padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 600; transition: .2s; margin-top: 4px; }
+.btn-add:hover { background: var(--surface-inset, rgba(0,0,0,.05)); }
 
-.toggle { font-size: 13px; color: #ccc; display: flex; align-items: center; gap: 6px; cursor: pointer; margin: 0 8px; }
+/* FAQ editor rows */
+.faq-edit-row { display: flex; gap: 12px; margin-bottom: 12px; align-items: stretch; background: var(--surface-card, rgba(0,0,0,.02)); padding: 12px; border-radius: 8px; border: 1px solid var(--surface-inset, rgba(0,0,0,0.05)); }
+.faq-edit-order { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; flex-shrink: 0; }
+.faq-num { font-size: 12px; font-weight: 700; color: var(--text-secondary, #666); }
+.btn-ord { background: var(--surface-page, rgba(255,255,255,.9)); border: 1px solid var(--surface-inset, rgba(0,0,0,.1)); color: var(--text-secondary, #666); border-radius: 5px; width: 26px; height: 22px; cursor: pointer; font-size: 10px; line-height: 1; transition: .2s; }
+.btn-ord:hover:not(:disabled) { background: var(--surface-inset, rgba(0,0,0,.06)); color: var(--text-primary, #333); }
+.btn-ord:disabled { opacity: 0.35; cursor: not-allowed; }
+.faq-edit-fields { flex: 1; display: flex; flex-direction: column; gap: 8px; }
+.faq-edit-fields input, .faq-edit-fields textarea { width: 100%; padding: 8px 12px; background: var(--surface-page, rgba(255,255,255,.9)); border: 1px solid var(--surface-inset, rgba(0,0,0,.1)); border-radius: 6px; color: var(--text-primary, #333); font-size: 13px; outline: none; font-family: inherit; box-sizing: border-box; resize: vertical; }
+.faq-edit-fields input { font-weight: 600; }
+
+.toggle { font-size: 13px; color: var(--text-secondary, #666); display: flex; align-items: center; gap: 6px; cursor: pointer; margin: 0 8px; }
+.toggle--big {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--color-text-main, #fff);
+  background: rgba(188, 74, 60, 0.10);
+  border: 1px solid rgba(188, 74, 60, 0.30);
+  padding: 12px 16px;
+  border-radius: 10px;
+  margin: 12px 0;
+  display: inline-flex;
+}
+.toggle--big input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--pv-red, #BC4A3C);
+  cursor: pointer;
+}
+
+.campaign-preview {
+  margin-top: 24px;
+  padding: 16px;
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px dashed rgba(255, 255, 255, 0.10);
+  border-radius: 12px;
+}
+.campaign-preview h4 {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--color-text-muted, #999);
+  margin: 0 0 10px 0;
+}
 
 /* Logo */
 .logo-row { display: flex; align-items: center; gap: 20px; }

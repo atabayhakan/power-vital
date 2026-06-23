@@ -1,0 +1,191 @@
+name: Deploy (Production)
+
+# Manual trigger only. Promotes a green build from main to production.
+#
+# What it does:
+#   1. Builds the backend (tsc -> dist/) and frontend (vite build)
+#   2. Creates a release artifact (.tar.gz with both)
+#   3. Uploads to the production server via rsync over SSH
+#   4. Runs a smoke test (curl /health) before declaring success
+#
+# Required secrets (set in repo Settings → Secrets):
+#   PRODUCTION_SSH_KEY     — private SSH key for the deploy user
+#   PRODUCTION_HOST        — e.g. pv-deploy@pv-prod.internal
+#   PRODUCTION_PATH        — e.g. /var/www/power-vital
+#   PRODUCTION_HEALTH_URL  — e.g. https://powervital.kg/health
+#
+# Why manual?
+#   - Production deploys should be deliberate (rollback = downtime)
+#   - GitHub environments can require a "reviewer" before allowing the run
+#   - This file ships a template; tune the rsync flags + post-deploy
+#     commands for your actual infra (PM2, nginx, supervisor, etc.)
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Release tag (e.g. v1.4.0). Used in artifact name.'
+        required: true
+        default: 'manual'
+      skip_smoke_test:
+        description: 'Skip the /health smoke test after deploy'
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+  id-token: none
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false  # never cancel an in-flight production deploy
+
+jobs:
+  build:
+    name: Build release artifact
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install backend
+        working-directory: backend
+        run: npm ci
+
+      - name: Prisma generate
+        working-directory: backend
+        env:
+          DATABASE_URL: 'mysql://user:pass@127.0.0.1:3306/dummy'
+        run: npx prisma generate
+
+      - name: Build backend
+        working-directory: backend
+        env:
+          DATABASE_URL: 'mysql://user:pass@127.0.0.1:3306/dummy'
+        run: npx tsc
+
+      - name: Install frontend
+        working-directory: frontend
+        run: npm ci
+
+      - name: Build frontend
+        working-directory: frontend
+        env:
+          VITE_API_URL: ${{ secrets.PRODUCTION_API_URL || 'https://powervital.kg/api/v1' }}
+          # Sentry is opt-in: if the DSN secret is not set, the build
+          # still succeeds and utils/sentry.ts stays a no-op at runtime.
+          VITE_SENTRY_DSN: ${{ secrets.VITE_SENTRY_DSN || '' }}
+          VITE_SENTRY_ENV: ${{ secrets.VITE_SENTRY_ENV || 'production' }}
+          VITE_SENTRY_TRACES_SAMPLE_RATE: ${{ secrets.VITE_SENTRY_TRACES_SAMPLE_RATE || '0' }}
+          VITE_SENTRY_RELEASE: ${{ github.event.inputs.tag || github.sha }}
+        run: npm run build
+
+      - name: Package release
+        env:
+          TAG: ${{ github.event.inputs.tag }}
+        run: |
+          mkdir -p release/backend release/frontend
+          cp -r backend/dist release/backend/
+          cp -r backend/prisma release/backend/
+          cp -r backend/scripts release/backend/
+          cp backend/package.json release/backend/
+          cp -r frontend/dist release/frontend/
+          cp backend/.env.example release/ 2>/dev/null || true
+          tar -czf pv-release-${TAG}.tar.gz release/
+          ls -lh pv-release-${TAG}.tar.gz
+
+      - name: Upload release artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: pv-release-${{ github.event.inputs.tag }}
+          path: pv-release-${{ github.event.inputs.tag }}.tar.gz
+          retention-days: 30
+
+  deploy:
+    name: Deploy to production
+    needs: build
+    runs-on: ubuntu-latest
+    environment: production  # GitHub Environment — configure required reviewers
+    steps:
+      - name: Download release artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: pv-release-${{ github.event.inputs.tag }}
+
+      - name: Copy to production
+        env:
+          SSH_KEY: ${{ secrets.PRODUCTION_SSH_KEY }}
+          HOST: ${{ secrets.PRODUCTION_HOST }}
+          PATH: ${{ secrets.PRODUCTION_PATH }}
+        run: |
+          mkdir -p ~/.ssh
+          echo "$SSH_KEY" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -H "$HOST" >> ~/.ssh/known_hosts 2>/dev/null
+          rsync -avz --delete \
+            -e "ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no" \
+            pv-release-${{ github.event.inputs.tag }}.tar.gz \
+            "$HOST:$PATH/releases/"
+
+      - name: Extract + restart
+        env:
+          SSH_KEY: ${{ secrets.PRODUCTION_SSH_KEY }}
+          HOST: ${{ secrets.PRODUCTION_HOST }}
+          PATH: ${{ secrets.PRODUCTION_PATH }}
+          TAG: ${{ github.event.inputs.tag }}
+        run: |
+          ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no "$HOST" << EOF
+            set -e
+            cd $PATH
+            # Stash the previous release so we can roll back fast
+            [ -d current ] && cp -r current releases/previous/
+            mkdir -p releases/$TAG
+            tar -xzf releases/pv-release-$TAG.tar.gz -C releases/$TAG --strip-components=1
+            rm -rf current
+            ln -s releases/$TAG current
+            # Run the FULLTEXT migration (idempotent)
+            mysql -h 127.0.0.1 -u pv_user -p$DB_PASSWORD pv_production < current/prisma/migrations/add_fulltext_search.sql || true
+            # Restart via PM2 (assumes app is named "pv-backend")
+            pm2 restart pv-backend
+            pm2 save
+          EOF
+
+      - name: Smoke test
+        if: ${{ !github.event.inputs.skip_smoke_test }}
+        env:
+          HEALTH_URL: ${{ secrets.PRODUCTION_HEALTH_URL }}
+        run: |
+          echo "Waiting for app to come up..."
+          sleep 10
+          STATUS=$(curl -s -o /tmp/health.json -w "%{http_code}" "$HEALTH_URL" || echo "000")
+          echo "GET $HEALTH_URL -> $STATUS"
+          cat /tmp/health.json
+          if [ "$STATUS" != "200" ]; then
+            echo "Smoke test FAILED. The deploy did NOT complete cleanly."
+            echo "Manual intervention required. Check pm2 logs on the production host."
+            exit 1
+          fi
+          echo "Smoke test PASSED."
+
+      - name: Notify success
+        if: success()
+        run: |
+          echo "## ✅ Production deploy succeeded" >> $GITHUB_STEP_SUMMARY
+          echo "- Tag: ${{ github.event.inputs.tag }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Commit: ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Actor: ${{ github.actor }}" >> $GITHUB_STEP_SUMMARY
+
+      - name: Notify failure (with rollback hint)
+        if: failure()
+        run: |
+          echo "## ❌ Production deploy FAILED" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Rollback" >> $GITHUB_STEP_SUMMARY
+          echo '```bash' >> $GITHUB_STEP_SUMMARY
+          echo "ssh ${{ secrets.PRODUCTION_HOST }} 'cd ${{ secrets.PRODUCTION_PATH }} && rm -rf current && ln -s releases/previous current && pm2 restart pv-backend'" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
