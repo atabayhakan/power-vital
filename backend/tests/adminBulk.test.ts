@@ -144,7 +144,7 @@ describe('CSV output — users export shape', () => {
     { header: 'role',         value: (u) => u.role },
     { header: 'wallet_kgs',   value: (u) => Number(u.walletBalanceKgs || 0).toFixed(2) },
     { header: 'wallet_usd',   value: (u) => Number(u.walletBalanceUsd || 0).toFixed(2) },
-    { header: 'cumulative_usd', value: (u) => Number(u.cumulativeSpendUsd || 0).toFixed(2) },
+    { header: 'cumulative_kgs', value: (u) => Number(u.cumulativeSpendKgs || 0).toFixed(2) },
     { header: 'loyalty_level',  value: (u) => u.loyaltyLevel ?? 0 },
     { header: 'monthly_active', value: (u) => u.isMonthlyActive ? 'yes' : 'no' },
     { header: 'sponsor',        value: (u) => u.sponsor?.name || '' },
@@ -156,25 +156,25 @@ describe('CSV output — users export shape', () => {
     // toCsv prepends a UTF-8 BOM so Excel auto-detects encoding.
     expect(csv).toMatch(/^\uFEFF/);
     expect(csv.replace(/^\uFEFF/, '').split('\r\n')[0]).toBe(
-      'user_id,name,email,role,wallet_kgs,wallet_usd,cumulative_usd,loyalty_level,monthly_active,sponsor,created_at'
+      'user_id,name,email,role,wallet_kgs,wallet_usd,cumulative_kgs,loyalty_level,monthly_active,sponsor,created_at'
     );
   });
 
   it('emits one row per user with the right arity', () => {
     const users = [
       { id: 'u-12345678', name: 'Ali', email: 'a@x.com', role: 'customer',
-        walletBalanceKgs: 100.5, walletBalanceUsd: 1.15, cumulativeSpendUsd: 50,
+        walletBalanceKgs: 100.5, walletBalanceUsd: 1.15, cumulativeSpendKgs: 4500,
         loyaltyLevel: 2, isMonthlyActive: true, sponsor: { name: 'Veli' },
         createdAt: new Date('2026-01-01T00:00:00Z') },
       { id: 'u-87654321', name: 'Ayşe', email: 'b@x.com', role: 'distributor',
-        walletBalanceKgs: 0, walletBalanceUsd: 0, cumulativeSpendUsd: 0,
+        walletBalanceKgs: 0, walletBalanceUsd: 0, cumulativeSpendKgs: 0,
         loyaltyLevel: 0, isMonthlyActive: false, sponsor: null,
         createdAt: new Date('2026-02-01T00:00:00Z') }
     ];
     const csv = toCsv(users, cols).replace(/^\uFEFF/, '');
     const lines = csv.split('\r\n').filter(l => l.length > 0);
     expect(lines).toHaveLength(3); // header + 2 rows (trailing CRLF stripped)
-    expect(lines[1].startsWith('u-12345678,Ali,a@x.com,customer,100.50,1.15,50.00,2,yes,Veli,2026-01-01T00:00:00.000Z')).toBe(true);
+    expect(lines[1].startsWith('u-12345678,Ali,a@x.com,customer,100.50,1.15,4500.00,2,yes,Veli,2026-01-01T00:00:00.000Z')).toBe(true);
     expect(lines[2].startsWith('u-87654321,Ayşe,b@x.com,distributor,0.00,0.00,0.00,0,no,,2026-02-01T00:00:00.000Z')).toBe(true);
   });
 });
@@ -186,7 +186,6 @@ describe('CSV output — products export shape', () => {
     { header: 'name',       value: (p) => p.name },
     { header: 'category',   value: (p) => p.category?.name || '' },
     { header: 'price_kgs',  value: (p) => Number(p.basePriceKgs).toFixed(2) },
-    { header: 'price_usd',  value: (p) => Number(p.basePriceUsd).toFixed(2) },
     { header: 'stock',      value: (p) => p.stockQuantity },
     { header: 'low_stock',  value: (p) => p.stockQuantity <= (p.minStockAlert ?? 10) ? 'yes' : 'no' },
     { header: 'created_at', value: (p) => p.createdAt.toISOString() },
@@ -195,14 +194,14 @@ describe('CSV output — products export shape', () => {
 
   it('header row matches the documented column order', () => {
     expect(toCsv([], cols).replace(/^\uFEFF/, '').split('\r\n')[0]).toBe(
-      'product_id,barcode,name,category,price_kgs,price_usd,stock,low_stock,created_at,updated_at'
+      'product_id,barcode,name,category,price_kgs,stock,low_stock,created_at,updated_at'
     );
   });
 
   it('flags low_stock=yes when stock <= minStockAlert', () => {
     const p = {
       id: 'p-1', barcode: 'BC-1', name: 'X', category: { name: 'Cat' },
-      basePriceKgs: 100, basePriceUsd: 1.2, stockQuantity: 5, minStockAlert: 10,
+      basePriceKgs: 100, stockQuantity: 5, minStockAlert: 10,
       createdAt: new Date('2026-01-01'), updatedAt: new Date('2026-01-02')
     };
     const csv = toCsv([p], cols);
@@ -212,12 +211,12 @@ describe('CSV output — products export shape', () => {
   it('treats missing category as empty string (not "undefined")', () => {
     const p = {
       id: 'p-2', barcode: 'BC-2', name: 'Y', category: null,
-      basePriceKgs: 100, basePriceUsd: 1.2, stockQuantity: 99, minStockAlert: 10,
+      basePriceKgs: 100, stockQuantity: 99, minStockAlert: 10,
       createdAt: new Date('2026-01-01'), updatedAt: new Date('2026-01-02')
     };
     const csv = toCsv([p], cols);
     const row = csv.split('\r\n')[1];
-    expect(row).toContain(',Y,,100.00,1.20,99,no,');
+    expect(row).toContain(',Y,,100.00,99,no,');
     expect(row).not.toContain('undefined');
   });
 });

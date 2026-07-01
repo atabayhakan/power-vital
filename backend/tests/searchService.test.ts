@@ -145,7 +145,6 @@ describe('searchService — LIKE fallback path', () => {
       description: 'High-dose Vitamin C supplement for daily immunity support.',
       barcode: '1234567890',
       basePriceKgs: 500,
-      basePriceUsd: 5.68,
       stockQuantity: 10,
       categoryId: 'c1'
     };

@@ -263,8 +263,10 @@ const fetchHistory = async () => {
     if (filterActorId.value.trim()) query.actorId = filterActorId.value.trim();
     if (filterTargetId.value.trim()) query.targetId = filterTargetId.value.trim();
     const { data } = await apiGet('/api/v1/push/broadcast-history', { query });
-    const payload = data as unknown as { rows?: HistoryRow[]; count?: number };
-    historyRows.value = payload.rows || [];
+    // Backend returns a cursor envelope { items, nextCursor, hasMore }. Tolerate
+    // a legacy { rows, count } shape too so history never silently shows empty.
+    const payload = data as unknown as { items?: HistoryRow[]; rows?: HistoryRow[]; count?: number };
+    historyRows.value = payload.items || payload.rows || [];
     historyCount.value = payload.count || historyRows.value.length;
   } catch (e: any) {
     historyError.value = e.response?.data?.error || e.message || 'Geçmiş yüklenemedi';

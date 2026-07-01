@@ -67,9 +67,8 @@ describe('cartAbandonmentService — trackActivity', () => {
       userId: 'u-1',
       guestId: null,
       items: [
-        { id: 'p-1', name: 'Vitamin C', basePriceUsd: 10, quantity: 1, imageUrl: '/uploads/x.webp' }
+        { id: 'p-1', name: 'Vitamin C', basePriceKgs: 10, quantity: 1, imageUrl: '/uploads/x.webp' }
       ],
-      totalUsd: 10,
       totalKgs: 900
     });
 
@@ -79,7 +78,6 @@ describe('cartAbandonmentService — trackActivity', () => {
     expect(call.data.status).toBe('pending');
     expect(call.data.lastProductId).toBe('p-1');
     expect(call.data.lastProductName).toBe('Vitamin C');
-    expect(call.data.cartTotalUsd).toBe(10);
     expect(call.data.cartTotalKgs).toBe(900);
   });
 
@@ -91,8 +89,7 @@ describe('cartAbandonmentService — trackActivity', () => {
     await mod.trackActivity({
       userId: 'u-1',
       guestId: null,
-      items: [{ id: 'p-2', name: 'Omega 3', basePriceUsd: 20, quantity: 1 }],
-      totalUsd: 20,
+      items: [{ id: 'p-2', name: 'Omega 3', basePriceKgs: 20, quantity: 1 }],
       totalKgs: 1800
     });
 
@@ -108,8 +105,7 @@ describe('cartAbandonmentService — trackActivity', () => {
     await mod.trackActivity({
       userId: null,
       guestId: null,
-      items: [{ id: 'p-1', name: 'X', basePriceUsd: 1, quantity: 1 }],
-      totalUsd: 1,
+      items: [{ id: 'p-1', name: 'X', basePriceKgs: 1, quantity: 1 }],
       totalKgs: 90
     });
     expect(createMock).not.toHaveBeenCalled();
@@ -123,7 +119,6 @@ describe('cartAbandonmentService — trackActivity', () => {
       userId: 'u-1',
       guestId: null,
       items: [],
-      totalUsd: 0,
       totalKgs: 0
     });
     expect(deleteManyMock).toHaveBeenCalledTimes(1);
@@ -175,9 +170,8 @@ describe('cartAbandonmentService — sweepAbandonedCarts', () => {
         lastProductName: 'Vitamin C',
         lastProductImg: '/uploads/x.webp',
         cartItems: JSON.stringify([
-          { id: 'p-1', name: 'Vitamin C', basePriceUsd: 10, quantity: 1 }
+          { id: 'p-1', name: 'Vitamin C', basePriceKgs: 10, quantity: 1 }
         ]),
-        cartTotalUsd: 10,
         cartTotalKgs: 900,
         lastActivityAt: new Date(Date.now() - 2 * 60 * 60 * 1000)
       }
@@ -199,7 +193,7 @@ describe('cartAbandonmentService — sweepAbandonedCarts', () => {
   it('skips a row whose status was changed to notified between the find and the update', async () => {
     // findMany returns the row
     findManyMock.mockResolvedValueOnce([
-      { id: 'r-1', userId: 'u-1', cartItems: '[]', cartTotalUsd: 0, cartTotalKgs: 0, lastProductName: 'X' }
+      { id: 'r-1', userId: 'u-1', cartItems: '[]', cartTotalKgs: 0, lastProductName: 'X' }
     ]);
     // First updateMany = "mark as notified" — count 0 (someone else flipped it)
     updateManyMock.mockResolvedValueOnce({ count: 0 });
@@ -230,7 +224,7 @@ describe('cartAbandonmentService — sweepAbandonedCarts', () => {
 
   it('catches errors per row and keeps ticking', async () => {
     findManyMock.mockResolvedValueOnce([
-      { id: 'r-1', userId: 'u-1', cartItems: '[]', cartTotalUsd: 0, cartTotalKgs: 0, lastProductName: 'X' }
+      { id: 'r-1', userId: 'u-1', cartItems: '[]', cartTotalKgs: 0, lastProductName: 'X' }
     ]);
     // First updateMany = the "mark as notified" call → count 1
     updateManyMock.mockResolvedValueOnce({ count: 1 });
@@ -250,7 +244,7 @@ describe('cartAbandonmentService — push body builder (localised titles)', () =
       lastProductName: 'Vitamin C',
       cartTotalKgs: 900,
       cartItems: JSON.stringify([
-        { id: 'p-1', name: 'Vitamin C', basePriceUsd: 10, quantity: 2 }
+        { id: 'p-1', name: 'Vitamin C', basePriceKgs: 10, quantity: 2 }
       ])
     }, 'kg');
     expect(payload.title).toContain('күтүп жатат');
@@ -263,7 +257,7 @@ describe('cartAbandonmentService — push body builder (localised titles)', () =
       lastProductName: 'Omega 3',
       cartTotalKgs: 1800,
       cartItems: JSON.stringify([
-        { id: 'p-1', name: 'Omega 3', basePriceUsd: 20, quantity: 1 }
+        { id: 'p-1', name: 'Omega 3', basePriceKgs: 20, quantity: 1 }
       ])
     }, 'tr');
     expect(payload.body).toContain('KGS');
@@ -275,7 +269,7 @@ describe('cartAbandonmentService — push body builder (localised titles)', () =
       lastProductName: 'Collagen',
       cartTotalKgs: 5000,
       cartItems: JSON.stringify([
-        { id: 'p-1', name: 'Collagen', basePriceUsd: 50, quantity: 1 }
+        { id: 'p-1', name: 'Collagen', basePriceKgs: 50, quantity: 1 }
       ])
     }, 'xx');
     expect(payload.title).toContain('ждёт');

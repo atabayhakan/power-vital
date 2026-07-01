@@ -147,8 +147,8 @@ const openProductPicker = () => {
 
 const handleProductPicked = (product: any) => {
   if (!selectedBlockId.value) return;
-  const usd = Number(product.basePriceUsd || 0);
-  const kgs = usd > 0 ? Math.round(calculatePrice(usd)) : 0;
+  const priceKgs = Number(product.basePriceKgs || 0);
+  const kgs = priceKgs > 0 ? Math.round(calculatePrice(priceKgs)) : 0;
   const oldKgs = kgs > 0 ? Math.round((kgs * 1.30) / 10) * 10 : '';
   const thumb = product.images?.[0]?.imageUrl || '';
 

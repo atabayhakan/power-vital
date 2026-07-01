@@ -129,31 +129,9 @@ router.post('/', validate({ body: CheckoutSchema }), async (req: Request, res: R
       }
     }
 
-    // Fetch site settings early to apply pricing logic
+    // Fetch site settings early — used further down for bank account info
     const siteSettings = await prisma.siteSettings.findFirst();
     const fsData = siteSettings?.financeSettings ? JSON.parse(siteSettings.financeSettings) : {};
-    const smoothingMode = fsData.smoothingMode || 'NEAREST_100';
-
-    const exchangeRateRecord = await prisma.exchangeRate.findUnique({ where: { currency: 'USD' } });
-    const exchangeRate = exchangeRateRecord ? Number(exchangeRateRecord.rateToKgs) : 88.5;
-
-    // Helper for smoothing
-    const applySmoothing = (rawKgs: number, mode: string) => {
-      if (mode === 'NEAREST_50') {
-        const rounded = Math.round(rawKgs / 50) * 50;
-        return rounded === 0 && rawKgs > 0 ? 50 : rounded;
-      }
-      if (mode === 'NEAREST_100') {
-        const rounded = Math.round(rawKgs / 100) * 100;
-        return rounded === 0 && rawKgs > 0 ? 100 : rounded;
-      }
-      if (mode === 'PSYCHOLOGICAL_90') {
-        const nearest100 = Math.round(rawKgs / 100) * 100;
-        const finalPrice = nearest100 > 10 ? nearest100 - 10 : Number(rawKgs.toFixed(2));
-        return finalPrice <= 0 && rawKgs > 0 ? 90 : finalPrice;
-      }
-      return Number(rawKgs.toFixed(2));
-    };
 
     // Calculate total based on PriceRule and dynamic discounts
     let totalKgs = 0;
@@ -186,16 +164,13 @@ router.post('/', validate({ body: CheckoutSchema }), async (req: Request, res: R
           where: { productId: product.id, role: userRole as any }
         });
         if (priceRule) {
-          unitPrice = applySmoothing(Number(priceRule.customPriceKgs), smoothingMode);
+          unitPrice = Number(priceRule.customPriceKgs);
         }
       }
 
-      // If no custom price rule applied, calculate dynamically like frontend
+      // If no custom price rule applied, use the product's fixed KGS price
       if (unitPrice === 0) {
-        const baseUsd = Number(product.basePriceUsd);
-        const discountedUsd = baseUsd * (1 - (discountRate / 100));
-        const rawKgs = discountedUsd * exchangeRate;
-        unitPrice = applySmoothing(rawKgs, smoothingMode);
+        unitPrice = Number(product.basePriceKgs) * (1 - (discountRate / 100));
       }
 
       totalKgs += unitPrice * qty;
@@ -226,7 +201,6 @@ router.post('/', validate({ body: CheckoutSchema }), async (req: Request, res: R
           orderType: req.body.orderType || 'ecommerce',
           status: 'pending',
           totalKgs,
-          totalUsd: 0,
           paymentMethod: req.body.paymentMethod || 'qr_transfer',
           customerName,
           customerPhone,

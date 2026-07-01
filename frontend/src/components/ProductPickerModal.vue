@@ -16,8 +16,7 @@ const emit = defineEmits<{
 interface Product {
   id: string;
   name: string;
-  basePriceUsd: number;
-  basePriceKgs?: number;
+  basePriceKgs: number;
   stockQuantity?: number;
   images?: { imageUrl: string }[];
   category?: { id: string; name: string } | null;
@@ -66,9 +65,9 @@ const filteredProducts = computed(() => {
 });
 
 const getKgsPrice = (p: Product): string => {
-  const usd = Number(p.basePriceUsd || 0);
-  if (usd <= 0) return '—';
-  return formatPrice(calculatePrice(usd));
+  const kgs = Number(p.basePriceKgs || 0);
+  if (kgs <= 0) return '—';
+  return formatPrice(calculatePrice(kgs));
 };
 
 const getThumb = (p: Product): string => {
@@ -170,7 +169,6 @@ onMounted(() => {
               </div>
               <div class="pp-card__price">
                 <strong>{{ getKgsPrice(p) }} KGS</strong>
-                <span class="pp-card__usd">${{ Number(p.basePriceUsd || 0).toFixed(2) }}</span>
               </div>
               <div class="pp-card__stock" :class="{ 'is-empty': (p.stockQuantity ?? 0) <= 5 }">
                 📦 Stok: {{ p.stockQuantity ?? 0 }}

@@ -19,8 +19,8 @@ globalThis.localStorage = localStorageMock;
 // because the composable caches its initial value from localStorage.
 vi.resetModules();
 
-const make = (id: string, name = `Product ${id}`, basePriceUsd = 10, imageUrl = '/uploads/x.webp') => ({
-  id, name, basePriceUsd, imageUrl
+const make = (id: string, name = `Product ${id}`, basePriceKgs = 10, imageUrl = '/uploads/x.webp') => ({
+  id, name, basePriceKgs, imageUrl
 });
 
 describe('useRecentlyViewed — track + persistence', () => {
@@ -80,7 +80,7 @@ describe('useRecentlyViewed — track + persistence', () => {
   it('reads existing entries back on next use', async () => {
     // Pre-seed storage and import a fresh module to simulate a new visit
     localStorageMock.setItem('pv_recently_viewed', JSON.stringify([
-      { id: 'seed1', name: 'Seed 1', basePriceUsd: 5, imageUrl: '/x.webp', viewedAt: 1 }
+      { id: 'seed1', name: 'Seed 1', basePriceKgs: 5, imageUrl: '/x.webp', viewedAt: 1 }
     ]));
     vi.resetModules();
     const mod = await import('../src/composables/useRecentlyViewed');
@@ -104,7 +104,7 @@ describe('useRecentlyViewed — track + persistence', () => {
     const mod = await import('../src/composables/useRecentlyViewed');
     const { track, recent } = mod.useRecentlyViewed();
     // @ts-expect-error testing runtime guard
-    track({ id: '', name: 'broken', basePriceUsd: 1, imageUrl: '' });
+    track({ id: '', name: 'broken', basePriceKgs: 1, imageUrl: '' });
     expect(recent.value.length).toBe(0);
   });
 

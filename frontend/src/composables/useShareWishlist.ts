@@ -17,7 +17,7 @@
 
 import { computed } from 'vue';
 import { useFavorites, type FavoriteItem } from './useFavorites';
-import { useCurrency } from './useCurrency';
+import { formatPrice } from '../utils/PriceEngine';
 import { useTranslate } from './useTranslate';
 
 const ENCODE_VERSION = 'w1'; // bump if the JSON shape changes
@@ -40,7 +40,7 @@ export const serializeItem = (f: FavoriteItem) => ({
   i: f.id,
   n: f.name,
   u: f.imageUrl,
-  p: f.basePriceUsd
+  p: f.basePriceKgs
 });
 
 export type SerializedItem = ReturnType<typeof serializeItem>;
@@ -75,7 +75,7 @@ export const hydrateFromUrl = (wParam: string | null | undefined): Omit<Favorite
         id: String(i.i),
         name: String(i.n || ''),
         imageUrl: String(i.u || ''),
-        basePriceUsd: Number(i.p) || 0
+        basePriceKgs: Number(i.p) || 0
       }));
   } catch {
     return [];
@@ -106,7 +106,6 @@ export interface ShareChannel {
 
 export function useShareWishlist() {
   const favorites = useFavorites();
-  const { formatPrice } = useCurrency();
   const { t } = useTranslate();
 
   const items = computed(() => favorites.recent.value);
@@ -121,7 +120,7 @@ export function useShareWishlist() {
     const lines: string[] = [];
     lines.push(t('share.bodyHeader', { count: items.value.length, name: 'Power Vital' }));
     for (const f of items.value) {
-      const price = formatPrice(f.basePriceUsd * 90);
+      const price = `${formatPrice(f.basePriceKgs)} KGS`;
       lines.push(`• ${f.name} — ${price}`);
     }
     lines.push('');

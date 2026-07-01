@@ -681,24 +681,6 @@ export const registerFinanceRoutes = () => {
   });
 };
 
-// ── Exchange rate ─────────────────────────────────────────────────────────
-export const registerExchangeRateRoutes = () => {
-  const tag = Tag('Exchange Rate', 'USD/KGS rate (cached, auto-refreshed daily)');
-
-  registry.registerPath({
-    method: 'get', path: '/api/v1/finance/exchange-rate',
-    tags: [tag.name], description: 'Get the current USD→KGS rate (?refresh=true forces a fetch)',
-    responses: { 200: { description: 'Rate' }, 404: { description: 'No rate available' } }
-  });
-
-  registry.registerPath({
-    method: 'post', path: '/api/v1/finance/exchange-rate/refresh',
-    tags: [tag.name], description: 'Manually trigger a rate fetch (admin)',
-    security: [{ bearerAuth: [] }],
-    responses: { 200: { description: 'Updated' }, 502: { description: 'Provider failed' } }
-  });
-};
-
 // ── System config ─────────────────────────────────────────────────────────
 export const registerSystemRoutes = () => {
   const tag = Tag('System', 'MLM toggles, payout limits');
@@ -1603,7 +1585,6 @@ export const registerAllRoutes = () => {
   registerOrderRoutes();
   registerCheckoutRoutes();
   registerFinanceRoutes();
-  registerExchangeRateRoutes();
   registerSystemRoutes();
   registerAdminRoutes();
   registerAdminListRoutes();      // NEW — paginated list endpoints

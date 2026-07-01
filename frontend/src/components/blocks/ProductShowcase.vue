@@ -17,7 +17,6 @@ const resolvedProduct = computed(() => {
   return props.product || {
     id: 'demo',
     name: 'Örnek Premium Ürün',
-    basePriceUsd: 49.90,
     basePriceKgs: 4500,
     oldPriceKgs: 5500,
     stockQuantity: 100,

@@ -74,7 +74,6 @@ async function main() {
       name: 'Power Vital Pure Collagen Peptides (300g)',
       description: 'Eklem, cilt ve saç sağlığı için birinci sınıf hidrolize kolajen tozu.',
       basePriceKgs: 3200.00,
-      basePriceUsd: 38.00,
       stockQuantity: 150,
       minStockAlert: 20,
     },
@@ -83,7 +82,6 @@ async function main() {
       name: 'Power Vital Omega-3 Balık Yağı (90 Kapsül)',
       description: 'Yüksek EPA/DHA oranlı, saf balık yağı.',
       basePriceKgs: 2100.00,
-      basePriceUsd: 25.00,
       stockQuantity: 200,
       minStockAlert: 30,
     },
@@ -92,7 +90,6 @@ async function main() {
       name: 'Power Vital Multivitamin Kompleks (60 Tablet)',
       description: 'Günlük enerji ve bağışıklık desteği için tam multivitamin.',
       basePriceKgs: 1850.00,
-      basePriceUsd: 22.00,
       stockQuantity: 120,
       minStockAlert: 25,
     },
@@ -122,15 +119,7 @@ async function main() {
   }
   console.log('Products:', products.length);
 
-  // 6. Exchange Rate
-  await prisma.exchangeRate.upsert({
-    where: { currency: 'USD' },
-    update: {},
-    create: { currency: 'USD', rateToKgs: 88.5 },
-  });
-  console.log('Exchange rate: 1 USD = 88.5 KGS');
-
-  // 7. System Config
+  // 6. System Config
   const existingConfig = await prisma.systemConfig.findFirst();
   if (!existingConfig) {
     await prisma.systemConfig.create({ data: {} });

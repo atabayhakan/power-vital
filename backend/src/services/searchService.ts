@@ -42,7 +42,6 @@ export interface SearchHit {
   description: string | null;
   barcode: string;
   basePriceKgs: number;
-  basePriceUsd: number;
   stockQuantity: number;
   categoryId: string | null;
   imageUrl: string | null;
@@ -173,7 +172,6 @@ const searchWithLike = async (opts: SearchOptions): Promise<SearchResult> => {
     description: r.description,
     barcode: r.barcode,
     basePriceKgs: Number(r.basePriceKgs),
-    basePriceUsd: Number(r.basePriceUsd),
     stockQuantity: r.stockQuantity,
     categoryId: r.categoryId,
     imageUrl: r.images?.[0]?.imageUrl ?? null,
@@ -239,7 +237,7 @@ export const searchProducts = async (rawQuery: string, opts: SearchOptions = { q
   const sql = `
     SELECT
       p.id, p.name, p.description, p.barcode,
-      p.basePriceKgs, p.basePriceUsd, p.stockQuantity, p.categoryId,
+      p.basePriceKgs, p.stockQuantity, p.categoryId,
       MATCH(p.name, p.description, p.barcode)
         AGAINST (? IN NATURAL LANGUAGE MODE) AS relevance
     FROM \`Product\` p
@@ -306,7 +304,6 @@ export const searchProducts = async (rawQuery: string, opts: SearchOptions = { q
         description: r.description,
         barcode: r.barcode,
         basePriceKgs: Number(r.basePriceKgs),
-        basePriceUsd: Number(r.basePriceUsd),
         stockQuantity: r.stockQuantity,
         categoryId: r.categoryId,
         imageUrl: imgs[0]?.imageUrl ?? null,

@@ -93,7 +93,7 @@ router.post('/login', limit(RATE_LIMITS.auth.login), validate({ body: LoginSchem
         role: user.role,
         walletBalanceKgs: user.walletBalanceKgs,
         walletBalanceUsd: user.walletBalanceUsd,
-        cumulativeSpendUsd: user.cumulativeSpendUsd,
+        cumulativeSpendKgs: user.cumulativeSpendKgs,
         loyaltyLevel: user.loyaltyLevel,
         dynamicDiscountRate: user.dynamicDiscountRate
       }
@@ -180,7 +180,7 @@ router.get('/me', authenticateJWT, async (req: any, res: Response) => {
         role: true,
         walletBalanceKgs: true,
         walletBalanceUsd: true,
-        cumulativeSpendUsd: true,
+        cumulativeSpendKgs: true,
         loyaltyLevel: true,
         dynamicDiscountRate: true,
         sponsorId: true,

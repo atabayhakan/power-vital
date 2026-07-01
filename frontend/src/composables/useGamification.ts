@@ -8,16 +8,16 @@ export function useGamification() {
   const userDiscountRate = computed(() => currentUser.value?.dynamicDiscountRate ?? 0);
   const userLoyaltyLevel = computed(() => currentUser.value?.loyaltyLevel ?? 0);
 
-  const getDiscountedKgs = (basePriceUsd: number | null | undefined) => {
-    return calculatePrice(basePriceUsd, userDiscountRate.value);
+  const getDiscountedKgs = (basePriceKgs: number | null | undefined) => {
+    return calculatePrice(basePriceKgs, userDiscountRate.value);
   };
 
-  const formatDiscountedPrice = (basePriceUsd: number | null | undefined) => {
-    return formatPrice(getDiscountedKgs(basePriceUsd));
+  const formatDiscountedPrice = (basePriceKgs: number | null | undefined) => {
+    return formatPrice(getDiscountedKgs(basePriceKgs));
   };
 
-  const getRetailKgs = (basePriceUsd: number | null | undefined) => {
-    return calculatePrice(basePriceUsd, 0); // No discount
+  const getRetailKgs = (basePriceKgs: number | null | undefined) => {
+    return calculatePrice(basePriceKgs, 0); // No discount
   };
 
   return {

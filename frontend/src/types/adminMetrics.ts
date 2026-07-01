@@ -7,9 +7,7 @@ export interface CartRecoveryKpis {
   expired: number;
   conversionRate: number;
   pendingValueKgs: number;
-  pendingValueUsd: number;
   recoveredValueKgs: number;
-  recoveredValueUsd: number;
   activeSessions: number;
   recentOrdersLast10m: number;
   /**

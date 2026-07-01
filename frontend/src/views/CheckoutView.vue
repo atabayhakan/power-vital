@@ -12,16 +12,16 @@ const cartStore = useCartStore();
 const currentUser = useCurrentUser();
 
 const financeSettings = getFinanceSettings();
-const thresholdUsd = financeSettings.checkoutShippingThresholdUsd ?? 100;
-const continueShoppingText = financeSettings.checkoutContinueShoppingText || 'Siparişiniz 100$ altında kaldı. Alışverişe devam etmek için tıklayınız.';
-const shippingCheckboxText = financeSettings.checkoutShippingCheckboxText || 'Siparişi ödemesini yapıyorum, 100$ altında sipariş verdiğim için kargo ücretini ödemeyi kabul ediyorum.';
+const thresholdKgs = financeSettings.checkoutShippingThresholdKgs ?? 9000;
+const continueShoppingText = financeSettings.checkoutContinueShoppingText || 'Siparişiniz 9.000 сом altında kaldı. Alışverişe devam etmek için tıklayınız.';
+const shippingCheckboxText = financeSettings.checkoutShippingCheckboxText || 'Siparişi ödemesini yapıyorum, 9.000 сом altında sipariş verdiğim için kargo ücretini ödemeyi kabul ediyorum.';
 const freeShippingSuccessText = financeSettings.checkoutFreeShippingSuccessText || '🎉 Tebrikle, kargonuz ücretsizdir!';
 
 const shippingAccepted = ref(false);
 const discountRate = computed(() => currentUser.value?.dynamicDiscountRate ?? 0);
-const orderTotalUsd = computed(() => cartStore.cartTotalUsd * (1 - (discountRate.value / 100)));
-const isUnderThreshold = computed(() => orderTotalUsd.value > 0 && orderTotalUsd.value < thresholdUsd);
-const isFreeShipping = computed(() => orderTotalUsd.value >= thresholdUsd);
+const orderTotalKgs = computed(() => cartStore.cartTotalKgs);
+const isUnderThreshold = computed(() => orderTotalKgs.value > 0 && orderTotalKgs.value < thresholdKgs);
+const isFreeShipping = computed(() => orderTotalKgs.value >= thresholdKgs);
 
 const step = ref(1); // 1=form, 2=QR+pay, 3=upload, 4=result
 const form = ref({ name: '', phone: '', email: '', address: '' });
@@ -287,7 +287,7 @@ const copyAndOpen = async (account: string, deepLink: string, targetName: string
                   </div>
                   <div class="co-cart-info">
                     <span class="co-cart-name">{{ item.name }}</span>
-                    <span class="co-cart-price">{{ fmtPrice(Number(item.basePriceUsd) * item.quantity * 88) }}</span>
+                    <span class="co-cart-price">{{ fmtPrice(Number(item.basePriceKgs) * item.quantity) }}</span>
                   </div>
                 </div>
               </div>

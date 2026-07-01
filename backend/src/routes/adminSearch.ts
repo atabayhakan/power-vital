@@ -107,7 +107,7 @@ router.get('/products', authenticateJWT, requireRole('admin'), async (req: Reque
       },
       select: {
         id: true, name: true, barcode: true,
-        basePriceKgs: true, basePriceUsd: true,
+        basePriceKgs: true,
         stockQuantity: true, minStockAlert: true,
         category: { select: { id: true, name: true } }
       },
@@ -124,7 +124,6 @@ router.get('/products', authenticateJWT, requireRole('admin'), async (req: Reque
         name: p.name,
         barcode: p.barcode,
         priceKgs: Number(p.basePriceKgs),
-        priceUsd: Number(p.basePriceUsd),
         stock: p.stockQuantity,
         lowStock: p.stockQuantity <= (p.minStockAlert ?? 10),
         category: p.category ? { id: p.category.id, name: p.category.name } : null

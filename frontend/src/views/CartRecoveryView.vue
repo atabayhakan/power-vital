@@ -20,10 +20,9 @@ import { computed, ref, onMounted, onBeforeUnmount } from 'vue';
 import axios from 'axios';
 import { useAdminMetrics } from '../composables/useAdminMetrics';
 import { useTranslate } from '../composables/useTranslate';
-import { useCurrency } from '../composables/useCurrency';
+import { formatPrice } from '../utils/PriceEngine';
 
 const { t } = useTranslate();
-const { formatPrice } = useCurrency();
 const { state, isLoading, error, refresh } = useAdminMetrics();
 
 // All admin dashboard strings live under `admin.cartRecovery.*`
@@ -63,12 +62,7 @@ const lastUpdatedAgo = computed(() => {
 
 const k = computed(() => state.value);
 
-const formatKgs = (n: number): string => {
-  // We always render money in the active currency. The values
-  // arrive as KGS from the server; useCurrency converts to USD
-  // when the user has flipped the toggle.
-  return formatPrice(n);
-};
+const formatKgs = (n: number): string => `${formatPrice(n)} KGS`;
 
 const formatRelative = (iso: string): string => {
   const ts = new Date(iso).getTime();

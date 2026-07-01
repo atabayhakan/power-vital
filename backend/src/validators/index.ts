@@ -109,7 +109,7 @@ export const ProductCreateSchema = z.object({
   barcode: z.string().trim().min(1, 'Barcode is required').max(50),
   name: z.string().trim().min(1, 'Name is required').max(200),
   description: z.string().max(5000).optional().nullable(),
-  basePriceUsd: z.union([
+  basePriceKgs: z.union([
     z.number().nonnegative('Price must be >= 0'),
     z.string().regex(/^\d+(\.\d+)?$/).transform(Number)
   ]),
@@ -120,7 +120,7 @@ export const ProductCreateSchema = z.object({
   accordions: z.union([z.array(AccordionItem), z.string()]).optional(),
   translations: z.union([z.string(), z.record(z.string(), z.any())]).optional().nullable()
 }).strict().openapi('ProductCreateRequest', {
-  description: 'Create a new product. basePriceKgs is auto-computed from basePriceUsd × exchange rate.'
+  description: 'Create a new product with a fixed KGS price.'
 });
 export type ProductCreateInput = z.infer<typeof ProductCreateSchema>;
 
@@ -410,13 +410,12 @@ export const CartHeartbeatSchema = z.object({
     id: z.string().min(1).max(191),
     name: z.string().max(500).optional().default(''),
     imageUrl: z.string().max(500).optional(),
-    basePriceUsd: z.number().nonnegative().max(1_000_000).optional().default(0),
+    basePriceKgs: z.number().nonnegative().max(100_000_000).optional().default(0),
     quantity: z.number().int().positive().max(999).optional().default(1)
   })).max(100).optional().default([]),
   totals: z.object({
-    usd: z.number().nonnegative().max(1_000_000).optional().default(0),
     kgs: z.number().nonnegative().max(100_000_000).optional().default(0)
-  }).optional().default({ usd: 0, kgs: 0 })
+  }).optional().default({ kgs: 0 })
 }).strict();
 export type CartHeartbeatInput = z.infer<typeof CartHeartbeatSchema>;
 

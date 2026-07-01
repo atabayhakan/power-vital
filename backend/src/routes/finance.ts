@@ -66,7 +66,6 @@ router.post('/wallet/pay', authenticateJWT, validate({ body: WalletPaySchema }),
           orderType: orderType || 'ecommerce',
           status: 'completed',
           totalKgs: amountKgs,
-          totalUsd: 0, // In a real system, calculate USD equivalent based on ExchangeRate
           paymentMethod: 'wallet',
         }
       });

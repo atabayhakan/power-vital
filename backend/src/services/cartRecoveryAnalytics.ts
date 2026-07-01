@@ -39,9 +39,7 @@ export interface CartRecoveryKpis {
   expired: number;
   conversionRate: number;          // converted / (converted + notified)
   pendingValueKgs: number;         // sum of cartTotalKgs where pending
-  pendingValueUsd: number;
   recoveredValueKgs: number;       // sum of converted carts' totalKgs
-  recoveredValueUsd: number;
   activeSessions: number;          // presence sum
   recentOrdersLast10m: number;     // inventory FOMO counter
   topProducts: Array<{ productId: string; name: string; imageUrl: string; abandonedCount: number; totalValueKgs: number; lastSeenAt: string }>;
@@ -60,35 +58,32 @@ export const getCartRecoveryKpis = async (): Promise<CartRecoveryKpis> => {
     const groups = await prisma.cartAbandonment.groupBy({
       by: ['status'],
       _count: { _all: true },
-      _sum: { cartTotalKgs: true, cartTotalUsd: true }
+      _sum: { cartTotalKgs: true }
     });
-    const empty = { pending: 0, notified: 0, converted: 0, expired: 0, sumKgs: 0, sumUsd: 0 };
+    const empty = { pending: 0, notified: 0, converted: 0, expired: 0, sumKgs: 0 };
     const counts = { ...empty };
     for (const g of groups) {
       const key = g.status as keyof typeof empty;
       if (key in counts) {
         counts[key] = g._count._all;
         counts.sumKgs += Number(g._sum.cartTotalKgs) || 0;
-        counts.sumUsd += Number(g._sum.cartTotalUsd) || 0;
       }
     }
 
     // Recovered (converted) value — sum of carts that converted
     const convertedAgg = await prisma.cartAbandonment.aggregate({
       where: { status: 'converted' },
-      _sum: { cartTotalKgs: true, cartTotalUsd: true }
+      _sum: { cartTotalKgs: true }
     });
 
     // Pending value
     const pendingAgg = await prisma.cartAbandonment.aggregate({
       where: { status: { in: ['pending', 'notified'] } },
-      _sum: { cartTotalKgs: true, cartTotalUsd: true }
+      _sum: { cartTotalKgs: true }
     });
 
     const pendingValueKgs = Number(pendingAgg._sum.cartTotalKgs) || 0;
-    const pendingValueUsd = Number(pendingAgg._sum.cartTotalUsd) || 0;
     const recoveredValueKgs = Number(convertedAgg._sum.cartTotalKgs) || 0;
-    const recoveredValueUsd = Number(convertedAgg._sum.cartTotalUsd) || 0;
 
     // Conversion rate (avoid /0)
     const totalTouched = counts.notified + counts.converted;
@@ -194,9 +189,7 @@ export const getCartRecoveryKpis = async (): Promise<CartRecoveryKpis> => {
       expired: counts.expired,
       conversionRate,
       pendingValueKgs,
-      pendingValueUsd,
       recoveredValueKgs,
-      recoveredValueUsd,
       activeSessions,
       recentOrdersLast10m,
       topProducts,

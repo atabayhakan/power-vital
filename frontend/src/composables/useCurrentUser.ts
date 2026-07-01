@@ -27,8 +27,8 @@ export interface CurrentUserSnapshot {
   loyaltyLevel: number;
   /** Server-computed dynamic discount percentage (0–100). */
   dynamicDiscountRate: number;
-  /** Cumulative spend in USD — used by WalletView for tier calculation. */
-  cumulativeSpendUsd?: number;
+  /** Cumulative spend in KGS — used by WalletView for tier calculation. */
+  cumulativeSpendKgs?: number;
 }
 
 /**
@@ -49,7 +49,7 @@ export const useCurrentUser = () => {
       name: u.name ?? '',
       loyaltyLevel: Number(u.loyaltyLevel ?? 0),
       dynamicDiscountRate: Number(u.dynamicDiscountRate ?? 0),
-      cumulativeSpendUsd: u.cumulativeSpendUsd
+      cumulativeSpendKgs: u.cumulativeSpendKgs
     };
   });
 };

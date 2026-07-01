@@ -92,7 +92,7 @@ router.delete('/impersonate/:sessionId',
 // GET /admin/impersonation/sessions — audit log of recent sessions
 // for the calling admin. Cursor-paginated so deep scrolling (e.g. an
 // admin reviewing the last 6 months of sessions) stays O(1) per page.
-router.get('/impersonation/sessions',
+router.get('/sessions',
   authenticateJWT,
   requireRole('admin'),
   requireRealAdmin,
@@ -153,7 +153,7 @@ router.get('/status',
 // GET /admin/impersonation/all — super-admin view of every session.
 // Kept as a separate endpoint so we can add additional RBAC later
 // (e.g. only super-admins can see this).
-router.get('/impersonation/all',
+router.get('/all',
   authenticateJWT,
   requireRole('admin'),
   requireRealAdmin,

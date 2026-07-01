@@ -499,7 +499,7 @@ export interface paths {
                         barcode?: string;
                         name?: string;
                         description?: string | null;
-                        basePriceUsd?: number | string;
+                        basePriceKgs?: number | string;
                         /** @default 0 */
                         stockQuantity?: number;
                         categoryId?: string | null;
@@ -1671,88 +1671,6 @@ export interface paths {
         };
         put?: never;
         post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/finance/exchange-rate": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** @description Get the current USD→KGS rate (?refresh=true forces a fetch) */
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description Rate */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-                /** @description No rate available */
-                404: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
-        };
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/finance/exchange-rate/refresh": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** @description Manually trigger a rate fetch (admin) */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description Updated */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-                /** @description Provider failed */
-                502: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
-        };
         delete?: never;
         options?: never;
         head?: never;
@@ -4824,12 +4742,12 @@ export interface components {
             currentPassword: string;
             newPassword: string;
         };
-        /** @description Create a new product. basePriceKgs is auto-computed from basePriceUsd × exchange rate. */
+        /** @description Create a new product with a fixed KGS price. */
         ProductCreateRequest: {
             barcode: string;
             name: string;
             description?: string | null;
-            basePriceUsd: number | string;
+            basePriceKgs: number | string;
             /** @default 0 */
             stockQuantity: number;
             categoryId?: string | null;

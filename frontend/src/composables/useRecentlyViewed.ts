@@ -23,7 +23,7 @@ let initialized = false;
 export interface RecentProduct {
   id: string;
   name: string;
-  basePriceUsd: number;
+  basePriceKgs: number;
   imageUrl: string;
   slug?: string;
   viewedAt: number; // ms epoch

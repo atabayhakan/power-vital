@@ -7,17 +7,16 @@
 // and the currency composable for the price label.
 import { useRouter } from 'vue-router';
 import { useRecentlyViewed } from '../../composables/useRecentlyViewed';
-import { useCurrency } from '../../composables/useCurrency';
+import { formatPrice } from '../../utils/PriceEngine';
 import { useTranslate } from '../../composables/useTranslate';
 import LazyImage from '../common/LazyImage.vue';
 
 const router = useRouter();
 const { recent, isEmpty } = useRecentlyViewed();
-const { formatPrice } = useCurrency();
 const { t } = useTranslate();
 
 const goToProduct = (id: string) => router.push(`/product/${id}`);
-const priceFor = (p: any) => formatPrice(p.basePriceUsd * 90); // 90 KGS/USD; refined by PriceEngine in production
+const priceFor = (p: any) => `${formatPrice(p.basePriceKgs)} KGS`;
 </script>
 
 <template>

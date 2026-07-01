@@ -12,7 +12,7 @@ export interface UserProfile {
   role?: UserRole;
   walletBalanceUsd?: number;
   walletBalanceKgs?: number;
-  cumulativeSpendUsd?: number;
+  cumulativeSpendKgs?: number;
   loyaltyLevel?: number;
   dynamicDiscountRate?: number;
 }

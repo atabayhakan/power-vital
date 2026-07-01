@@ -79,7 +79,7 @@ export function createMockPrisma(): MockPrisma {
     'user', 'product', 'category', 'order', 'orderItem', 'transaction',
     'withdrawalRequest', 'priceRule', 'productImage', 'productReview',
     'storeReview', 'cartAbandonment', 'heroSlide', 'siteSettings',
-    'exchangeRate', 'systemConfig', 'page', 'media', 'mediaFolder',
+    'systemConfig', 'page', 'media', 'mediaFolder',
     'pushSubscription', 'pushBroadcast', 'pushScheduled', 'broadcastLog',
     'impersonationSession', 'adminBroadcast', 'weeklyCycle', 'userWeeklyStats',
     'clientError', 'broadcastJob',

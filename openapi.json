@@ -151,7 +151,7 @@
             ],
             "maxLength": 5000
           },
-          "basePriceUsd": {
+          "basePriceKgs": {
             "anyOf": [
               {
                 "type": "number",
@@ -266,10 +266,10 @@
         "required": [
           "barcode",
           "name",
-          "basePriceUsd"
+          "basePriceKgs"
         ],
         "additionalProperties": false,
-        "description": "Create a new product. basePriceKgs is auto-computed from basePriceUsd × exchange rate."
+        "description": "Create a new product with a fixed KGS price."
       },
       "OrderStatusUpdateRequest": {
         "type": "object",
@@ -1468,7 +1468,7 @@
                     ],
                     "maxLength": 5000
                   },
-                  "basePriceUsd": {
+                  "basePriceKgs": {
                     "anyOf": [
                       {
                         "type": "number",
@@ -3102,43 +3102,6 @@
           },
           "401": {
             "description": "Not authenticated"
-          }
-        }
-      }
-    },
-    "/api/v1/finance/exchange-rate": {
-      "get": {
-        "tags": [
-          "Exchange Rate"
-        ],
-        "description": "Get the current USD→KGS rate (?refresh=true forces a fetch)",
-        "responses": {
-          "200": {
-            "description": "Rate"
-          },
-          "404": {
-            "description": "No rate available"
-          }
-        }
-      }
-    },
-    "/api/v1/finance/exchange-rate/refresh": {
-      "post": {
-        "tags": [
-          "Exchange Rate"
-        ],
-        "description": "Manually trigger a rate fetch (admin)",
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Updated"
-          },
-          "502": {
-            "description": "Provider failed"
           }
         }
       }

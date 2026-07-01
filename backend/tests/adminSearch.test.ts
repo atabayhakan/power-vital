@@ -79,10 +79,10 @@ beforeEach(() => {
   ];
   products = [
     { id: 'p-1', name: 'Reishi Coffee', barcode: 'PV-001',
-      basePriceKgs: 760, basePriceUsd: 8.7, stockQuantity: 93, minStockAlert: 10,
+      basePriceKgs: 760, stockQuantity: 93, minStockAlert: 10,
       category: null },
     { id: 'p-2', name: 'Code RED', barcode: 'PV-002',
-      basePriceKgs: 1180, basePriceUsd: 13.5, stockQuantity: 5, minStockAlert: 10,
+      basePriceKgs: 1180, stockQuantity: 5, minStockAlert: 10,
       category: { id: 'cat-1', name: 'Supplements' } }
   ];
 });

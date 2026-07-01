@@ -47,7 +47,7 @@ export interface CartItemSnapshot {
   id: string;
   name: string;
   imageUrl?: string;
-  basePriceUsd: number;
+  basePriceKgs: number;
   quantity: number;
 }
 
@@ -55,7 +55,6 @@ export interface CartSnapshot {
   userId: string | null;
   guestId: string | null;
   items: CartItemSnapshot[];
-  totalUsd: number;
   totalKgs: number;
 }
 
@@ -111,7 +110,6 @@ export const trackActivity = async (snapshot: CartSnapshot): Promise<void> => {
         lastProductName: lastItem?.name,
         lastProductImg: lastItem?.imageUrl,
         cartItems: JSON.stringify(snapshot.items),
-        cartTotalUsd: snapshot.totalUsd,
         cartTotalKgs: snapshot.totalKgs,
         lastActivityAt: new Date(),
         status: existing.status === 'notified' && Date.now() - (existing.notifiedAt?.getTime() || 0) < 24 * 60 * 60 * 1000
@@ -128,7 +126,6 @@ export const trackActivity = async (snapshot: CartSnapshot): Promise<void> => {
         lastProductName: lastItem?.name,
         lastProductImg: lastItem?.imageUrl,
         cartItems: JSON.stringify(snapshot.items),
-        cartTotalUsd: snapshot.totalUsd,
         cartTotalKgs: snapshot.totalKgs,
         status: 'pending',
         expiresAt: new Date(Date.now() + EXPIRY_DAYS * 24 * 60 * 60 * 1000)
@@ -204,7 +201,6 @@ const buildPushPayload = (row: any, locale: string) => {
       url: '/checkout',
       type: 'cart_abandoned',
       cartTotalKgs: row.cartTotalKgs,
-      cartTotalUsd: row.cartTotalUsd,
       lastProductId: row.lastProductId
     },
     tag: `cart-abandoned-${row.id}`,

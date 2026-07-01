@@ -10,7 +10,7 @@ interface AccordionEntry {
 }
 interface Product {
   id: string; barcode: string; name: string; description: string;
-  basePriceUsd: string; basePriceKgs: string; stockQuantity: number;
+  basePriceKgs: string; stockQuantity: number;
   categoryId: string | null; category?: { id: string; name: string } | null;
   images?: { id: string; imageUrl: string }[];
   accordions?: AccordionEntry[] | null;
@@ -56,7 +56,7 @@ const token = () => localStorage.getItem('token') || '';
 const headers = () => ({ Authorization: `Bearer ${token()}` });
 
 const form = ref({
-  barcode: '', name: '', description: '', basePriceUsd: 0, stockQuantity: 0,
+  barcode: '', name: '', description: '', basePriceKgs: 0, stockQuantity: 0,
   categoryId: '', imageUrls: [] as string[],
   accordions: [] as AccordionEntry[],
   benefits: [] as string[],
@@ -114,7 +114,7 @@ const openModal = (product?: Product) => {
     form.value = {
       barcode: product.barcode, name: product.name,
       description: product.description || '',
-      basePriceUsd: parseFloat(product.basePriceUsd),
+      basePriceKgs: parseFloat(product.basePriceKgs),
       stockQuantity: product.stockQuantity,
       categoryId: product.categoryId || '',
       imageUrls: product.images?.map(i => i.imageUrl) || [],
@@ -125,7 +125,7 @@ const openModal = (product?: Product) => {
   } else {
     editingProductId.value = null;
     form.value = {
-      barcode: '', name: '', description: '', basePriceUsd: 0, stockQuantity: 0,
+      barcode: '', name: '', description: '', basePriceKgs: 0, stockQuantity: 0,
       categoryId: '', imageUrls: [], accordions: [], benefits: [], translations: {}
     };
   }
@@ -307,7 +307,6 @@ onMounted(fetchProducts);
               <th>Barkod</th>
               <th>Ürün Adı</th>
               <th>Kategori</th>
-              <th>Fiyat (USD)</th>
               <th>Fiyat (KGS)</th>
               <th>Stok</th>
               <th style="text-align: right;">İşlemler</th>
@@ -330,8 +329,7 @@ onMounted(fetchProducts);
                 <span class="cat-badge" v-if="product.category">{{ product.category.name }}</span>
                 <span v-else class="text-muted">—</span>
               </td>
-              <td class="font-medium" style="white-space: nowrap;">${{ parseFloat(product.basePriceUsd).toFixed(2) }}</td>
-              <td class="font-bold price-kgs-cell">{{ fmtKgs(calculatePrice(Number(product.basePriceUsd), 0)) }} <span class="currency-label">сом</span></td>
+              <td class="font-bold price-kgs-cell">{{ fmtKgs(calculatePrice(Number(product.basePriceKgs), 0)) }} <span class="currency-label">сом</span></td>
               <td>
                 <span class="status-badge" :class="product.stockQuantity < 10 ? 'st-cancelled' : 'st-paid'">
                   {{ product.stockQuantity }}
@@ -437,9 +435,8 @@ onMounted(fetchProducts);
 
           <div class="form-row">
             <div class="form-group">
-              <label>Fiyat (USD)</label>
-              <div class="input-with-icon"><span class="icon">$</span><input type="number" class="admin-input" step="0.01" min="0" v-model="form.basePriceUsd" required /></div>
-              <small class="hint">KGS fiyatı güncel kura göre otomatik hesaplanır.</small>
+              <label>Fiyat (KGS)</label>
+              <div class="input-with-icon"><span class="icon">сом</span><input type="number" class="admin-input" step="1" min="0" v-model="form.basePriceKgs" required /></div>
             </div>
           </div>
 

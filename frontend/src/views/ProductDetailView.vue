@@ -36,13 +36,11 @@ const accField = (acc: any, field: 'title' | 'content'): string => {
   return acc[field] || '';
 };
 
-// Free shipping threshold = KGS equivalent of the configured $100 USD threshold
-// (single source of truth, matches cart + checkout).
+// Free shipping threshold — fixed KGS amount (single source of
+// truth, matches cart + checkout).
 const freeShippingThreshold = computed(() => {
   const fs = getFinanceSettings();
-  const usd = Number(fs.checkoutShippingThresholdUsd) || 100;
-  const rate = Number(fs.exchangeRate) || 88.5;
-  return usd * rate;
+  return Number(fs.checkoutShippingThresholdKgs) || 9000;
 });
 
 const product = ref<any>(null);
@@ -67,7 +65,7 @@ onMounted(async () => {
       id: 'demo',
       name: 'Örnek Premium Takviye',
       description: 'Bu sayfa Sayfa Tasarımcısı (Page Builder) önizlemesi için özel olarak oluşturulmuş bir demo içeriğidir.',
-      basePriceUsd: 49.90,
+      basePriceKgs: 4390,
       stockQuantity: 100,
       images: ['https://images.unsplash.com/photo-1550572017-edb9b478d1eb?auto=format&fit=crop&q=80&w=800'],
       benefits: [],
@@ -113,7 +111,7 @@ const trackProductView = (p: any) => {
   recent.track({
     id: p.id,
     name: tField(p, 'name') || p.name || '',
-    basePriceUsd: Number(p.basePriceUsd) || 0,
+    basePriceKgs: Number(p.basePriceKgs) || 0,
     imageUrl: typeof firstImg === 'string' ? firstImg : (firstImg?.imageUrl || ''),
     slug: p.slug
   });
@@ -124,7 +122,7 @@ const addToCart = () => {
   cartStore.addToCart({
     id: product.value.id,
     name: tField(product.value, 'name') || product.value.name,
-    basePriceUsd: Number(product.value.basePriceUsd),
+    basePriceKgs: Number(product.value.basePriceKgs),
     imageUrl: product.value.images[0]
   }, quantity.value);
 
@@ -133,7 +131,7 @@ const addToCart = () => {
 };
 
 const priceKgs = computed(() => {
-  return product.value?.basePriceUsd ? getDiscountedKgs(product.value.basePriceUsd) : 0;
+  return product.value?.basePriceKgs ? getDiscountedKgs(product.value.basePriceKgs) : 0;
 });
 const isLowStock = computed(() => product.value && product.value.stockQuantity > 0 && product.value.stockQuantity <= 5);
 const isOutOfStock = computed(() => product.value && product.value.stockQuantity === 0);
@@ -256,14 +254,14 @@ onUnmounted(() => window.removeEventListener('keydown', onLightboxKeydown));
         <!-- Price & Stock -->
         <div class="pdp-price glass-panel">
           <div v-if="userDiscountRate > 0" class="gamified-price-box">
-            <span class="pdp-old-price">{{ formatPrice(getRetailKgs(product?.basePriceUsd)) }} KGS</span>
+            <span class="pdp-old-price">{{ formatPrice(getRetailKgs(product?.basePriceKgs)) }} KGS</span>
             <div class="pdp-level-price">
-              <span class="pdp-current-price">{{ formatDiscountedPrice(product?.basePriceUsd) }} KGS</span>
+              <span class="pdp-current-price">{{ formatDiscountedPrice(product?.basePriceKgs) }} KGS</span>
               <span class="level-badge">Senin Level {{ userLoyaltyLevel }} Fiyatın!</span>
             </div>
           </div>
           <div v-else>
-            <span class="pdp-current-price">{{ formatPrice(getRetailKgs(product?.basePriceUsd)) }} KGS</span>
+            <span class="pdp-current-price">{{ formatPrice(getRetailKgs(product?.basePriceKgs)) }} KGS</span>
           </div>
           <div class="pdp-stock" :class="{ 'pdp-stock--available': !isOutOfStock }">
             <span class="pdp-stock__dot" :class="{ 'pdp-stock__pulse': isLowStock }" aria-hidden="true"/>

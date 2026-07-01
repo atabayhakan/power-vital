@@ -877,17 +877,8 @@
       "topErrors": "⚠️ En Sık Hata Sebepleri"
     },
     "finance": {
-      "title": "⚙️ Akıllı Kur & Fiyatlandırma",
-      "subtitle": "Tüm mağazadaki ürün fiyatlarını tek noktadan yönetin ve psikolojik fiyatlama taktiklerini uygulayın.",
-      "engineSection": "Finans Motoru Ayarları",
-      "exchangeRate": "Güncel Kur (1 USD = X KGS)",
-      "fetchFailed": "⚠ Kur çekilemedi:",
-      "smoothingMode": "Fiyat Pürüzsüzleştirme Modu (Smoothing Mode)",
-      "smoothNone": "Kusursuz Çeviri — Yuvarlama Yok",
-      "smooth50": "En Yakın 50'ye Yuvarla (sonu 50 veya 00)",
-      "smooth100": "En Yakın 100'e Yuvarla (sonu 00)",
-      "autoFetch": "Otomatik Kur Çekme",
-      "autoFetchHint": "Açıkken sistem her 24 saatte NBKR/exchangerate-api'den güncel kuru otomatik çeker.",
+      "title": "⚙️ Ödeme & Kargo Ayarları",
+      "subtitle": "Manuel ödeme hesaplarını ve kargo alt limitini tek noktadan yönetin.",
       "manualPaySection": "Manuel Ödeme ve QR Ayarları",
       "manualPayHint": "Müşterilerin ödeme sayfasında hızlıca kopyalayıp uygulamayı açabileceği numaraları belirleyin.",
       "mbankAccount": "MBank Numarası / Hesabı",
@@ -897,16 +888,11 @@
       "customQrHint": "Eğer buraya bir resim linki girerseniz, ödeme sayfasında otomatik oluşturulan QR yerine bu resim gösterilir.",
       "shippingSection": "Ödeme Ekranı Kargo & Alt Limit Ayarları",
       "shippingHint": "Sepet toplamı belirli bir limitin altında kalan kullanıcılara uyarı gösterin.",
-      "thresholdUsd": "Kargo Ücreti Alt Limiti (USD)",
+      "thresholdKgs": "Kargo Ücreti Alt Limiti (KGS)",
       "continueText": "Uyarı / Alışverişe Devam Et Buton Yazısı",
       "checkboxText": "Kargo Kabul Onay Kutusu (Checkbox) Yazısı",
       "freeShippingText": "Ücretsiz Kargo Tebrik Mesajı (Limit üstü siparişler için)",
-      "savedToast": "✅ Finans kuralları başarıyla kaydedildi! (Tüm fiyatlar güncellendi)",
-      "simSection": "Sistem Simülasyonu",
-      "simHint": "Canlı sistemin fiyatları nasıl göstereceğini test edin.",
-      "testPrice": "Test Edilecek Ürün Fiyatı (USD)",
-      "simRaw": "Ham Çeviri:",
-      "simFinal": "Müşterinin Göreceği Fiyat:"
+      "savedToast": "✅ Ayarlar başarıyla kaydedildi!"
     },
     "category": {
       "title": "📦 Dinamik Kategori Yönetimi",

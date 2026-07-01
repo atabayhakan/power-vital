@@ -15,7 +15,7 @@ export interface FavoriteItem {
   id: string;
   name: string;
   imageUrl: string;
-  basePriceUsd: number;
+  basePriceKgs: number;
   addedAt: number; // ms epoch — used to keep the list chronologically ordered
 }
 
@@ -34,7 +34,7 @@ const readStored = (): FavoriteItem[] => {
         id: i.id,
         name: String(i.name || ''),
         imageUrl: String(i.imageUrl || ''),
-        basePriceUsd: Number(i.basePriceUsd) || 0,
+        basePriceKgs: Number(i.basePriceKgs) || 0,
         addedAt: Number(i.addedAt) || Date.now()
       }));
   } catch {

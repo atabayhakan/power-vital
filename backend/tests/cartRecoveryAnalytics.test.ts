@@ -44,7 +44,7 @@ beforeEach(() => {
 describe('cartRecoveryAnalytics — empty state', () => {
   it('returns zeros when no abandonment rows exist', async () => {
     groupByMock.mockResolvedValue([]);
-    aggregateMock.mockResolvedValue({ _sum: { cartTotalKgs: null, cartTotalUsd: null } });
+    aggregateMock.mockResolvedValue({ _sum: { cartTotalKgs: null } });
     findManyMock.mockResolvedValue([]);
 
     const mod = await import('../src/services/cartRecoveryAnalytics');
@@ -67,10 +67,10 @@ describe('cartRecoveryAnalytics — happy path', () => {
     // different shapes for each via mockImplementationOnce.
     groupByMock
       .mockResolvedValueOnce([
-        { status: 'pending', _count: { _all: 5 }, _sum: { cartTotalKgs: 5000, cartTotalUsd: 50 } },
-        { status: 'notified', _count: { _all: 3 }, _sum: { cartTotalKgs: 3000, cartTotalUsd: 30 } },
-        { status: 'converted', _count: { _all: 2 }, _sum: { cartTotalKgs: 2000, cartTotalUsd: 20 } },
-        { status: 'expired', _count: { _all: 7 }, _sum: { cartTotalKgs: 0, cartTotalUsd: 0 } }
+        { status: 'pending', _count: { _all: 5 }, _sum: { cartTotalKgs: 5000 } },
+        { status: 'notified', _count: { _all: 3 }, _sum: { cartTotalKgs: 3000 } },
+        { status: 'converted', _count: { _all: 2 }, _sum: { cartTotalKgs: 2000 } },
+        { status: 'expired', _count: { _all: 7 }, _sum: { cartTotalKgs: 0 } }
       ])
       .mockResolvedValueOnce([
         { lastProductId: 'p-A', _count: { _all: 3 }, _sum: { cartTotalKgs: 3000 } },
@@ -80,8 +80,8 @@ describe('cartRecoveryAnalytics — happy path', () => {
     // Two aggregate calls in service order (converted first,
     // then pending — the order is set in the service body).
     aggregateMock
-      .mockResolvedValueOnce({ _sum: { cartTotalKgs: 2000, cartTotalUsd: 20 } })  // converted
-      .mockResolvedValueOnce({ _sum: { cartTotalKgs: 8000, cartTotalUsd: 80 } }); // pending
+      .mockResolvedValueOnce({ _sum: { cartTotalKgs: 2000 } })  // converted
+      .mockResolvedValueOnce({ _sum: { cartTotalKgs: 8000 } }); // pending
 
     // findMany: top products + recent activity + recent touched product ids
     findManyMock.mockResolvedValue([]);
@@ -101,7 +101,7 @@ describe('cartRecoveryAnalytics — happy path', () => {
 
   it('caches the result for CACHE_TTL_MS (15s)', async () => {
     groupByMock.mockResolvedValue([]);
-    aggregateMock.mockResolvedValue({ _sum: { cartTotalKgs: 0, cartTotalUsd: 0 } });
+    aggregateMock.mockResolvedValue({ _sum: { cartTotalKgs: 0 } });
     findManyMock.mockResolvedValue([]);
 
     const mod = await import('../src/services/cartRecoveryAnalytics');
@@ -124,7 +124,7 @@ describe('cartRecoveryAnalytics — happy path', () => {
 
   it('cache hit then miss returns fresh data after TTL', async () => {
     groupByMock.mockResolvedValue([]);
-    aggregateMock.mockResolvedValue({ _sum: { cartTotalKgs: 0, cartTotalUsd: 0 } });
+    aggregateMock.mockResolvedValue({ _sum: { cartTotalKgs: 0 } });
     findManyMock.mockResolvedValue([]);
 
     const mod = await import('../src/services/cartRecoveryAnalytics');
@@ -139,7 +139,7 @@ describe('cartRecoveryAnalytics — FOMO aggregation', () => {
   it('sums recentOrderCount only for products with abandonment in the last 10 min', async () => {
     groupByMock.mockResolvedValueOnce([]);  // status groupBy
     groupByMock.mockResolvedValueOnce([]);  // topProducts groupBy
-    aggregateMock.mockResolvedValue({ _sum: { cartTotalKgs: 0, cartTotalUsd: 0 } });
+    aggregateMock.mockResolvedValue({ _sum: { cartTotalKgs: 0 } });
     // findMany is called in two places:
     //   1. the "topProducts" products fetch
     //   2. the "recent touched" distinct lastProductId fetch

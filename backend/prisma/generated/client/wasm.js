@@ -133,7 +133,7 @@ exports.Prisma.UserScalarFieldEnum = {
   passwordHash: 'passwordHash',
   walletBalanceKgs: 'walletBalanceKgs',
   walletBalanceUsd: 'walletBalanceUsd',
-  cumulativeSpendUsd: 'cumulativeSpendUsd',
+  cumulativeSpendKgs: 'cumulativeSpendKgs',
   loyaltyLevel: 'loyaltyLevel',
   dynamicDiscountRate: 'dynamicDiscountRate',
   isMonthlyActive: 'isMonthlyActive',
@@ -162,7 +162,6 @@ exports.Prisma.ProductScalarFieldEnum = {
   accordions: 'accordions',
   benefits: 'benefits',
   basePriceKgs: 'basePriceKgs',
-  basePriceUsd: 'basePriceUsd',
   translations: 'translations',
   stockQuantity: 'stockQuantity',
   minStockAlert: 'minStockAlert',
@@ -184,7 +183,6 @@ exports.Prisma.OrderScalarFieldEnum = {
   orderType: 'orderType',
   status: 'status',
   totalKgs: 'totalKgs',
-  totalUsd: 'totalUsd',
   paymentMethod: 'paymentMethod',
   customerName: 'customerName',
   customerPhone: 'customerPhone',
@@ -214,13 +212,6 @@ exports.Prisma.TransactionScalarFieldEnum = {
   currency: 'currency',
   description: 'description',
   createdAt: 'createdAt'
-};
-
-exports.Prisma.ExchangeRateScalarFieldEnum = {
-  id: 'id',
-  currency: 'currency',
-  rateToKgs: 'rateToKgs',
-  updatedAt: 'updatedAt'
 };
 
 exports.Prisma.SystemConfigScalarFieldEnum = {
@@ -406,7 +397,6 @@ exports.Prisma.CartAbandonmentScalarFieldEnum = {
   lastProductName: 'lastProductName',
   lastProductImg: 'lastProductImg',
   cartItems: 'cartItems',
-  cartTotalUsd: 'cartTotalUsd',
   cartTotalKgs: 'cartTotalKgs',
   status: 'status',
   lastActivityAt: 'lastActivityAt',
@@ -502,7 +492,6 @@ exports.Prisma.ModelName = {
   Order: 'Order',
   OrderItem: 'OrderItem',
   Transaction: 'Transaction',
-  ExchangeRate: 'ExchangeRate',
   SystemConfig: 'SystemConfig',
   WeeklyCycle: 'WeeklyCycle',
   UserWeeklyStats: 'UserWeeklyStats',

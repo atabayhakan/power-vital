@@ -37,7 +37,7 @@ onMounted(async () => {
   try {
     const res = await api.get('/products?limit=5');
     if (res.data && res.data.length > 0) {
-      upsellProduct.value = res.data.find((p: any) => p.basePriceUsd < 20) || res.data[0];
+      upsellProduct.value = res.data.find((p: any) => p.basePriceKgs < 1800) || res.data[0];
     }
   } catch (e) {
     console.error('Failed to load upsell product', e);
@@ -50,7 +50,7 @@ const addUpsell = () => {
     cartStore.addToCart({
       id: upsellProduct.value.id,
       name: tField(upsellProduct.value, 'name') || upsellProduct.value.name,
-      basePriceUsd: upsellProduct.value.basePriceUsd,
+      basePriceKgs: upsellProduct.value.basePriceKgs,
       imageUrl: upsellProduct.value.images?.[0]?.imageUrl || upsellProduct.value.images?.[0]
     });
     setTimeout(() => { upsellAdding.value = false; }, 600);
@@ -102,7 +102,7 @@ const onTouchMove = (e: TouchEvent) => {
           <div class="item-img" :style="{ backgroundImage: `url(${item.imageUrl || ''})` }"/>
           <div class="item-details">
             <h4 class="item-name">{{ item.name }}</h4>
-            <div class="item-price">{{ formatPrice(getDiscountedKgs(item.basePriceUsd)) }} KGS</div>
+            <div class="item-price">{{ formatPrice(getDiscountedKgs(item.basePriceKgs)) }} KGS</div>
             <div class="item-bottom">
               <div class="qty-controls glass-controls">
                 <button class="qty-btn" @click="cartStore.updateQuantity(item.id, -1)">−</button>
@@ -121,7 +121,7 @@ const onTouchMove = (e: TouchEvent) => {
             <div class="upsell-img" :style="{ backgroundImage: `url(${upsellProduct.images?.[0]?.imageUrl || upsellProduct.images?.[0] || ''})` }"/>
             <div class="upsell-info">
               <h5 class="upsell-name">{{ tField(upsellProduct, 'name') || upsellProduct.name }}</h5>
-              <span class="upsell-price">{{ formatPrice(getDiscountedKgs(upsellProduct.basePriceUsd)) }} KGS</span>
+              <span class="upsell-price">{{ formatPrice(getDiscountedKgs(upsellProduct.basePriceKgs)) }} KGS</span>
             </div>
             <button class="upsell-add-btn" :class="{'is-adding': upsellAdding}" @click="addUpsell">+</button>
           </div>

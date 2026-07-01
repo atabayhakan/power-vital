@@ -277,15 +277,7 @@ router.get('/barcode/:barcode', async (req: Request, res: Response) => {
 // POST /api/v1/products - Create a new product
 router.post('/', authenticateJWT, requireRole('admin'), validate({ body: ProductCreateSchema }), async (req: Request, res: Response) => {
   try {
-    const { barcode, name, description, basePriceUsd, stockQuantity, categoryId, imageUrls, benefits, accordions, translations } = req.body as ProductCreateInput;
-
-    const exchangeRate = await prisma.exchangeRate.findUnique({
-      where: { currency: 'USD' }
-    });
-    if (!exchangeRate) return res.status(500).json({ error: 'Exchange rate not configured. Please set USD/KGS rate first.' });
-    const rateToKgs = Number(exchangeRate.rateToKgs);
-
-    const basePriceKgs = Number(basePriceUsd) * rateToKgs;
+    const { barcode, name, description, basePriceKgs, stockQuantity, categoryId, imageUrls, benefits, accordions, translations } = req.body as ProductCreateInput;
 
     // benefits: array of strings → JSON
     let benefitsJson: string | null = null;
@@ -313,7 +305,6 @@ router.post('/', authenticateJWT, requireRole('admin'), validate({ body: Product
         barcode,
         name,
         description,
-        basePriceUsd,
         basePriceKgs,
         stockQuantity: stockQuantity || 0,
         ...categoryRelation,
@@ -347,14 +338,7 @@ router.post('/', authenticateJWT, requireRole('admin'), validate({ body: Product
 router.put('/:id', authenticateJWT, requireRole('admin'), validate({ body: ProductUpdateSchema, params: IdParamSchema }), async (req: Request, res: Response) => {
   try {
     const { id } = req.params as { id: string };
-    const { barcode, name, description, basePriceUsd, stockQuantity, categoryId, imageUrls, benefits, accordions, translations } = req.body as ProductUpdateInput;
-
-    const exchangeRate = await prisma.exchangeRate.findUnique({
-      where: { currency: 'USD' }
-    });
-    if (!exchangeRate) return res.status(500).json({ error: 'Exchange rate not configured. Please set USD/KGS rate first.' });
-    const rateToKgs = Number(exchangeRate.rateToKgs);
-    const basePriceKgs = Number(basePriceUsd) * rateToKgs;
+    const { barcode, name, description, basePriceKgs, stockQuantity, categoryId, imageUrls, benefits, accordions, translations } = req.body as ProductUpdateInput;
 
     // If imageUrls provided, replace all images
     if (imageUrls) {
@@ -401,7 +385,6 @@ router.put('/:id', authenticateJWT, requireRole('admin'), validate({ body: Produ
         barcode,
         name,
         description,
-        basePriceUsd,
         basePriceKgs,
         stockQuantity,
         ...categoryRelationUpdate,

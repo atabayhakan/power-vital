@@ -1,7 +1,7 @@
 import { Router, Request, Response } from 'express';
 import { authenticateJWT, requireRole } from '../middleware/auth';
 import prisma from '../lib/prisma';
-import { handleOrderPaidAscension } from '../services/ascensionService';
+import { handleOrderPaidAscension, revertOrderEffects } from '../services/ascensionService';
 import { sendToUser } from '../services/pushService';
 import { validate, OrderStatusUpdateSchema, OrderListQuerySchema, IdParamSchema } from '../validators';
 import { logger } from '../utils/logger';
@@ -103,7 +103,6 @@ router.get('/:id', authenticateJWT, validate({ params: IdParamSchema }), async (
       orderType: order.orderType,
       paymentMethod: order.paymentMethod,
       totalKgs: order.totalKgs,
-      totalUsd: order.totalUsd,
       customerName: order.customerName,
       customerPhone: order.customerPhone,
       customerEmail: order.customerEmail,
@@ -176,6 +175,21 @@ router.put('/:id/status', authenticateJWT, requireRole('admin'), validate({ body
   } catch (error: any) {
     logger.error({ err: error }, 'Update Order Status Error:');
     res.status(500).json({ error: 'Failed to update order status' });
+  }
+});
+
+// POST /api/v1/orders/:id/revert - admin "Geri Al": reset to pending AND undo
+// all financial/career effects (claw back MLM bonuses from upline wallets +
+// recompute the buyer's loyalty level / discount / role). Idempotent.
+router.post('/:id/revert', authenticateJWT, requireRole('admin'), validate({ params: IdParamSchema }), async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params as { id: string };
+    const result = await revertOrderEffects(id);
+    res.json({ ok: true, ...result });
+  } catch (error: any) {
+    if (String(error?.message || '').includes('not found')) return res.status(404).json({ error: 'Order not found' });
+    logger.error({ err: error }, 'Revert Order Error:');
+    res.status(500).json({ error: 'Failed to revert order' });
   }
 });
 

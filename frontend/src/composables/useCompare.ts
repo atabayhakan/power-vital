@@ -19,7 +19,7 @@ export interface CompareItem {
   id: string;
   name: string;
   imageUrl: string;
-  basePriceUsd: number;
+  basePriceKgs: number;
   category?: string;
   slug?: string;
 }

@@ -46,10 +46,10 @@ vi.mock('../src/middleware/auth', () => ({
 
 const sampleProducts = [
   { id: 'p1', name: 'Reishi Coffee', barcode: 'Pv-010', stockQuantity: 93, minStockAlert: 10,
-    basePriceKgs: 760, basePriceUsd: 8.7, images: [], category: null, translations: null,
+    basePriceKgs: 760, images: [], category: null, translations: null,
     categoryId: null, description: '', accordions: null, benefits: null, createdAt: new Date(), updatedAt: new Date() },
   { id: 'p2', name: 'Code RED', barcode: 'PV-009', stockQuantity: 38, minStockAlert: 10,
-    basePriceKgs: 1180, basePriceUsd: 13.5, images: [], category: null, translations: null,
+    basePriceKgs: 1180, images: [], category: null, translations: null,
     categoryId: 'cat-1', description: '', accordions: null, benefits: null, createdAt: new Date(), updatedAt: new Date() }
 ];
 

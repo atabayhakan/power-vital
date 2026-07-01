@@ -31,7 +31,7 @@ model User {
   walletBalanceKgs Decimal @default(0.00)
   walletBalanceUsd Decimal @default(0.00)
 
-  cumulativeSpendUsd  Decimal @default(0.00)
+  cumulativeSpendKgs  Decimal @default(0.00)
   loyaltyLevel        Int     @default(0)
   dynamicDiscountRate Decimal @default(0.00)
 
@@ -105,7 +105,6 @@ model Product {
   benefits String? @db.Text
 
   basePriceKgs Decimal
-  basePriceUsd Decimal
 
   translations String? @db.Text
 
@@ -146,7 +145,6 @@ model Order {
   status    String @default("pending")
 
   totalKgs Decimal
-  totalUsd Decimal
 
   paymentMethod String
 
@@ -198,13 +196,6 @@ model Transaction {
 
   @@index([type])
   @@index([createdAt])
-}
-
-model ExchangeRate {
-  id        String   @id @default(uuid())
-  currency  String   @unique @default("USD")
-  rateToKgs Decimal
-  updatedAt DateTime @updatedAt
 }
 
 model SystemConfig {
@@ -503,9 +494,8 @@ model CartAbandonment {
   lastProductName String?
   lastProductImg  String?
 
-  // JSON: [{ id, name, imageUrl, basePriceUsd, quantity }, ...]
+  // JSON: [{ id, name, imageUrl, basePriceKgs, quantity }, ...]
   cartItems    String @db.Text
-  cartTotalUsd Float
   cartTotalKgs Float
 
   // Lifecycle: pending → notified (push sent) → converted (the

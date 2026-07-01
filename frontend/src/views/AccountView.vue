@@ -46,20 +46,20 @@ const walletKgs = computed(() => Number((user.value as any)?.walletBalanceKgs) |
 
 // ═══ Loyalty progress — how much spend until the next permanent-discount tier ═══
 const loyaltyThresholds = [
-  { level: 1, spend: 100, discount: 5 },
-  { level: 2, spend: 250, discount: 10 },
-  { level: 3, spend: 500, discount: 15 },
-  { level: 4, spend: 750, discount: 20 },
-  { level: 5, spend: 1000, discount: 25 },
+  { level: 1, spend: 9000, discount: 5 },
+  { level: 2, spend: 22000, discount: 10 },
+  { level: 3, spend: 44000, discount: 15 },
+  { level: 4, spend: 66000, discount: 20 },
+  { level: 5, spend: 88000, discount: 25 },
 ];
-const spendUsd = computed(() => Number((user.value as any)?.cumulativeSpendUsd || 0));
+const spendKgs = computed(() => Number((user.value as any)?.cumulativeSpendKgs || 0));
 const nextLevel = computed(() => {
   const lvl = Number(user.value?.loyaltyLevel || 0);
   if (lvl >= 5) return null; // already at the top tier
   const next = loyaltyThresholds.find(th => th.level === lvl + 1);
   if (!next) return null;
-  const remaining = Math.max(0, next.spend - spendUsd.value);
-  const pct = Math.min(100, Math.max(3, (spendUsd.value / next.spend) * 100));
+  const remaining = Math.max(0, next.spend - spendKgs.value);
+  const pct = Math.min(100, Math.max(3, (spendKgs.value / next.spend) * 100));
   return { targetLevel: next.level, remaining, targetDiscount: next.discount, pct };
 });
 
@@ -79,10 +79,10 @@ const orderStatusLabel = (s: string) => {
 };
 
 const fallbackProducts = [
-  { id: 'd1', name: 'Power Vital Karadut Özü', basePriceUsd: 14.99, images: [{ imageUrl: 'https://cdn.myikas.com/images/c7afacdb-7cce-47a1-8553-35d2c163884c/abdf396c-433e-4dc4-ae67-5c43f805b42d/1080/karadut-01.webp' }] },
-  { id: 'd2', name: 'Power Vital Omega 3', basePriceUsd: 20.50, images: [{ imageUrl: 'https://cdn.myikas.com/images/c7afacdb-7cce-47a1-8553-35d2c163884c/33ad56e8-87bc-4af9-b202-1a893bdea410/1080/omega30.webp' }] },
-  { id: 'd3', name: 'Power Vital Magnezyum', basePriceUsd: 25.00, images: [] },
-  { id: 'd4', name: 'Collagen Tripeptide', basePriceUsd: 22.00, images: [] },
+  { id: 'd1', name: 'Power Vital Karadut Özü', basePriceKgs: 1300, images: [{ imageUrl: 'https://cdn.myikas.com/images/c7afacdb-7cce-47a1-8553-35d2c163884c/abdf396c-433e-4dc4-ae67-5c43f805b42d/1080/karadut-01.webp' }] },
+  { id: 'd2', name: 'Power Vital Omega 3', basePriceKgs: 1800, images: [{ imageUrl: 'https://cdn.myikas.com/images/c7afacdb-7cce-47a1-8553-35d2c163884c/33ad56e8-87bc-4af9-b202-1a893bdea410/1080/omega30.webp' }] },
+  { id: 'd3', name: 'Power Vital Magnezyum', basePriceKgs: 2200, images: [] },
+  { id: 'd4', name: 'Collagen Tripeptide', basePriceKgs: 1950, images: [] },
 ];
 
 onMounted(async () => {
@@ -110,13 +110,13 @@ onMounted(async () => {
 });
 
 const productImg = (p: any) => p.images?.[0]?.imageUrl || '';
-const productPrice = (p: any) => formatPrice(getDiscountedKgs(Number(p.basePriceUsd || 0)));
+const productPrice = (p: any) => formatPrice(getDiscountedKgs(Number(p.basePriceKgs || 0)));
 
 const addToCart = (p: any) => {
   cartStore.addToCart({
     id: p.id,
     name: tField(p, 'name') || p.name,
-    basePriceUsd: Number(p.basePriceUsd),
+    basePriceKgs: Number(p.basePriceKgs),
     imageUrl: productImg(p),
   }, 1);
   const next = new Set(justAdded.value).add(p.id);
@@ -188,7 +188,7 @@ const logout = () => { authStore.logout(); router.push('/login'); };
         <span class="acc-progress__disc">%{{ nextLevel.targetDiscount }} {{ t('account.discountWord') }}</span>
       </div>
       <div class="acc-progress__bar"><div class="acc-progress__fill" :style="{ width: nextLevel.pct + '%' }"/></div>
-      <p class="acc-progress__hint">{{ t('account.remainingHint', { amount: '$' + Math.ceil(nextLevel.remaining) }) }}</p>
+      <p class="acc-progress__hint">{{ t('account.remainingHint', { amount: formatPrice(nextLevel.remaining) + ' KGS' }) }}</p>
     </router-link>
     <div class="acc-progress acc-progress--max" v-else>
       <span class="acc-progress__crown">👑</span>

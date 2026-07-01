@@ -49,11 +49,6 @@ export type OrderItem = $Result.DefaultSelection<Prisma.$OrderItemPayload>
  */
 export type Transaction = $Result.DefaultSelection<Prisma.$TransactionPayload>
 /**
- * Model ExchangeRate
- * 
- */
-export type ExchangeRate = $Result.DefaultSelection<Prisma.$ExchangeRatePayload>
-/**
  * Model SystemConfig
  * 
  */
@@ -341,16 +336,6 @@ export class PrismaClient<
     * ```
     */
   get transaction(): Prisma.TransactionDelegate<ExtArgs>;
-
-  /**
-   * `prisma.exchangeRate`: Exposes CRUD operations for the **ExchangeRate** model.
-    * Example usage:
-    * ```ts
-    * // Fetch zero or more ExchangeRates
-    * const exchangeRates = await prisma.exchangeRate.findMany()
-    * ```
-    */
-  get exchangeRate(): Prisma.ExchangeRateDelegate<ExtArgs>;
 
   /**
    * `prisma.systemConfig`: Exposes CRUD operations for the **SystemConfig** model.
@@ -989,7 +974,6 @@ export namespace Prisma {
     Order: 'Order',
     OrderItem: 'OrderItem',
     Transaction: 'Transaction',
-    ExchangeRate: 'ExchangeRate',
     SystemConfig: 'SystemConfig',
     WeeklyCycle: 'WeeklyCycle',
     UserWeeklyStats: 'UserWeeklyStats',
@@ -1024,7 +1008,7 @@ export namespace Prisma {
 
   export type TypeMap<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, ClientOptions = {}> = {
     meta: {
-      modelProps: "user" | "withdrawalRequest" | "product" | "priceRule" | "order" | "orderItem" | "transaction" | "exchangeRate" | "systemConfig" | "weeklyCycle" | "userWeeklyStats" | "heroSlide" | "category" | "productImage" | "siteSettings" | "mediaFolder" | "media" | "page" | "productReview" | "storeReview" | "refreshToken" | "pushSubscription" | "cartAbandonment" | "broadcastLog" | "broadcastJob" | "impersonationSession" | "clientError"
+      modelProps: "user" | "withdrawalRequest" | "product" | "priceRule" | "order" | "orderItem" | "transaction" | "systemConfig" | "weeklyCycle" | "userWeeklyStats" | "heroSlide" | "category" | "productImage" | "siteSettings" | "mediaFolder" | "media" | "page" | "productReview" | "storeReview" | "refreshToken" | "pushSubscription" | "cartAbandonment" | "broadcastLog" | "broadcastJob" | "impersonationSession" | "clientError"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -1487,72 +1471,6 @@ export namespace Prisma {
           count: {
             args: Prisma.TransactionCountArgs<ExtArgs>
             result: $Utils.Optional<TransactionCountAggregateOutputType> | number
-          }
-        }
-      }
-      ExchangeRate: {
-        payload: Prisma.$ExchangeRatePayload<ExtArgs>
-        fields: Prisma.ExchangeRateFieldRefs
-        operations: {
-          findUnique: {
-            args: Prisma.ExchangeRateFindUniqueArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$ExchangeRatePayload> | null
-          }
-          findUniqueOrThrow: {
-            args: Prisma.ExchangeRateFindUniqueOrThrowArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$ExchangeRatePayload>
-          }
-          findFirst: {
-            args: Prisma.ExchangeRateFindFirstArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$ExchangeRatePayload> | null
-          }
-          findFirstOrThrow: {
-            args: Prisma.ExchangeRateFindFirstOrThrowArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$ExchangeRatePayload>
-          }
-          findMany: {
-            args: Prisma.ExchangeRateFindManyArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$ExchangeRatePayload>[]
-          }
-          create: {
-            args: Prisma.ExchangeRateCreateArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$ExchangeRatePayload>
-          }
-          createMany: {
-            args: Prisma.ExchangeRateCreateManyArgs<ExtArgs>
-            result: BatchPayload
-          }
-          delete: {
-            args: Prisma.ExchangeRateDeleteArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$ExchangeRatePayload>
-          }
-          update: {
-            args: Prisma.ExchangeRateUpdateArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$ExchangeRatePayload>
-          }
-          deleteMany: {
-            args: Prisma.ExchangeRateDeleteManyArgs<ExtArgs>
-            result: BatchPayload
-          }
-          updateMany: {
-            args: Prisma.ExchangeRateUpdateManyArgs<ExtArgs>
-            result: BatchPayload
-          }
-          upsert: {
-            args: Prisma.ExchangeRateUpsertArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$ExchangeRatePayload>
-          }
-          aggregate: {
-            args: Prisma.ExchangeRateAggregateArgs<ExtArgs>
-            result: $Utils.Optional<AggregateExchangeRate>
-          }
-          groupBy: {
-            args: Prisma.ExchangeRateGroupByArgs<ExtArgs>
-            result: $Utils.Optional<ExchangeRateGroupByOutputType>[]
-          }
-          count: {
-            args: Prisma.ExchangeRateCountArgs<ExtArgs>
-            result: $Utils.Optional<ExchangeRateCountAggregateOutputType> | number
           }
         }
       }
@@ -3333,7 +3251,7 @@ export namespace Prisma {
   export type UserAvgAggregateOutputType = {
     walletBalanceKgs: Decimal | null
     walletBalanceUsd: Decimal | null
-    cumulativeSpendUsd: Decimal | null
+    cumulativeSpendKgs: Decimal | null
     loyaltyLevel: number | null
     dynamicDiscountRate: Decimal | null
   }
@@ -3341,7 +3259,7 @@ export namespace Prisma {
   export type UserSumAggregateOutputType = {
     walletBalanceKgs: Decimal | null
     walletBalanceUsd: Decimal | null
-    cumulativeSpendUsd: Decimal | null
+    cumulativeSpendKgs: Decimal | null
     loyaltyLevel: number | null
     dynamicDiscountRate: Decimal | null
   }
@@ -3357,7 +3275,7 @@ export namespace Prisma {
     passwordHash: string | null
     walletBalanceKgs: Decimal | null
     walletBalanceUsd: Decimal | null
-    cumulativeSpendUsd: Decimal | null
+    cumulativeSpendKgs: Decimal | null
     loyaltyLevel: number | null
     dynamicDiscountRate: Decimal | null
     isMonthlyActive: boolean | null
@@ -3378,7 +3296,7 @@ export namespace Prisma {
     passwordHash: string | null
     walletBalanceKgs: Decimal | null
     walletBalanceUsd: Decimal | null
-    cumulativeSpendUsd: Decimal | null
+    cumulativeSpendKgs: Decimal | null
     loyaltyLevel: number | null
     dynamicDiscountRate: Decimal | null
     isMonthlyActive: boolean | null
@@ -3399,7 +3317,7 @@ export namespace Prisma {
     passwordHash: number
     walletBalanceKgs: number
     walletBalanceUsd: number
-    cumulativeSpendUsd: number
+    cumulativeSpendKgs: number
     loyaltyLevel: number
     dynamicDiscountRate: number
     isMonthlyActive: number
@@ -3414,7 +3332,7 @@ export namespace Prisma {
   export type UserAvgAggregateInputType = {
     walletBalanceKgs?: true
     walletBalanceUsd?: true
-    cumulativeSpendUsd?: true
+    cumulativeSpendKgs?: true
     loyaltyLevel?: true
     dynamicDiscountRate?: true
   }
@@ -3422,7 +3340,7 @@ export namespace Prisma {
   export type UserSumAggregateInputType = {
     walletBalanceKgs?: true
     walletBalanceUsd?: true
-    cumulativeSpendUsd?: true
+    cumulativeSpendKgs?: true
     loyaltyLevel?: true
     dynamicDiscountRate?: true
   }
@@ -3438,7 +3356,7 @@ export namespace Prisma {
     passwordHash?: true
     walletBalanceKgs?: true
     walletBalanceUsd?: true
-    cumulativeSpendUsd?: true
+    cumulativeSpendKgs?: true
     loyaltyLevel?: true
     dynamicDiscountRate?: true
     isMonthlyActive?: true
@@ -3459,7 +3377,7 @@ export namespace Prisma {
     passwordHash?: true
     walletBalanceKgs?: true
     walletBalanceUsd?: true
-    cumulativeSpendUsd?: true
+    cumulativeSpendKgs?: true
     loyaltyLevel?: true
     dynamicDiscountRate?: true
     isMonthlyActive?: true
@@ -3480,7 +3398,7 @@ export namespace Prisma {
     passwordHash?: true
     walletBalanceKgs?: true
     walletBalanceUsd?: true
-    cumulativeSpendUsd?: true
+    cumulativeSpendKgs?: true
     loyaltyLevel?: true
     dynamicDiscountRate?: true
     isMonthlyActive?: true
@@ -3588,7 +3506,7 @@ export namespace Prisma {
     passwordHash: string
     walletBalanceKgs: Decimal
     walletBalanceUsd: Decimal
-    cumulativeSpendUsd: Decimal
+    cumulativeSpendKgs: Decimal
     loyaltyLevel: number
     dynamicDiscountRate: Decimal
     isMonthlyActive: boolean
@@ -3628,7 +3546,7 @@ export namespace Prisma {
     passwordHash?: boolean
     walletBalanceKgs?: boolean
     walletBalanceUsd?: boolean
-    cumulativeSpendUsd?: boolean
+    cumulativeSpendKgs?: boolean
     loyaltyLevel?: boolean
     dynamicDiscountRate?: boolean
     isMonthlyActive?: boolean
@@ -3668,7 +3586,7 @@ export namespace Prisma {
     passwordHash?: boolean
     walletBalanceKgs?: boolean
     walletBalanceUsd?: boolean
-    cumulativeSpendUsd?: boolean
+    cumulativeSpendKgs?: boolean
     loyaltyLevel?: boolean
     dynamicDiscountRate?: boolean
     isMonthlyActive?: boolean
@@ -3731,7 +3649,7 @@ export namespace Prisma {
       passwordHash: string
       walletBalanceKgs: Prisma.Decimal
       walletBalanceUsd: Prisma.Decimal
-      cumulativeSpendUsd: Prisma.Decimal
+      cumulativeSpendKgs: Prisma.Decimal
       loyaltyLevel: number
       dynamicDiscountRate: Prisma.Decimal
       isMonthlyActive: boolean
@@ -4135,7 +4053,7 @@ export namespace Prisma {
     readonly passwordHash: FieldRef<"User", 'String'>
     readonly walletBalanceKgs: FieldRef<"User", 'Decimal'>
     readonly walletBalanceUsd: FieldRef<"User", 'Decimal'>
-    readonly cumulativeSpendUsd: FieldRef<"User", 'Decimal'>
+    readonly cumulativeSpendKgs: FieldRef<"User", 'Decimal'>
     readonly loyaltyLevel: FieldRef<"User", 'Int'>
     readonly dynamicDiscountRate: FieldRef<"User", 'Decimal'>
     readonly isMonthlyActive: FieldRef<"User", 'Boolean'>
@@ -5751,14 +5669,12 @@ export namespace Prisma {
 
   export type ProductAvgAggregateOutputType = {
     basePriceKgs: Decimal | null
-    basePriceUsd: Decimal | null
     stockQuantity: number | null
     minStockAlert: number | null
   }
 
   export type ProductSumAggregateOutputType = {
     basePriceKgs: Decimal | null
-    basePriceUsd: Decimal | null
     stockQuantity: number | null
     minStockAlert: number | null
   }
@@ -5771,7 +5687,6 @@ export namespace Prisma {
     accordions: string | null
     benefits: string | null
     basePriceKgs: Decimal | null
-    basePriceUsd: Decimal | null
     translations: string | null
     stockQuantity: number | null
     minStockAlert: number | null
@@ -5788,7 +5703,6 @@ export namespace Prisma {
     accordions: string | null
     benefits: string | null
     basePriceKgs: Decimal | null
-    basePriceUsd: Decimal | null
     translations: string | null
     stockQuantity: number | null
     minStockAlert: number | null
@@ -5805,7 +5719,6 @@ export namespace Prisma {
     accordions: number
     benefits: number
     basePriceKgs: number
-    basePriceUsd: number
     translations: number
     stockQuantity: number
     minStockAlert: number
@@ -5818,14 +5731,12 @@ export namespace Prisma {
 
   export type ProductAvgAggregateInputType = {
     basePriceKgs?: true
-    basePriceUsd?: true
     stockQuantity?: true
     minStockAlert?: true
   }
 
   export type ProductSumAggregateInputType = {
     basePriceKgs?: true
-    basePriceUsd?: true
     stockQuantity?: true
     minStockAlert?: true
   }
@@ -5838,7 +5749,6 @@ export namespace Prisma {
     accordions?: true
     benefits?: true
     basePriceKgs?: true
-    basePriceUsd?: true
     translations?: true
     stockQuantity?: true
     minStockAlert?: true
@@ -5855,7 +5765,6 @@ export namespace Prisma {
     accordions?: true
     benefits?: true
     basePriceKgs?: true
-    basePriceUsd?: true
     translations?: true
     stockQuantity?: true
     minStockAlert?: true
@@ -5872,7 +5781,6 @@ export namespace Prisma {
     accordions?: true
     benefits?: true
     basePriceKgs?: true
-    basePriceUsd?: true
     translations?: true
     stockQuantity?: true
     minStockAlert?: true
@@ -5976,7 +5884,6 @@ export namespace Prisma {
     accordions: string | null
     benefits: string | null
     basePriceKgs: Decimal
-    basePriceUsd: Decimal
     translations: string | null
     stockQuantity: number
     minStockAlert: number
@@ -6012,7 +5919,6 @@ export namespace Prisma {
     accordions?: boolean
     benefits?: boolean
     basePriceKgs?: boolean
-    basePriceUsd?: boolean
     translations?: boolean
     stockQuantity?: boolean
     minStockAlert?: boolean
@@ -6036,7 +5942,6 @@ export namespace Prisma {
     accordions?: boolean
     benefits?: boolean
     basePriceKgs?: boolean
-    basePriceUsd?: boolean
     translations?: boolean
     stockQuantity?: boolean
     minStockAlert?: boolean
@@ -6071,7 +5976,6 @@ export namespace Prisma {
       accordions: string | null
       benefits: string | null
       basePriceKgs: Prisma.Decimal
-      basePriceUsd: Prisma.Decimal
       translations: string | null
       stockQuantity: number
       minStockAlert: number
@@ -6459,7 +6363,6 @@ export namespace Prisma {
     readonly accordions: FieldRef<"Product", 'String'>
     readonly benefits: FieldRef<"Product", 'String'>
     readonly basePriceKgs: FieldRef<"Product", 'Decimal'>
-    readonly basePriceUsd: FieldRef<"Product", 'Decimal'>
     readonly translations: FieldRef<"Product", 'String'>
     readonly stockQuantity: FieldRef<"Product", 'Int'>
     readonly minStockAlert: FieldRef<"Product", 'Int'>
@@ -7790,12 +7693,10 @@ export namespace Prisma {
 
   export type OrderAvgAggregateOutputType = {
     totalKgs: Decimal | null
-    totalUsd: Decimal | null
   }
 
   export type OrderSumAggregateOutputType = {
     totalKgs: Decimal | null
-    totalUsd: Decimal | null
   }
 
   export type OrderMinAggregateOutputType = {
@@ -7804,7 +7705,6 @@ export namespace Prisma {
     orderType: string | null
     status: string | null
     totalKgs: Decimal | null
-    totalUsd: Decimal | null
     paymentMethod: string | null
     customerName: string | null
     customerPhone: string | null
@@ -7823,7 +7723,6 @@ export namespace Prisma {
     orderType: string | null
     status: string | null
     totalKgs: Decimal | null
-    totalUsd: Decimal | null
     paymentMethod: string | null
     customerName: string | null
     customerPhone: string | null
@@ -7842,7 +7741,6 @@ export namespace Prisma {
     orderType: number
     status: number
     totalKgs: number
-    totalUsd: number
     paymentMethod: number
     customerName: number
     customerPhone: number
@@ -7859,12 +7757,10 @@ export namespace Prisma {
 
   export type OrderAvgAggregateInputType = {
     totalKgs?: true
-    totalUsd?: true
   }
 
   export type OrderSumAggregateInputType = {
     totalKgs?: true
-    totalUsd?: true
   }
 
   export type OrderMinAggregateInputType = {
@@ -7873,7 +7769,6 @@ export namespace Prisma {
     orderType?: true
     status?: true
     totalKgs?: true
-    totalUsd?: true
     paymentMethod?: true
     customerName?: true
     customerPhone?: true
@@ -7892,7 +7787,6 @@ export namespace Prisma {
     orderType?: true
     status?: true
     totalKgs?: true
-    totalUsd?: true
     paymentMethod?: true
     customerName?: true
     customerPhone?: true
@@ -7911,7 +7805,6 @@ export namespace Prisma {
     orderType?: true
     status?: true
     totalKgs?: true
-    totalUsd?: true
     paymentMethod?: true
     customerName?: true
     customerPhone?: true
@@ -8017,7 +7910,6 @@ export namespace Prisma {
     orderType: string
     status: string
     totalKgs: Decimal
-    totalUsd: Decimal
     paymentMethod: string
     customerName: string | null
     customerPhone: string | null
@@ -8055,7 +7947,6 @@ export namespace Prisma {
     orderType?: boolean
     status?: boolean
     totalKgs?: boolean
-    totalUsd?: boolean
     paymentMethod?: boolean
     customerName?: boolean
     customerPhone?: boolean
@@ -8078,7 +7969,6 @@ export namespace Prisma {
     orderType?: boolean
     status?: boolean
     totalKgs?: boolean
-    totalUsd?: boolean
     paymentMethod?: boolean
     customerName?: boolean
     customerPhone?: boolean
@@ -8109,7 +7999,6 @@ export namespace Prisma {
       orderType: string
       status: string
       totalKgs: Prisma.Decimal
-      totalUsd: Prisma.Decimal
       paymentMethod: string
       customerName: string | null
       customerPhone: string | null
@@ -8496,7 +8385,6 @@ export namespace Prisma {
     readonly orderType: FieldRef<"Order", 'String'>
     readonly status: FieldRef<"Order", 'String'>
     readonly totalKgs: FieldRef<"Order", 'Decimal'>
-    readonly totalUsd: FieldRef<"Order", 'Decimal'>
     readonly paymentMethod: FieldRef<"Order", 'String'>
     readonly customerName: FieldRef<"Order", 'String'>
     readonly customerPhone: FieldRef<"Order", 'String'>
@@ -10723,861 +10611,6 @@ export namespace Prisma {
      * Choose, which related nodes to fetch as well
      */
     include?: TransactionInclude<ExtArgs> | null
-  }
-
-
-  /**
-   * Model ExchangeRate
-   */
-
-  export type AggregateExchangeRate = {
-    _count: ExchangeRateCountAggregateOutputType | null
-    _avg: ExchangeRateAvgAggregateOutputType | null
-    _sum: ExchangeRateSumAggregateOutputType | null
-    _min: ExchangeRateMinAggregateOutputType | null
-    _max: ExchangeRateMaxAggregateOutputType | null
-  }
-
-  export type ExchangeRateAvgAggregateOutputType = {
-    rateToKgs: Decimal | null
-  }
-
-  export type ExchangeRateSumAggregateOutputType = {
-    rateToKgs: Decimal | null
-  }
-
-  export type ExchangeRateMinAggregateOutputType = {
-    id: string | null
-    currency: string | null
-    rateToKgs: Decimal | null
-    updatedAt: Date | null
-  }
-
-  export type ExchangeRateMaxAggregateOutputType = {
-    id: string | null
-    currency: string | null
-    rateToKgs: Decimal | null
-    updatedAt: Date | null
-  }
-
-  export type ExchangeRateCountAggregateOutputType = {
-    id: number
-    currency: number
-    rateToKgs: number
-    updatedAt: number
-    _all: number
-  }
-
-
-  export type ExchangeRateAvgAggregateInputType = {
-    rateToKgs?: true
-  }
-
-  export type ExchangeRateSumAggregateInputType = {
-    rateToKgs?: true
-  }
-
-  export type ExchangeRateMinAggregateInputType = {
-    id?: true
-    currency?: true
-    rateToKgs?: true
-    updatedAt?: true
-  }
-
-  export type ExchangeRateMaxAggregateInputType = {
-    id?: true
-    currency?: true
-    rateToKgs?: true
-    updatedAt?: true
-  }
-
-  export type ExchangeRateCountAggregateInputType = {
-    id?: true
-    currency?: true
-    rateToKgs?: true
-    updatedAt?: true
-    _all?: true
-  }
-
-  export type ExchangeRateAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Filter which ExchangeRate to aggregate.
-     */
-    where?: ExchangeRateWhereInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
-     * Determine the order of ExchangeRates to fetch.
-     */
-    orderBy?: ExchangeRateOrderByWithRelationInput | ExchangeRateOrderByWithRelationInput[]
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
-     * Sets the start position
-     */
-    cursor?: ExchangeRateWhereUniqueInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Take `±n` ExchangeRates from the position of the cursor.
-     */
-    take?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Skip the first `n` ExchangeRates.
-     */
-    skip?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
-     * Count returned ExchangeRates
-    **/
-    _count?: true | ExchangeRateCountAggregateInputType
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
-     * Select which fields to average
-    **/
-    _avg?: ExchangeRateAvgAggregateInputType
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
-     * Select which fields to sum
-    **/
-    _sum?: ExchangeRateSumAggregateInputType
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
-     * Select which fields to find the minimum value
-    **/
-    _min?: ExchangeRateMinAggregateInputType
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
-     * Select which fields to find the maximum value
-    **/
-    _max?: ExchangeRateMaxAggregateInputType
-  }
-
-  export type GetExchangeRateAggregateType<T extends ExchangeRateAggregateArgs> = {
-        [P in keyof T & keyof AggregateExchangeRate]: P extends '_count' | 'count'
-      ? T[P] extends true
-        ? number
-        : GetScalarType<T[P], AggregateExchangeRate[P]>
-      : GetScalarType<T[P], AggregateExchangeRate[P]>
-  }
-
-
-
-
-  export type ExchangeRateGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    where?: ExchangeRateWhereInput
-    orderBy?: ExchangeRateOrderByWithAggregationInput | ExchangeRateOrderByWithAggregationInput[]
-    by: ExchangeRateScalarFieldEnum[] | ExchangeRateScalarFieldEnum
-    having?: ExchangeRateScalarWhereWithAggregatesInput
-    take?: number
-    skip?: number
-    _count?: ExchangeRateCountAggregateInputType | true
-    _avg?: ExchangeRateAvgAggregateInputType
-    _sum?: ExchangeRateSumAggregateInputType
-    _min?: ExchangeRateMinAggregateInputType
-    _max?: ExchangeRateMaxAggregateInputType
-  }
-
-  export type ExchangeRateGroupByOutputType = {
-    id: string
-    currency: string
-    rateToKgs: Decimal
-    updatedAt: Date
-    _count: ExchangeRateCountAggregateOutputType | null
-    _avg: ExchangeRateAvgAggregateOutputType | null
-    _sum: ExchangeRateSumAggregateOutputType | null
-    _min: ExchangeRateMinAggregateOutputType | null
-    _max: ExchangeRateMaxAggregateOutputType | null
-  }
-
-  type GetExchangeRateGroupByPayload<T extends ExchangeRateGroupByArgs> = Prisma.PrismaPromise<
-    Array<
-      PickEnumerable<ExchangeRateGroupByOutputType, T['by']> &
-        {
-          [P in ((keyof T) & (keyof ExchangeRateGroupByOutputType))]: P extends '_count'
-            ? T[P] extends boolean
-              ? number
-              : GetScalarType<T[P], ExchangeRateGroupByOutputType[P]>
-            : GetScalarType<T[P], ExchangeRateGroupByOutputType[P]>
-        }
-      >
-    >
-
-
-  export type ExchangeRateSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
-    id?: boolean
-    currency?: boolean
-    rateToKgs?: boolean
-    updatedAt?: boolean
-  }, ExtArgs["result"]["exchangeRate"]>
-
-
-  export type ExchangeRateSelectScalar = {
-    id?: boolean
-    currency?: boolean
-    rateToKgs?: boolean
-    updatedAt?: boolean
-  }
-
-
-  export type $ExchangeRatePayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    name: "ExchangeRate"
-    objects: {}
-    scalars: $Extensions.GetPayloadResult<{
-      id: string
-      currency: string
-      rateToKgs: Prisma.Decimal
-      updatedAt: Date
-    }, ExtArgs["result"]["exchangeRate"]>
-    composites: {}
-  }
-
-  type ExchangeRateGetPayload<S extends boolean | null | undefined | ExchangeRateDefaultArgs> = $Result.GetResult<Prisma.$ExchangeRatePayload, S>
-
-  type ExchangeRateCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = 
-    Omit<ExchangeRateFindManyArgs, 'select' | 'include' | 'distinct'> & {
-      select?: ExchangeRateCountAggregateInputType | true
-    }
-
-  export interface ExchangeRateDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> {
-    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['ExchangeRate'], meta: { name: 'ExchangeRate' } }
-    /**
-     * Find zero or one ExchangeRate that matches the filter.
-     * @param {ExchangeRateFindUniqueArgs} args - Arguments to find a ExchangeRate
-     * @example
-     * // Get one ExchangeRate
-     * const exchangeRate = await prisma.exchangeRate.findUnique({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-     */
-    findUnique<T extends ExchangeRateFindUniqueArgs>(args: SelectSubset<T, ExchangeRateFindUniqueArgs<ExtArgs>>): Prisma__ExchangeRateClient<$Result.GetResult<Prisma.$ExchangeRatePayload<ExtArgs>, T, "findUnique"> | null, null, ExtArgs>
-
-    /**
-     * Find one ExchangeRate that matches the filter or throw an error with `error.code='P2025'` 
-     * if no matches were found.
-     * @param {ExchangeRateFindUniqueOrThrowArgs} args - Arguments to find a ExchangeRate
-     * @example
-     * // Get one ExchangeRate
-     * const exchangeRate = await prisma.exchangeRate.findUniqueOrThrow({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-     */
-    findUniqueOrThrow<T extends ExchangeRateFindUniqueOrThrowArgs>(args: SelectSubset<T, ExchangeRateFindUniqueOrThrowArgs<ExtArgs>>): Prisma__ExchangeRateClient<$Result.GetResult<Prisma.$ExchangeRatePayload<ExtArgs>, T, "findUniqueOrThrow">, never, ExtArgs>
-
-    /**
-     * Find the first ExchangeRate that matches the filter.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {ExchangeRateFindFirstArgs} args - Arguments to find a ExchangeRate
-     * @example
-     * // Get one ExchangeRate
-     * const exchangeRate = await prisma.exchangeRate.findFirst({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-     */
-    findFirst<T extends ExchangeRateFindFirstArgs>(args?: SelectSubset<T, ExchangeRateFindFirstArgs<ExtArgs>>): Prisma__ExchangeRateClient<$Result.GetResult<Prisma.$ExchangeRatePayload<ExtArgs>, T, "findFirst"> | null, null, ExtArgs>
-
-    /**
-     * Find the first ExchangeRate that matches the filter or
-     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {ExchangeRateFindFirstOrThrowArgs} args - Arguments to find a ExchangeRate
-     * @example
-     * // Get one ExchangeRate
-     * const exchangeRate = await prisma.exchangeRate.findFirstOrThrow({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-     */
-    findFirstOrThrow<T extends ExchangeRateFindFirstOrThrowArgs>(args?: SelectSubset<T, ExchangeRateFindFirstOrThrowArgs<ExtArgs>>): Prisma__ExchangeRateClient<$Result.GetResult<Prisma.$ExchangeRatePayload<ExtArgs>, T, "findFirstOrThrow">, never, ExtArgs>
-
-    /**
-     * Find zero or more ExchangeRates that matches the filter.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {ExchangeRateFindManyArgs} args - Arguments to filter and select certain fields only.
-     * @example
-     * // Get all ExchangeRates
-     * const exchangeRates = await prisma.exchangeRate.findMany()
-     * 
-     * // Get first 10 ExchangeRates
-     * const exchangeRates = await prisma.exchangeRate.findMany({ take: 10 })
-     * 
-     * // Only select the `id`
-     * const exchangeRateWithIdOnly = await prisma.exchangeRate.findMany({ select: { id: true } })
-     * 
-     */
-    findMany<T extends ExchangeRateFindManyArgs>(args?: SelectSubset<T, ExchangeRateFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ExchangeRatePayload<ExtArgs>, T, "findMany">>
-
-    /**
-     * Create a ExchangeRate.
-     * @param {ExchangeRateCreateArgs} args - Arguments to create a ExchangeRate.
-     * @example
-     * // Create one ExchangeRate
-     * const ExchangeRate = await prisma.exchangeRate.create({
-     *   data: {
-     *     // ... data to create a ExchangeRate
-     *   }
-     * })
-     * 
-     */
-    create<T extends ExchangeRateCreateArgs>(args: SelectSubset<T, ExchangeRateCreateArgs<ExtArgs>>): Prisma__ExchangeRateClient<$Result.GetResult<Prisma.$ExchangeRatePayload<ExtArgs>, T, "create">, never, ExtArgs>
-
-    /**
-     * Create many ExchangeRates.
-     * @param {ExchangeRateCreateManyArgs} args - Arguments to create many ExchangeRates.
-     * @example
-     * // Create many ExchangeRates
-     * const exchangeRate = await prisma.exchangeRate.createMany({
-     *   data: [
-     *     // ... provide data here
-     *   ]
-     * })
-     *     
-     */
-    createMany<T extends ExchangeRateCreateManyArgs>(args?: SelectSubset<T, ExchangeRateCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
-
-    /**
-     * Delete a ExchangeRate.
-     * @param {ExchangeRateDeleteArgs} args - Arguments to delete one ExchangeRate.
-     * @example
-     * // Delete one ExchangeRate
-     * const ExchangeRate = await prisma.exchangeRate.delete({
-     *   where: {
-     *     // ... filter to delete one ExchangeRate
-     *   }
-     * })
-     * 
-     */
-    delete<T extends ExchangeRateDeleteArgs>(args: SelectSubset<T, ExchangeRateDeleteArgs<ExtArgs>>): Prisma__ExchangeRateClient<$Result.GetResult<Prisma.$ExchangeRatePayload<ExtArgs>, T, "delete">, never, ExtArgs>
-
-    /**
-     * Update one ExchangeRate.
-     * @param {ExchangeRateUpdateArgs} args - Arguments to update one ExchangeRate.
-     * @example
-     * // Update one ExchangeRate
-     * const exchangeRate = await prisma.exchangeRate.update({
-     *   where: {
-     *     // ... provide filter here
-     *   },
-     *   data: {
-     *     // ... provide data here
-     *   }
-     * })
-     * 
-     */
-    update<T extends ExchangeRateUpdateArgs>(args: SelectSubset<T, ExchangeRateUpdateArgs<ExtArgs>>): Prisma__ExchangeRateClient<$Result.GetResult<Prisma.$ExchangeRatePayload<ExtArgs>, T, "update">, never, ExtArgs>
-
-    /**
-     * Delete zero or more ExchangeRates.
-     * @param {ExchangeRateDeleteManyArgs} args - Arguments to filter ExchangeRates to delete.
-     * @example
-     * // Delete a few ExchangeRates
-     * const { count } = await prisma.exchangeRate.deleteMany({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-     * 
-     */
-    deleteMany<T extends ExchangeRateDeleteManyArgs>(args?: SelectSubset<T, ExchangeRateDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
-
-    /**
-     * Update zero or more ExchangeRates.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {ExchangeRateUpdateManyArgs} args - Arguments to update one or more rows.
-     * @example
-     * // Update many ExchangeRates
-     * const exchangeRate = await prisma.exchangeRate.updateMany({
-     *   where: {
-     *     // ... provide filter here
-     *   },
-     *   data: {
-     *     // ... provide data here
-     *   }
-     * })
-     * 
-     */
-    updateMany<T extends ExchangeRateUpdateManyArgs>(args: SelectSubset<T, ExchangeRateUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
-
-    /**
-     * Create or update one ExchangeRate.
-     * @param {ExchangeRateUpsertArgs} args - Arguments to update or create a ExchangeRate.
-     * @example
-     * // Update or create a ExchangeRate
-     * const exchangeRate = await prisma.exchangeRate.upsert({
-     *   create: {
-     *     // ... data to create a ExchangeRate
-     *   },
-     *   update: {
-     *     // ... in case it already exists, update
-     *   },
-     *   where: {
-     *     // ... the filter for the ExchangeRate we want to update
-     *   }
-     * })
-     */
-    upsert<T extends ExchangeRateUpsertArgs>(args: SelectSubset<T, ExchangeRateUpsertArgs<ExtArgs>>): Prisma__ExchangeRateClient<$Result.GetResult<Prisma.$ExchangeRatePayload<ExtArgs>, T, "upsert">, never, ExtArgs>
-
-
-    /**
-     * Count the number of ExchangeRates.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {ExchangeRateCountArgs} args - Arguments to filter ExchangeRates to count.
-     * @example
-     * // Count the number of ExchangeRates
-     * const count = await prisma.exchangeRate.count({
-     *   where: {
-     *     // ... the filter for the ExchangeRates we want to count
-     *   }
-     * })
-    **/
-    count<T extends ExchangeRateCountArgs>(
-      args?: Subset<T, ExchangeRateCountArgs>,
-    ): Prisma.PrismaPromise<
-      T extends $Utils.Record<'select', any>
-        ? T['select'] extends true
-          ? number
-          : GetScalarType<T['select'], ExchangeRateCountAggregateOutputType>
-        : number
-    >
-
-    /**
-     * Allows you to perform aggregations operations on a ExchangeRate.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {ExchangeRateAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
-     * @example
-     * // Ordered by age ascending
-     * // Where email contains prisma.io
-     * // Limited to the 10 users
-     * const aggregations = await prisma.user.aggregate({
-     *   _avg: {
-     *     age: true,
-     *   },
-     *   where: {
-     *     email: {
-     *       contains: "prisma.io",
-     *     },
-     *   },
-     *   orderBy: {
-     *     age: "asc",
-     *   },
-     *   take: 10,
-     * })
-    **/
-    aggregate<T extends ExchangeRateAggregateArgs>(args: Subset<T, ExchangeRateAggregateArgs>): Prisma.PrismaPromise<GetExchangeRateAggregateType<T>>
-
-    /**
-     * Group by ExchangeRate.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {ExchangeRateGroupByArgs} args - Group by arguments.
-     * @example
-     * // Group by city, order by createdAt, get count
-     * const result = await prisma.user.groupBy({
-     *   by: ['city', 'createdAt'],
-     *   orderBy: {
-     *     createdAt: true
-     *   },
-     *   _count: {
-     *     _all: true
-     *   },
-     * })
-     * 
-    **/
-    groupBy<
-      T extends ExchangeRateGroupByArgs,
-      HasSelectOrTake extends Or<
-        Extends<'skip', Keys<T>>,
-        Extends<'take', Keys<T>>
-      >,
-      OrderByArg extends True extends HasSelectOrTake
-        ? { orderBy: ExchangeRateGroupByArgs['orderBy'] }
-        : { orderBy?: ExchangeRateGroupByArgs['orderBy'] },
-      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
-      ByFields extends MaybeTupleToUnion<T['by']>,
-      ByValid extends Has<ByFields, OrderFields>,
-      HavingFields extends GetHavingFields<T['having']>,
-      HavingValid extends Has<ByFields, HavingFields>,
-      ByEmpty extends T['by'] extends never[] ? True : False,
-      InputErrors extends ByEmpty extends True
-      ? `Error: "by" must not be empty.`
-      : HavingValid extends False
-      ? {
-          [P in HavingFields]: P extends ByFields
-            ? never
-            : P extends string
-            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
-            : [
-                Error,
-                'Field ',
-                P,
-                ` in "having" needs to be provided in "by"`,
-              ]
-        }[HavingFields]
-      : 'take' extends Keys<T>
-      ? 'orderBy' extends Keys<T>
-        ? ByValid extends True
-          ? {}
-          : {
-              [P in OrderFields]: P extends ByFields
-                ? never
-                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
-            }[OrderFields]
-        : 'Error: If you provide "take", you also need to provide "orderBy"'
-      : 'skip' extends Keys<T>
-      ? 'orderBy' extends Keys<T>
-        ? ByValid extends True
-          ? {}
-          : {
-              [P in OrderFields]: P extends ByFields
-                ? never
-                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
-            }[OrderFields]
-        : 'Error: If you provide "skip", you also need to provide "orderBy"'
-      : ByValid extends True
-      ? {}
-      : {
-          [P in OrderFields]: P extends ByFields
-            ? never
-            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
-        }[OrderFields]
-    >(args: SubsetIntersection<T, ExchangeRateGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetExchangeRateGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
-  /**
-   * Fields of the ExchangeRate model
-   */
-  readonly fields: ExchangeRateFieldRefs;
-  }
-
-  /**
-   * The delegate class that acts as a "Promise-like" for ExchangeRate.
-   * Why is this prefixed with `Prisma__`?
-   * Because we want to prevent naming conflicts as mentioned in
-   * https://github.com/prisma/prisma-client-js/issues/707
-   */
-  export interface Prisma__ExchangeRateClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> extends Prisma.PrismaPromise<T> {
-    readonly [Symbol.toStringTag]: "PrismaPromise"
-    /**
-     * Attaches callbacks for the resolution and/or rejection of the Promise.
-     * @param onfulfilled The callback to execute when the Promise is resolved.
-     * @param onrejected The callback to execute when the Promise is rejected.
-     * @returns A Promise for the completion of which ever callback is executed.
-     */
-    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
-    /**
-     * Attaches a callback for only the rejection of the Promise.
-     * @param onrejected The callback to execute when the Promise is rejected.
-     * @returns A Promise for the completion of the callback.
-     */
-    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
-    /**
-     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
-     * resolved value cannot be modified from the callback.
-     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
-     * @returns A Promise for the completion of the callback.
-     */
-    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
-  }
-
-
-
-
-  /**
-   * Fields of the ExchangeRate model
-   */ 
-  interface ExchangeRateFieldRefs {
-    readonly id: FieldRef<"ExchangeRate", 'String'>
-    readonly currency: FieldRef<"ExchangeRate", 'String'>
-    readonly rateToKgs: FieldRef<"ExchangeRate", 'Decimal'>
-    readonly updatedAt: FieldRef<"ExchangeRate", 'DateTime'>
-  }
-    
-
-  // Custom InputTypes
-  /**
-   * ExchangeRate findUnique
-   */
-  export type ExchangeRateFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the ExchangeRate
-     */
-    select?: ExchangeRateSelect<ExtArgs> | null
-    /**
-     * Filter, which ExchangeRate to fetch.
-     */
-    where: ExchangeRateWhereUniqueInput
-  }
-
-  /**
-   * ExchangeRate findUniqueOrThrow
-   */
-  export type ExchangeRateFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the ExchangeRate
-     */
-    select?: ExchangeRateSelect<ExtArgs> | null
-    /**
-     * Filter, which ExchangeRate to fetch.
-     */
-    where: ExchangeRateWhereUniqueInput
-  }
-
-  /**
-   * ExchangeRate findFirst
-   */
-  export type ExchangeRateFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the ExchangeRate
-     */
-    select?: ExchangeRateSelect<ExtArgs> | null
-    /**
-     * Filter, which ExchangeRate to fetch.
-     */
-    where?: ExchangeRateWhereInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
-     * Determine the order of ExchangeRates to fetch.
-     */
-    orderBy?: ExchangeRateOrderByWithRelationInput | ExchangeRateOrderByWithRelationInput[]
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
-     * Sets the position for searching for ExchangeRates.
-     */
-    cursor?: ExchangeRateWhereUniqueInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Take `±n` ExchangeRates from the position of the cursor.
-     */
-    take?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Skip the first `n` ExchangeRates.
-     */
-    skip?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
-     * 
-     * Filter by unique combinations of ExchangeRates.
-     */
-    distinct?: ExchangeRateScalarFieldEnum | ExchangeRateScalarFieldEnum[]
-  }
-
-  /**
-   * ExchangeRate findFirstOrThrow
-   */
-  export type ExchangeRateFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the ExchangeRate
-     */
-    select?: ExchangeRateSelect<ExtArgs> | null
-    /**
-     * Filter, which ExchangeRate to fetch.
-     */
-    where?: ExchangeRateWhereInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
-     * Determine the order of ExchangeRates to fetch.
-     */
-    orderBy?: ExchangeRateOrderByWithRelationInput | ExchangeRateOrderByWithRelationInput[]
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
-     * Sets the position for searching for ExchangeRates.
-     */
-    cursor?: ExchangeRateWhereUniqueInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Take `±n` ExchangeRates from the position of the cursor.
-     */
-    take?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Skip the first `n` ExchangeRates.
-     */
-    skip?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
-     * 
-     * Filter by unique combinations of ExchangeRates.
-     */
-    distinct?: ExchangeRateScalarFieldEnum | ExchangeRateScalarFieldEnum[]
-  }
-
-  /**
-   * ExchangeRate findMany
-   */
-  export type ExchangeRateFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the ExchangeRate
-     */
-    select?: ExchangeRateSelect<ExtArgs> | null
-    /**
-     * Filter, which ExchangeRates to fetch.
-     */
-    where?: ExchangeRateWhereInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
-     * Determine the order of ExchangeRates to fetch.
-     */
-    orderBy?: ExchangeRateOrderByWithRelationInput | ExchangeRateOrderByWithRelationInput[]
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
-     * Sets the position for listing ExchangeRates.
-     */
-    cursor?: ExchangeRateWhereUniqueInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Take `±n` ExchangeRates from the position of the cursor.
-     */
-    take?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Skip the first `n` ExchangeRates.
-     */
-    skip?: number
-    distinct?: ExchangeRateScalarFieldEnum | ExchangeRateScalarFieldEnum[]
-  }
-
-  /**
-   * ExchangeRate create
-   */
-  export type ExchangeRateCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the ExchangeRate
-     */
-    select?: ExchangeRateSelect<ExtArgs> | null
-    /**
-     * The data needed to create a ExchangeRate.
-     */
-    data: XOR<ExchangeRateCreateInput, ExchangeRateUncheckedCreateInput>
-  }
-
-  /**
-   * ExchangeRate createMany
-   */
-  export type ExchangeRateCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * The data used to create many ExchangeRates.
-     */
-    data: ExchangeRateCreateManyInput | ExchangeRateCreateManyInput[]
-    skipDuplicates?: boolean
-  }
-
-  /**
-   * ExchangeRate update
-   */
-  export type ExchangeRateUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the ExchangeRate
-     */
-    select?: ExchangeRateSelect<ExtArgs> | null
-    /**
-     * The data needed to update a ExchangeRate.
-     */
-    data: XOR<ExchangeRateUpdateInput, ExchangeRateUncheckedUpdateInput>
-    /**
-     * Choose, which ExchangeRate to update.
-     */
-    where: ExchangeRateWhereUniqueInput
-  }
-
-  /**
-   * ExchangeRate updateMany
-   */
-  export type ExchangeRateUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * The data used to update ExchangeRates.
-     */
-    data: XOR<ExchangeRateUpdateManyMutationInput, ExchangeRateUncheckedUpdateManyInput>
-    /**
-     * Filter which ExchangeRates to update
-     */
-    where?: ExchangeRateWhereInput
-  }
-
-  /**
-   * ExchangeRate upsert
-   */
-  export type ExchangeRateUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the ExchangeRate
-     */
-    select?: ExchangeRateSelect<ExtArgs> | null
-    /**
-     * The filter to search for the ExchangeRate to update in case it exists.
-     */
-    where: ExchangeRateWhereUniqueInput
-    /**
-     * In case the ExchangeRate found by the `where` argument doesn't exist, create a new ExchangeRate with this data.
-     */
-    create: XOR<ExchangeRateCreateInput, ExchangeRateUncheckedCreateInput>
-    /**
-     * In case the ExchangeRate was found with the provided `where` argument, update it with this data.
-     */
-    update: XOR<ExchangeRateUpdateInput, ExchangeRateUncheckedUpdateInput>
-  }
-
-  /**
-   * ExchangeRate delete
-   */
-  export type ExchangeRateDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the ExchangeRate
-     */
-    select?: ExchangeRateSelect<ExtArgs> | null
-    /**
-     * Filter which ExchangeRate to delete.
-     */
-    where: ExchangeRateWhereUniqueInput
-  }
-
-  /**
-   * ExchangeRate deleteMany
-   */
-  export type ExchangeRateDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Filter which ExchangeRates to delete
-     */
-    where?: ExchangeRateWhereInput
-  }
-
-  /**
-   * ExchangeRate without action
-   */
-  export type ExchangeRateDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the ExchangeRate
-     */
-    select?: ExchangeRateSelect<ExtArgs> | null
   }
 
 
@@ -24850,12 +23883,10 @@ export namespace Prisma {
   }
 
   export type CartAbandonmentAvgAggregateOutputType = {
-    cartTotalUsd: number | null
     cartTotalKgs: number | null
   }
 
   export type CartAbandonmentSumAggregateOutputType = {
-    cartTotalUsd: number | null
     cartTotalKgs: number | null
   }
 
@@ -24867,7 +23898,6 @@ export namespace Prisma {
     lastProductName: string | null
     lastProductImg: string | null
     cartItems: string | null
-    cartTotalUsd: number | null
     cartTotalKgs: number | null
     status: string | null
     lastActivityAt: Date | null
@@ -24887,7 +23917,6 @@ export namespace Prisma {
     lastProductName: string | null
     lastProductImg: string | null
     cartItems: string | null
-    cartTotalUsd: number | null
     cartTotalKgs: number | null
     status: string | null
     lastActivityAt: Date | null
@@ -24907,7 +23936,6 @@ export namespace Prisma {
     lastProductName: number
     lastProductImg: number
     cartItems: number
-    cartTotalUsd: number
     cartTotalKgs: number
     status: number
     lastActivityAt: number
@@ -24922,12 +23950,10 @@ export namespace Prisma {
 
 
   export type CartAbandonmentAvgAggregateInputType = {
-    cartTotalUsd?: true
     cartTotalKgs?: true
   }
 
   export type CartAbandonmentSumAggregateInputType = {
-    cartTotalUsd?: true
     cartTotalKgs?: true
   }
 
@@ -24939,7 +23965,6 @@ export namespace Prisma {
     lastProductName?: true
     lastProductImg?: true
     cartItems?: true
-    cartTotalUsd?: true
     cartTotalKgs?: true
     status?: true
     lastActivityAt?: true
@@ -24959,7 +23984,6 @@ export namespace Prisma {
     lastProductName?: true
     lastProductImg?: true
     cartItems?: true
-    cartTotalUsd?: true
     cartTotalKgs?: true
     status?: true
     lastActivityAt?: true
@@ -24979,7 +24003,6 @@ export namespace Prisma {
     lastProductName?: true
     lastProductImg?: true
     cartItems?: true
-    cartTotalUsd?: true
     cartTotalKgs?: true
     status?: true
     lastActivityAt?: true
@@ -25086,7 +24109,6 @@ export namespace Prisma {
     lastProductName: string | null
     lastProductImg: string | null
     cartItems: string
-    cartTotalUsd: number
     cartTotalKgs: number
     status: string
     lastActivityAt: Date
@@ -25125,7 +24147,6 @@ export namespace Prisma {
     lastProductName?: boolean
     lastProductImg?: boolean
     cartItems?: boolean
-    cartTotalUsd?: boolean
     cartTotalKgs?: boolean
     status?: boolean
     lastActivityAt?: boolean
@@ -25147,7 +24168,6 @@ export namespace Prisma {
     lastProductName?: boolean
     lastProductImg?: boolean
     cartItems?: boolean
-    cartTotalUsd?: boolean
     cartTotalKgs?: boolean
     status?: boolean
     lastActivityAt?: boolean
@@ -25176,7 +24196,6 @@ export namespace Prisma {
       lastProductName: string | null
       lastProductImg: string | null
       cartItems: string
-      cartTotalUsd: number
       cartTotalKgs: number
       status: string
       lastActivityAt: Date
@@ -25563,7 +24582,6 @@ export namespace Prisma {
     readonly lastProductName: FieldRef<"CartAbandonment", 'String'>
     readonly lastProductImg: FieldRef<"CartAbandonment", 'String'>
     readonly cartItems: FieldRef<"CartAbandonment", 'String'>
-    readonly cartTotalUsd: FieldRef<"CartAbandonment", 'Float'>
     readonly cartTotalKgs: FieldRef<"CartAbandonment", 'Float'>
     readonly status: FieldRef<"CartAbandonment", 'String'>
     readonly lastActivityAt: FieldRef<"CartAbandonment", 'DateTime'>
@@ -29900,7 +28918,7 @@ export namespace Prisma {
     passwordHash: 'passwordHash',
     walletBalanceKgs: 'walletBalanceKgs',
     walletBalanceUsd: 'walletBalanceUsd',
-    cumulativeSpendUsd: 'cumulativeSpendUsd',
+    cumulativeSpendKgs: 'cumulativeSpendKgs',
     loyaltyLevel: 'loyaltyLevel',
     dynamicDiscountRate: 'dynamicDiscountRate',
     isMonthlyActive: 'isMonthlyActive',
@@ -29935,7 +28953,6 @@ export namespace Prisma {
     accordions: 'accordions',
     benefits: 'benefits',
     basePriceKgs: 'basePriceKgs',
-    basePriceUsd: 'basePriceUsd',
     translations: 'translations',
     stockQuantity: 'stockQuantity',
     minStockAlert: 'minStockAlert',
@@ -29963,7 +28980,6 @@ export namespace Prisma {
     orderType: 'orderType',
     status: 'status',
     totalKgs: 'totalKgs',
-    totalUsd: 'totalUsd',
     paymentMethod: 'paymentMethod',
     customerName: 'customerName',
     customerPhone: 'customerPhone',
@@ -30002,16 +29018,6 @@ export namespace Prisma {
   };
 
   export type TransactionScalarFieldEnum = (typeof TransactionScalarFieldEnum)[keyof typeof TransactionScalarFieldEnum]
-
-
-  export const ExchangeRateScalarFieldEnum: {
-    id: 'id',
-    currency: 'currency',
-    rateToKgs: 'rateToKgs',
-    updatedAt: 'updatedAt'
-  };
-
-  export type ExchangeRateScalarFieldEnum = (typeof ExchangeRateScalarFieldEnum)[keyof typeof ExchangeRateScalarFieldEnum]
 
 
   export const SystemConfigScalarFieldEnum: {
@@ -30239,7 +29245,6 @@ export namespace Prisma {
     lastProductName: 'lastProductName',
     lastProductImg: 'lastProductImg',
     cartItems: 'cartItems',
-    cartTotalUsd: 'cartTotalUsd',
     cartTotalKgs: 'cartTotalKgs',
     status: 'status',
     lastActivityAt: 'lastActivityAt',
@@ -30411,7 +29416,7 @@ export namespace Prisma {
     passwordHash?: StringFilter<"User"> | string
     walletBalanceKgs?: DecimalFilter<"User"> | Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: DecimalFilter<"User"> | Decimal | DecimalJsLike | number | string
-    cumulativeSpendUsd?: DecimalFilter<"User"> | Decimal | DecimalJsLike | number | string
+    cumulativeSpendKgs?: DecimalFilter<"User"> | Decimal | DecimalJsLike | number | string
     loyaltyLevel?: IntFilter<"User"> | number
     dynamicDiscountRate?: DecimalFilter<"User"> | Decimal | DecimalJsLike | number | string
     isMonthlyActive?: BoolFilter<"User"> | boolean
@@ -30449,7 +29454,7 @@ export namespace Prisma {
     passwordHash?: SortOrder
     walletBalanceKgs?: SortOrder
     walletBalanceUsd?: SortOrder
-    cumulativeSpendUsd?: SortOrder
+    cumulativeSpendKgs?: SortOrder
     loyaltyLevel?: SortOrder
     dynamicDiscountRate?: SortOrder
     isMonthlyActive?: SortOrder
@@ -30490,7 +29495,7 @@ export namespace Prisma {
     passwordHash?: StringFilter<"User"> | string
     walletBalanceKgs?: DecimalFilter<"User"> | Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: DecimalFilter<"User"> | Decimal | DecimalJsLike | number | string
-    cumulativeSpendUsd?: DecimalFilter<"User"> | Decimal | DecimalJsLike | number | string
+    cumulativeSpendKgs?: DecimalFilter<"User"> | Decimal | DecimalJsLike | number | string
     loyaltyLevel?: IntFilter<"User"> | number
     dynamicDiscountRate?: DecimalFilter<"User"> | Decimal | DecimalJsLike | number | string
     isMonthlyActive?: BoolFilter<"User"> | boolean
@@ -30528,7 +29533,7 @@ export namespace Prisma {
     passwordHash?: SortOrder
     walletBalanceKgs?: SortOrder
     walletBalanceUsd?: SortOrder
-    cumulativeSpendUsd?: SortOrder
+    cumulativeSpendKgs?: SortOrder
     loyaltyLevel?: SortOrder
     dynamicDiscountRate?: SortOrder
     isMonthlyActive?: SortOrder
@@ -30557,7 +29562,7 @@ export namespace Prisma {
     passwordHash?: StringWithAggregatesFilter<"User"> | string
     walletBalanceKgs?: DecimalWithAggregatesFilter<"User"> | Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: DecimalWithAggregatesFilter<"User"> | Decimal | DecimalJsLike | number | string
-    cumulativeSpendUsd?: DecimalWithAggregatesFilter<"User"> | Decimal | DecimalJsLike | number | string
+    cumulativeSpendKgs?: DecimalWithAggregatesFilter<"User"> | Decimal | DecimalJsLike | number | string
     loyaltyLevel?: IntWithAggregatesFilter<"User"> | number
     dynamicDiscountRate?: DecimalWithAggregatesFilter<"User"> | Decimal | DecimalJsLike | number | string
     isMonthlyActive?: BoolWithAggregatesFilter<"User"> | boolean
@@ -30650,7 +29655,6 @@ export namespace Prisma {
     accordions?: StringNullableFilter<"Product"> | string | null
     benefits?: StringNullableFilter<"Product"> | string | null
     basePriceKgs?: DecimalFilter<"Product"> | Decimal | DecimalJsLike | number | string
-    basePriceUsd?: DecimalFilter<"Product"> | Decimal | DecimalJsLike | number | string
     translations?: StringNullableFilter<"Product"> | string | null
     stockQuantity?: IntFilter<"Product"> | number
     minStockAlert?: IntFilter<"Product"> | number
@@ -30672,7 +29676,6 @@ export namespace Prisma {
     accordions?: SortOrderInput | SortOrder
     benefits?: SortOrderInput | SortOrder
     basePriceKgs?: SortOrder
-    basePriceUsd?: SortOrder
     translations?: SortOrderInput | SortOrder
     stockQuantity?: SortOrder
     minStockAlert?: SortOrder
@@ -30697,7 +29700,6 @@ export namespace Prisma {
     accordions?: StringNullableFilter<"Product"> | string | null
     benefits?: StringNullableFilter<"Product"> | string | null
     basePriceKgs?: DecimalFilter<"Product"> | Decimal | DecimalJsLike | number | string
-    basePriceUsd?: DecimalFilter<"Product"> | Decimal | DecimalJsLike | number | string
     translations?: StringNullableFilter<"Product"> | string | null
     stockQuantity?: IntFilter<"Product"> | number
     minStockAlert?: IntFilter<"Product"> | number
@@ -30719,7 +29721,6 @@ export namespace Prisma {
     accordions?: SortOrderInput | SortOrder
     benefits?: SortOrderInput | SortOrder
     basePriceKgs?: SortOrder
-    basePriceUsd?: SortOrder
     translations?: SortOrderInput | SortOrder
     stockQuantity?: SortOrder
     minStockAlert?: SortOrder
@@ -30744,7 +29745,6 @@ export namespace Prisma {
     accordions?: StringNullableWithAggregatesFilter<"Product"> | string | null
     benefits?: StringNullableWithAggregatesFilter<"Product"> | string | null
     basePriceKgs?: DecimalWithAggregatesFilter<"Product"> | Decimal | DecimalJsLike | number | string
-    basePriceUsd?: DecimalWithAggregatesFilter<"Product"> | Decimal | DecimalJsLike | number | string
     translations?: StringNullableWithAggregatesFilter<"Product"> | string | null
     stockQuantity?: IntWithAggregatesFilter<"Product"> | number
     minStockAlert?: IntWithAggregatesFilter<"Product"> | number
@@ -30815,7 +29815,6 @@ export namespace Prisma {
     orderType?: StringFilter<"Order"> | string
     status?: StringFilter<"Order"> | string
     totalKgs?: DecimalFilter<"Order"> | Decimal | DecimalJsLike | number | string
-    totalUsd?: DecimalFilter<"Order"> | Decimal | DecimalJsLike | number | string
     paymentMethod?: StringFilter<"Order"> | string
     customerName?: StringNullableFilter<"Order"> | string | null
     customerPhone?: StringNullableFilter<"Order"> | string | null
@@ -30836,7 +29835,6 @@ export namespace Prisma {
     orderType?: SortOrder
     status?: SortOrder
     totalKgs?: SortOrder
-    totalUsd?: SortOrder
     paymentMethod?: SortOrder
     customerName?: SortOrderInput | SortOrder
     customerPhone?: SortOrderInput | SortOrder
@@ -30860,7 +29858,6 @@ export namespace Prisma {
     orderType?: StringFilter<"Order"> | string
     status?: StringFilter<"Order"> | string
     totalKgs?: DecimalFilter<"Order"> | Decimal | DecimalJsLike | number | string
-    totalUsd?: DecimalFilter<"Order"> | Decimal | DecimalJsLike | number | string
     paymentMethod?: StringFilter<"Order"> | string
     customerName?: StringNullableFilter<"Order"> | string | null
     customerPhone?: StringNullableFilter<"Order"> | string | null
@@ -30881,7 +29878,6 @@ export namespace Prisma {
     orderType?: SortOrder
     status?: SortOrder
     totalKgs?: SortOrder
-    totalUsd?: SortOrder
     paymentMethod?: SortOrder
     customerName?: SortOrderInput | SortOrder
     customerPhone?: SortOrderInput | SortOrder
@@ -30908,7 +29904,6 @@ export namespace Prisma {
     orderType?: StringWithAggregatesFilter<"Order"> | string
     status?: StringWithAggregatesFilter<"Order"> | string
     totalKgs?: DecimalWithAggregatesFilter<"Order"> | Decimal | DecimalJsLike | number | string
-    totalUsd?: DecimalWithAggregatesFilter<"Order"> | Decimal | DecimalJsLike | number | string
     paymentMethod?: StringWithAggregatesFilter<"Order"> | string
     customerName?: StringNullableWithAggregatesFilter<"Order"> | string | null
     customerPhone?: StringNullableWithAggregatesFilter<"Order"> | string | null
@@ -31051,55 +30046,6 @@ export namespace Prisma {
     currency?: StringWithAggregatesFilter<"Transaction"> | string
     description?: StringNullableWithAggregatesFilter<"Transaction"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"Transaction"> | Date | string
-  }
-
-  export type ExchangeRateWhereInput = {
-    AND?: ExchangeRateWhereInput | ExchangeRateWhereInput[]
-    OR?: ExchangeRateWhereInput[]
-    NOT?: ExchangeRateWhereInput | ExchangeRateWhereInput[]
-    id?: StringFilter<"ExchangeRate"> | string
-    currency?: StringFilter<"ExchangeRate"> | string
-    rateToKgs?: DecimalFilter<"ExchangeRate"> | Decimal | DecimalJsLike | number | string
-    updatedAt?: DateTimeFilter<"ExchangeRate"> | Date | string
-  }
-
-  export type ExchangeRateOrderByWithRelationInput = {
-    id?: SortOrder
-    currency?: SortOrder
-    rateToKgs?: SortOrder
-    updatedAt?: SortOrder
-  }
-
-  export type ExchangeRateWhereUniqueInput = Prisma.AtLeast<{
-    id?: string
-    currency?: string
-    AND?: ExchangeRateWhereInput | ExchangeRateWhereInput[]
-    OR?: ExchangeRateWhereInput[]
-    NOT?: ExchangeRateWhereInput | ExchangeRateWhereInput[]
-    rateToKgs?: DecimalFilter<"ExchangeRate"> | Decimal | DecimalJsLike | number | string
-    updatedAt?: DateTimeFilter<"ExchangeRate"> | Date | string
-  }, "id" | "currency">
-
-  export type ExchangeRateOrderByWithAggregationInput = {
-    id?: SortOrder
-    currency?: SortOrder
-    rateToKgs?: SortOrder
-    updatedAt?: SortOrder
-    _count?: ExchangeRateCountOrderByAggregateInput
-    _avg?: ExchangeRateAvgOrderByAggregateInput
-    _max?: ExchangeRateMaxOrderByAggregateInput
-    _min?: ExchangeRateMinOrderByAggregateInput
-    _sum?: ExchangeRateSumOrderByAggregateInput
-  }
-
-  export type ExchangeRateScalarWhereWithAggregatesInput = {
-    AND?: ExchangeRateScalarWhereWithAggregatesInput | ExchangeRateScalarWhereWithAggregatesInput[]
-    OR?: ExchangeRateScalarWhereWithAggregatesInput[]
-    NOT?: ExchangeRateScalarWhereWithAggregatesInput | ExchangeRateScalarWhereWithAggregatesInput[]
-    id?: StringWithAggregatesFilter<"ExchangeRate"> | string
-    currency?: StringWithAggregatesFilter<"ExchangeRate"> | string
-    rateToKgs?: DecimalWithAggregatesFilter<"ExchangeRate"> | Decimal | DecimalJsLike | number | string
-    updatedAt?: DateTimeWithAggregatesFilter<"ExchangeRate"> | Date | string
   }
 
   export type SystemConfigWhereInput = {
@@ -32211,7 +31157,6 @@ export namespace Prisma {
     lastProductName?: StringNullableFilter<"CartAbandonment"> | string | null
     lastProductImg?: StringNullableFilter<"CartAbandonment"> | string | null
     cartItems?: StringFilter<"CartAbandonment"> | string
-    cartTotalUsd?: FloatFilter<"CartAbandonment"> | number
     cartTotalKgs?: FloatFilter<"CartAbandonment"> | number
     status?: StringFilter<"CartAbandonment"> | string
     lastActivityAt?: DateTimeFilter<"CartAbandonment"> | Date | string
@@ -32232,7 +31177,6 @@ export namespace Prisma {
     lastProductName?: SortOrderInput | SortOrder
     lastProductImg?: SortOrderInput | SortOrder
     cartItems?: SortOrder
-    cartTotalUsd?: SortOrder
     cartTotalKgs?: SortOrder
     status?: SortOrder
     lastActivityAt?: SortOrder
@@ -32256,7 +31200,6 @@ export namespace Prisma {
     lastProductName?: StringNullableFilter<"CartAbandonment"> | string | null
     lastProductImg?: StringNullableFilter<"CartAbandonment"> | string | null
     cartItems?: StringFilter<"CartAbandonment"> | string
-    cartTotalUsd?: FloatFilter<"CartAbandonment"> | number
     cartTotalKgs?: FloatFilter<"CartAbandonment"> | number
     status?: StringFilter<"CartAbandonment"> | string
     lastActivityAt?: DateTimeFilter<"CartAbandonment"> | Date | string
@@ -32277,7 +31220,6 @@ export namespace Prisma {
     lastProductName?: SortOrderInput | SortOrder
     lastProductImg?: SortOrderInput | SortOrder
     cartItems?: SortOrder
-    cartTotalUsd?: SortOrder
     cartTotalKgs?: SortOrder
     status?: SortOrder
     lastActivityAt?: SortOrder
@@ -32305,7 +31247,6 @@ export namespace Prisma {
     lastProductName?: StringNullableWithAggregatesFilter<"CartAbandonment"> | string | null
     lastProductImg?: StringNullableWithAggregatesFilter<"CartAbandonment"> | string | null
     cartItems?: StringWithAggregatesFilter<"CartAbandonment"> | string
-    cartTotalUsd?: FloatWithAggregatesFilter<"CartAbandonment"> | number
     cartTotalKgs?: FloatWithAggregatesFilter<"CartAbandonment"> | number
     status?: StringWithAggregatesFilter<"CartAbandonment"> | string
     lastActivityAt?: DateTimeWithAggregatesFilter<"CartAbandonment"> | Date | string
@@ -32720,7 +31661,7 @@ export namespace Prisma {
     passwordHash: string
     walletBalanceKgs?: Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: Decimal | DecimalJsLike | number | string
-    cumulativeSpendUsd?: Decimal | DecimalJsLike | number | string
+    cumulativeSpendKgs?: Decimal | DecimalJsLike | number | string
     loyaltyLevel?: number
     dynamicDiscountRate?: Decimal | DecimalJsLike | number | string
     isMonthlyActive?: boolean
@@ -32758,7 +31699,7 @@ export namespace Prisma {
     passwordHash: string
     walletBalanceKgs?: Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: Decimal | DecimalJsLike | number | string
-    cumulativeSpendUsd?: Decimal | DecimalJsLike | number | string
+    cumulativeSpendKgs?: Decimal | DecimalJsLike | number | string
     loyaltyLevel?: number
     dynamicDiscountRate?: Decimal | DecimalJsLike | number | string
     isMonthlyActive?: boolean
@@ -32794,7 +31735,7 @@ export namespace Prisma {
     passwordHash?: StringFieldUpdateOperationsInput | string
     walletBalanceKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    cumulativeSpendUsd?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    cumulativeSpendKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     loyaltyLevel?: IntFieldUpdateOperationsInput | number
     dynamicDiscountRate?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     isMonthlyActive?: BoolFieldUpdateOperationsInput | boolean
@@ -32832,7 +31773,7 @@ export namespace Prisma {
     passwordHash?: StringFieldUpdateOperationsInput | string
     walletBalanceKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    cumulativeSpendUsd?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    cumulativeSpendKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     loyaltyLevel?: IntFieldUpdateOperationsInput | number
     dynamicDiscountRate?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     isMonthlyActive?: BoolFieldUpdateOperationsInput | boolean
@@ -32869,7 +31810,7 @@ export namespace Prisma {
     passwordHash: string
     walletBalanceKgs?: Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: Decimal | DecimalJsLike | number | string
-    cumulativeSpendUsd?: Decimal | DecimalJsLike | number | string
+    cumulativeSpendKgs?: Decimal | DecimalJsLike | number | string
     loyaltyLevel?: number
     dynamicDiscountRate?: Decimal | DecimalJsLike | number | string
     isMonthlyActive?: boolean
@@ -32889,7 +31830,7 @@ export namespace Prisma {
     passwordHash?: StringFieldUpdateOperationsInput | string
     walletBalanceKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    cumulativeSpendUsd?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    cumulativeSpendKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     loyaltyLevel?: IntFieldUpdateOperationsInput | number
     dynamicDiscountRate?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     isMonthlyActive?: BoolFieldUpdateOperationsInput | boolean
@@ -32910,7 +31851,7 @@ export namespace Prisma {
     passwordHash?: StringFieldUpdateOperationsInput | string
     walletBalanceKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    cumulativeSpendUsd?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    cumulativeSpendKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     loyaltyLevel?: IntFieldUpdateOperationsInput | number
     dynamicDiscountRate?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     isMonthlyActive?: BoolFieldUpdateOperationsInput | boolean
@@ -33004,7 +31945,6 @@ export namespace Prisma {
     accordions?: string | null
     benefits?: string | null
     basePriceKgs: Decimal | DecimalJsLike | number | string
-    basePriceUsd: Decimal | DecimalJsLike | number | string
     translations?: string | null
     stockQuantity?: number
     minStockAlert?: number
@@ -33025,7 +31965,6 @@ export namespace Prisma {
     accordions?: string | null
     benefits?: string | null
     basePriceKgs: Decimal | DecimalJsLike | number | string
-    basePriceUsd: Decimal | DecimalJsLike | number | string
     translations?: string | null
     stockQuantity?: number
     minStockAlert?: number
@@ -33046,7 +31985,6 @@ export namespace Prisma {
     accordions?: NullableStringFieldUpdateOperationsInput | string | null
     benefits?: NullableStringFieldUpdateOperationsInput | string | null
     basePriceKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    basePriceUsd?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     translations?: NullableStringFieldUpdateOperationsInput | string | null
     stockQuantity?: IntFieldUpdateOperationsInput | number
     minStockAlert?: IntFieldUpdateOperationsInput | number
@@ -33067,7 +32005,6 @@ export namespace Prisma {
     accordions?: NullableStringFieldUpdateOperationsInput | string | null
     benefits?: NullableStringFieldUpdateOperationsInput | string | null
     basePriceKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    basePriceUsd?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     translations?: NullableStringFieldUpdateOperationsInput | string | null
     stockQuantity?: IntFieldUpdateOperationsInput | number
     minStockAlert?: IntFieldUpdateOperationsInput | number
@@ -33088,7 +32025,6 @@ export namespace Prisma {
     accordions?: string | null
     benefits?: string | null
     basePriceKgs: Decimal | DecimalJsLike | number | string
-    basePriceUsd: Decimal | DecimalJsLike | number | string
     translations?: string | null
     stockQuantity?: number
     minStockAlert?: number
@@ -33105,7 +32041,6 @@ export namespace Prisma {
     accordions?: NullableStringFieldUpdateOperationsInput | string | null
     benefits?: NullableStringFieldUpdateOperationsInput | string | null
     basePriceKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    basePriceUsd?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     translations?: NullableStringFieldUpdateOperationsInput | string | null
     stockQuantity?: IntFieldUpdateOperationsInput | number
     minStockAlert?: IntFieldUpdateOperationsInput | number
@@ -33121,7 +32056,6 @@ export namespace Prisma {
     accordions?: NullableStringFieldUpdateOperationsInput | string | null
     benefits?: NullableStringFieldUpdateOperationsInput | string | null
     basePriceKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    basePriceUsd?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     translations?: NullableStringFieldUpdateOperationsInput | string | null
     stockQuantity?: IntFieldUpdateOperationsInput | number
     minStockAlert?: IntFieldUpdateOperationsInput | number
@@ -33183,7 +32117,6 @@ export namespace Prisma {
     orderType?: string
     status?: string
     totalKgs: Decimal | DecimalJsLike | number | string
-    totalUsd: Decimal | DecimalJsLike | number | string
     paymentMethod: string
     customerName?: string | null
     customerPhone?: string | null
@@ -33204,7 +32137,6 @@ export namespace Prisma {
     orderType?: string
     status?: string
     totalKgs: Decimal | DecimalJsLike | number | string
-    totalUsd: Decimal | DecimalJsLike | number | string
     paymentMethod: string
     customerName?: string | null
     customerPhone?: string | null
@@ -33223,7 +32155,6 @@ export namespace Prisma {
     orderType?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
     totalKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    totalUsd?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     paymentMethod?: StringFieldUpdateOperationsInput | string
     customerName?: NullableStringFieldUpdateOperationsInput | string | null
     customerPhone?: NullableStringFieldUpdateOperationsInput | string | null
@@ -33244,7 +32175,6 @@ export namespace Prisma {
     orderType?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
     totalKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    totalUsd?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     paymentMethod?: StringFieldUpdateOperationsInput | string
     customerName?: NullableStringFieldUpdateOperationsInput | string | null
     customerPhone?: NullableStringFieldUpdateOperationsInput | string | null
@@ -33264,7 +32194,6 @@ export namespace Prisma {
     orderType?: string
     status?: string
     totalKgs: Decimal | DecimalJsLike | number | string
-    totalUsd: Decimal | DecimalJsLike | number | string
     paymentMethod: string
     customerName?: string | null
     customerPhone?: string | null
@@ -33282,7 +32211,6 @@ export namespace Prisma {
     orderType?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
     totalKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    totalUsd?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     paymentMethod?: StringFieldUpdateOperationsInput | string
     customerName?: NullableStringFieldUpdateOperationsInput | string | null
     customerPhone?: NullableStringFieldUpdateOperationsInput | string | null
@@ -33301,7 +32229,6 @@ export namespace Prisma {
     orderType?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
     totalKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    totalUsd?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     paymentMethod?: StringFieldUpdateOperationsInput | string
     customerName?: NullableStringFieldUpdateOperationsInput | string | null
     customerPhone?: NullableStringFieldUpdateOperationsInput | string | null
@@ -33442,55 +32369,6 @@ export namespace Prisma {
     currency?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
-  export type ExchangeRateCreateInput = {
-    id?: string
-    currency?: string
-    rateToKgs: Decimal | DecimalJsLike | number | string
-    updatedAt?: Date | string
-  }
-
-  export type ExchangeRateUncheckedCreateInput = {
-    id?: string
-    currency?: string
-    rateToKgs: Decimal | DecimalJsLike | number | string
-    updatedAt?: Date | string
-  }
-
-  export type ExchangeRateUpdateInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    currency?: StringFieldUpdateOperationsInput | string
-    rateToKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
-  export type ExchangeRateUncheckedUpdateInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    currency?: StringFieldUpdateOperationsInput | string
-    rateToKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
-  export type ExchangeRateCreateManyInput = {
-    id?: string
-    currency?: string
-    rateToKgs: Decimal | DecimalJsLike | number | string
-    updatedAt?: Date | string
-  }
-
-  export type ExchangeRateUpdateManyMutationInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    currency?: StringFieldUpdateOperationsInput | string
-    rateToKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
-  export type ExchangeRateUncheckedUpdateManyInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    currency?: StringFieldUpdateOperationsInput | string
-    rateToKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type SystemConfigCreateInput = {
@@ -34728,7 +33606,6 @@ export namespace Prisma {
     lastProductName?: string | null
     lastProductImg?: string | null
     cartItems: string
-    cartTotalUsd: number
     cartTotalKgs: number
     status?: string
     lastActivityAt?: Date | string
@@ -34749,7 +33626,6 @@ export namespace Prisma {
     lastProductName?: string | null
     lastProductImg?: string | null
     cartItems: string
-    cartTotalUsd: number
     cartTotalKgs: number
     status?: string
     lastActivityAt?: Date | string
@@ -34768,7 +33644,6 @@ export namespace Prisma {
     lastProductName?: NullableStringFieldUpdateOperationsInput | string | null
     lastProductImg?: NullableStringFieldUpdateOperationsInput | string | null
     cartItems?: StringFieldUpdateOperationsInput | string
-    cartTotalUsd?: FloatFieldUpdateOperationsInput | number
     cartTotalKgs?: FloatFieldUpdateOperationsInput | number
     status?: StringFieldUpdateOperationsInput | string
     lastActivityAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -34789,7 +33664,6 @@ export namespace Prisma {
     lastProductName?: NullableStringFieldUpdateOperationsInput | string | null
     lastProductImg?: NullableStringFieldUpdateOperationsInput | string | null
     cartItems?: StringFieldUpdateOperationsInput | string
-    cartTotalUsd?: FloatFieldUpdateOperationsInput | number
     cartTotalKgs?: FloatFieldUpdateOperationsInput | number
     status?: StringFieldUpdateOperationsInput | string
     lastActivityAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -34809,7 +33683,6 @@ export namespace Prisma {
     lastProductName?: string | null
     lastProductImg?: string | null
     cartItems: string
-    cartTotalUsd: number
     cartTotalKgs: number
     status?: string
     lastActivityAt?: Date | string
@@ -34828,7 +33701,6 @@ export namespace Prisma {
     lastProductName?: NullableStringFieldUpdateOperationsInput | string | null
     lastProductImg?: NullableStringFieldUpdateOperationsInput | string | null
     cartItems?: StringFieldUpdateOperationsInput | string
-    cartTotalUsd?: FloatFieldUpdateOperationsInput | number
     cartTotalKgs?: FloatFieldUpdateOperationsInput | number
     status?: StringFieldUpdateOperationsInput | string
     lastActivityAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -34848,7 +33720,6 @@ export namespace Prisma {
     lastProductName?: NullableStringFieldUpdateOperationsInput | string | null
     lastProductImg?: NullableStringFieldUpdateOperationsInput | string | null
     cartItems?: StringFieldUpdateOperationsInput | string
-    cartTotalUsd?: FloatFieldUpdateOperationsInput | number
     cartTotalKgs?: FloatFieldUpdateOperationsInput | number
     status?: StringFieldUpdateOperationsInput | string
     lastActivityAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -35547,7 +34418,7 @@ export namespace Prisma {
     passwordHash?: SortOrder
     walletBalanceKgs?: SortOrder
     walletBalanceUsd?: SortOrder
-    cumulativeSpendUsd?: SortOrder
+    cumulativeSpendKgs?: SortOrder
     loyaltyLevel?: SortOrder
     dynamicDiscountRate?: SortOrder
     isMonthlyActive?: SortOrder
@@ -35560,7 +34431,7 @@ export namespace Prisma {
   export type UserAvgOrderByAggregateInput = {
     walletBalanceKgs?: SortOrder
     walletBalanceUsd?: SortOrder
-    cumulativeSpendUsd?: SortOrder
+    cumulativeSpendKgs?: SortOrder
     loyaltyLevel?: SortOrder
     dynamicDiscountRate?: SortOrder
   }
@@ -35576,7 +34447,7 @@ export namespace Prisma {
     passwordHash?: SortOrder
     walletBalanceKgs?: SortOrder
     walletBalanceUsd?: SortOrder
-    cumulativeSpendUsd?: SortOrder
+    cumulativeSpendKgs?: SortOrder
     loyaltyLevel?: SortOrder
     dynamicDiscountRate?: SortOrder
     isMonthlyActive?: SortOrder
@@ -35597,7 +34468,7 @@ export namespace Prisma {
     passwordHash?: SortOrder
     walletBalanceKgs?: SortOrder
     walletBalanceUsd?: SortOrder
-    cumulativeSpendUsd?: SortOrder
+    cumulativeSpendKgs?: SortOrder
     loyaltyLevel?: SortOrder
     dynamicDiscountRate?: SortOrder
     isMonthlyActive?: SortOrder
@@ -35610,7 +34481,7 @@ export namespace Prisma {
   export type UserSumOrderByAggregateInput = {
     walletBalanceKgs?: SortOrder
     walletBalanceUsd?: SortOrder
-    cumulativeSpendUsd?: SortOrder
+    cumulativeSpendKgs?: SortOrder
     loyaltyLevel?: SortOrder
     dynamicDiscountRate?: SortOrder
   }
@@ -35806,7 +34677,6 @@ export namespace Prisma {
     accordions?: SortOrder
     benefits?: SortOrder
     basePriceKgs?: SortOrder
-    basePriceUsd?: SortOrder
     translations?: SortOrder
     stockQuantity?: SortOrder
     minStockAlert?: SortOrder
@@ -35817,7 +34687,6 @@ export namespace Prisma {
 
   export type ProductAvgOrderByAggregateInput = {
     basePriceKgs?: SortOrder
-    basePriceUsd?: SortOrder
     stockQuantity?: SortOrder
     minStockAlert?: SortOrder
   }
@@ -35830,7 +34699,6 @@ export namespace Prisma {
     accordions?: SortOrder
     benefits?: SortOrder
     basePriceKgs?: SortOrder
-    basePriceUsd?: SortOrder
     translations?: SortOrder
     stockQuantity?: SortOrder
     minStockAlert?: SortOrder
@@ -35847,7 +34715,6 @@ export namespace Prisma {
     accordions?: SortOrder
     benefits?: SortOrder
     basePriceKgs?: SortOrder
-    basePriceUsd?: SortOrder
     translations?: SortOrder
     stockQuantity?: SortOrder
     minStockAlert?: SortOrder
@@ -35858,7 +34725,6 @@ export namespace Prisma {
 
   export type ProductSumOrderByAggregateInput = {
     basePriceKgs?: SortOrder
-    basePriceUsd?: SortOrder
     stockQuantity?: SortOrder
     minStockAlert?: SortOrder
   }
@@ -35908,7 +34774,6 @@ export namespace Prisma {
     orderType?: SortOrder
     status?: SortOrder
     totalKgs?: SortOrder
-    totalUsd?: SortOrder
     paymentMethod?: SortOrder
     customerName?: SortOrder
     customerPhone?: SortOrder
@@ -35923,7 +34788,6 @@ export namespace Prisma {
 
   export type OrderAvgOrderByAggregateInput = {
     totalKgs?: SortOrder
-    totalUsd?: SortOrder
   }
 
   export type OrderMaxOrderByAggregateInput = {
@@ -35932,7 +34796,6 @@ export namespace Prisma {
     orderType?: SortOrder
     status?: SortOrder
     totalKgs?: SortOrder
-    totalUsd?: SortOrder
     paymentMethod?: SortOrder
     customerName?: SortOrder
     customerPhone?: SortOrder
@@ -35951,7 +34814,6 @@ export namespace Prisma {
     orderType?: SortOrder
     status?: SortOrder
     totalKgs?: SortOrder
-    totalUsd?: SortOrder
     paymentMethod?: SortOrder
     customerName?: SortOrder
     customerPhone?: SortOrder
@@ -35966,7 +34828,6 @@ export namespace Prisma {
 
   export type OrderSumOrderByAggregateInput = {
     totalKgs?: SortOrder
-    totalUsd?: SortOrder
   }
 
   export type OrderRelationFilter = {
@@ -36049,35 +34910,6 @@ export namespace Prisma {
 
   export type TransactionSumOrderByAggregateInput = {
     amount?: SortOrder
-  }
-
-  export type ExchangeRateCountOrderByAggregateInput = {
-    id?: SortOrder
-    currency?: SortOrder
-    rateToKgs?: SortOrder
-    updatedAt?: SortOrder
-  }
-
-  export type ExchangeRateAvgOrderByAggregateInput = {
-    rateToKgs?: SortOrder
-  }
-
-  export type ExchangeRateMaxOrderByAggregateInput = {
-    id?: SortOrder
-    currency?: SortOrder
-    rateToKgs?: SortOrder
-    updatedAt?: SortOrder
-  }
-
-  export type ExchangeRateMinOrderByAggregateInput = {
-    id?: SortOrder
-    currency?: SortOrder
-    rateToKgs?: SortOrder
-    updatedAt?: SortOrder
-  }
-
-  export type ExchangeRateSumOrderByAggregateInput = {
-    rateToKgs?: SortOrder
   }
 
   export type SystemConfigCountOrderByAggregateInput = {
@@ -36741,7 +35573,6 @@ export namespace Prisma {
     lastProductName?: SortOrder
     lastProductImg?: SortOrder
     cartItems?: SortOrder
-    cartTotalUsd?: SortOrder
     cartTotalKgs?: SortOrder
     status?: SortOrder
     lastActivityAt?: SortOrder
@@ -36754,7 +35585,6 @@ export namespace Prisma {
   }
 
   export type CartAbandonmentAvgOrderByAggregateInput = {
-    cartTotalUsd?: SortOrder
     cartTotalKgs?: SortOrder
   }
 
@@ -36766,7 +35596,6 @@ export namespace Prisma {
     lastProductName?: SortOrder
     lastProductImg?: SortOrder
     cartItems?: SortOrder
-    cartTotalUsd?: SortOrder
     cartTotalKgs?: SortOrder
     status?: SortOrder
     lastActivityAt?: SortOrder
@@ -36786,7 +35615,6 @@ export namespace Prisma {
     lastProductName?: SortOrder
     lastProductImg?: SortOrder
     cartItems?: SortOrder
-    cartTotalUsd?: SortOrder
     cartTotalKgs?: SortOrder
     status?: SortOrder
     lastActivityAt?: SortOrder
@@ -36799,7 +35627,6 @@ export namespace Prisma {
   }
 
   export type CartAbandonmentSumOrderByAggregateInput = {
-    cartTotalUsd?: SortOrder
     cartTotalKgs?: SortOrder
   }
 
@@ -38661,7 +37488,7 @@ export namespace Prisma {
     passwordHash: string
     walletBalanceKgs?: Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: Decimal | DecimalJsLike | number | string
-    cumulativeSpendUsd?: Decimal | DecimalJsLike | number | string
+    cumulativeSpendKgs?: Decimal | DecimalJsLike | number | string
     loyaltyLevel?: number
     dynamicDiscountRate?: Decimal | DecimalJsLike | number | string
     isMonthlyActive?: boolean
@@ -38698,7 +37525,7 @@ export namespace Prisma {
     passwordHash: string
     walletBalanceKgs?: Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: Decimal | DecimalJsLike | number | string
-    cumulativeSpendUsd?: Decimal | DecimalJsLike | number | string
+    cumulativeSpendKgs?: Decimal | DecimalJsLike | number | string
     loyaltyLevel?: number
     dynamicDiscountRate?: Decimal | DecimalJsLike | number | string
     isMonthlyActive?: boolean
@@ -38738,7 +37565,7 @@ export namespace Prisma {
     passwordHash: string
     walletBalanceKgs?: Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: Decimal | DecimalJsLike | number | string
-    cumulativeSpendUsd?: Decimal | DecimalJsLike | number | string
+    cumulativeSpendKgs?: Decimal | DecimalJsLike | number | string
     loyaltyLevel?: number
     dynamicDiscountRate?: Decimal | DecimalJsLike | number | string
     isMonthlyActive?: boolean
@@ -38774,7 +37601,7 @@ export namespace Prisma {
     passwordHash: string
     walletBalanceKgs?: Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: Decimal | DecimalJsLike | number | string
-    cumulativeSpendUsd?: Decimal | DecimalJsLike | number | string
+    cumulativeSpendKgs?: Decimal | DecimalJsLike | number | string
     loyaltyLevel?: number
     dynamicDiscountRate?: Decimal | DecimalJsLike | number | string
     isMonthlyActive?: boolean
@@ -38815,7 +37642,6 @@ export namespace Prisma {
     orderType?: string
     status?: string
     totalKgs: Decimal | DecimalJsLike | number | string
-    totalUsd: Decimal | DecimalJsLike | number | string
     paymentMethod: string
     customerName?: string | null
     customerPhone?: string | null
@@ -38834,7 +37660,6 @@ export namespace Prisma {
     orderType?: string
     status?: string
     totalKgs: Decimal | DecimalJsLike | number | string
-    totalUsd: Decimal | DecimalJsLike | number | string
     paymentMethod: string
     customerName?: string | null
     customerPhone?: string | null
@@ -39083,7 +37908,6 @@ export namespace Prisma {
     lastProductName?: string | null
     lastProductImg?: string | null
     cartItems: string
-    cartTotalUsd: number
     cartTotalKgs: number
     status?: string
     lastActivityAt?: Date | string
@@ -39102,7 +37926,6 @@ export namespace Prisma {
     lastProductName?: string | null
     lastProductImg?: string | null
     cartItems: string
-    cartTotalUsd: number
     cartTotalKgs: number
     status?: string
     lastActivityAt?: Date | string
@@ -39375,7 +38198,7 @@ export namespace Prisma {
     passwordHash?: StringFieldUpdateOperationsInput | string
     walletBalanceKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    cumulativeSpendUsd?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    cumulativeSpendKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     loyaltyLevel?: IntFieldUpdateOperationsInput | number
     dynamicDiscountRate?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     isMonthlyActive?: BoolFieldUpdateOperationsInput | boolean
@@ -39412,7 +38235,7 @@ export namespace Prisma {
     passwordHash?: StringFieldUpdateOperationsInput | string
     walletBalanceKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    cumulativeSpendUsd?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    cumulativeSpendKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     loyaltyLevel?: IntFieldUpdateOperationsInput | number
     dynamicDiscountRate?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     isMonthlyActive?: BoolFieldUpdateOperationsInput | boolean
@@ -39467,7 +38290,7 @@ export namespace Prisma {
     passwordHash?: StringFilter<"User"> | string
     walletBalanceKgs?: DecimalFilter<"User"> | Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: DecimalFilter<"User"> | Decimal | DecimalJsLike | number | string
-    cumulativeSpendUsd?: DecimalFilter<"User"> | Decimal | DecimalJsLike | number | string
+    cumulativeSpendKgs?: DecimalFilter<"User"> | Decimal | DecimalJsLike | number | string
     loyaltyLevel?: IntFilter<"User"> | number
     dynamicDiscountRate?: DecimalFilter<"User"> | Decimal | DecimalJsLike | number | string
     isMonthlyActive?: BoolFilter<"User"> | boolean
@@ -39502,7 +38325,6 @@ export namespace Prisma {
     orderType?: StringFilter<"Order"> | string
     status?: StringFilter<"Order"> | string
     totalKgs?: DecimalFilter<"Order"> | Decimal | DecimalJsLike | number | string
-    totalUsd?: DecimalFilter<"Order"> | Decimal | DecimalJsLike | number | string
     paymentMethod?: StringFilter<"Order"> | string
     customerName?: StringNullableFilter<"Order"> | string | null
     customerPhone?: StringNullableFilter<"Order"> | string | null
@@ -39756,7 +38578,6 @@ export namespace Prisma {
     lastProductName?: StringNullableFilter<"CartAbandonment"> | string | null
     lastProductImg?: StringNullableFilter<"CartAbandonment"> | string | null
     cartItems?: StringFilter<"CartAbandonment"> | string
-    cartTotalUsd?: FloatFilter<"CartAbandonment"> | number
     cartTotalKgs?: FloatFilter<"CartAbandonment"> | number
     status?: StringFilter<"CartAbandonment"> | string
     lastActivityAt?: DateTimeFilter<"CartAbandonment"> | Date | string
@@ -39951,7 +38772,7 @@ export namespace Prisma {
     passwordHash: string
     walletBalanceKgs?: Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: Decimal | DecimalJsLike | number | string
-    cumulativeSpendUsd?: Decimal | DecimalJsLike | number | string
+    cumulativeSpendKgs?: Decimal | DecimalJsLike | number | string
     loyaltyLevel?: number
     dynamicDiscountRate?: Decimal | DecimalJsLike | number | string
     isMonthlyActive?: boolean
@@ -39988,7 +38809,7 @@ export namespace Prisma {
     passwordHash: string
     walletBalanceKgs?: Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: Decimal | DecimalJsLike | number | string
-    cumulativeSpendUsd?: Decimal | DecimalJsLike | number | string
+    cumulativeSpendKgs?: Decimal | DecimalJsLike | number | string
     loyaltyLevel?: number
     dynamicDiscountRate?: Decimal | DecimalJsLike | number | string
     isMonthlyActive?: boolean
@@ -40039,7 +38860,7 @@ export namespace Prisma {
     passwordHash?: StringFieldUpdateOperationsInput | string
     walletBalanceKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    cumulativeSpendUsd?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    cumulativeSpendKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     loyaltyLevel?: IntFieldUpdateOperationsInput | number
     dynamicDiscountRate?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     isMonthlyActive?: BoolFieldUpdateOperationsInput | boolean
@@ -40076,7 +38897,7 @@ export namespace Prisma {
     passwordHash?: StringFieldUpdateOperationsInput | string
     walletBalanceKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    cumulativeSpendUsd?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    cumulativeSpendKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     loyaltyLevel?: IntFieldUpdateOperationsInput | number
     dynamicDiscountRate?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     isMonthlyActive?: BoolFieldUpdateOperationsInput | boolean
@@ -40369,7 +39190,6 @@ export namespace Prisma {
     accordions?: string | null
     benefits?: string | null
     basePriceKgs: Decimal | DecimalJsLike | number | string
-    basePriceUsd: Decimal | DecimalJsLike | number | string
     translations?: string | null
     stockQuantity?: number
     minStockAlert?: number
@@ -40389,7 +39209,6 @@ export namespace Prisma {
     accordions?: string | null
     benefits?: string | null
     basePriceKgs: Decimal | DecimalJsLike | number | string
-    basePriceUsd: Decimal | DecimalJsLike | number | string
     translations?: string | null
     stockQuantity?: number
     minStockAlert?: number
@@ -40425,7 +39244,6 @@ export namespace Prisma {
     accordions?: NullableStringFieldUpdateOperationsInput | string | null
     benefits?: NullableStringFieldUpdateOperationsInput | string | null
     basePriceKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    basePriceUsd?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     translations?: NullableStringFieldUpdateOperationsInput | string | null
     stockQuantity?: IntFieldUpdateOperationsInput | number
     minStockAlert?: IntFieldUpdateOperationsInput | number
@@ -40445,7 +39263,6 @@ export namespace Prisma {
     accordions?: NullableStringFieldUpdateOperationsInput | string | null
     benefits?: NullableStringFieldUpdateOperationsInput | string | null
     basePriceKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    basePriceUsd?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     translations?: NullableStringFieldUpdateOperationsInput | string | null
     stockQuantity?: IntFieldUpdateOperationsInput | number
     minStockAlert?: IntFieldUpdateOperationsInput | number
@@ -40467,7 +39284,7 @@ export namespace Prisma {
     passwordHash: string
     walletBalanceKgs?: Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: Decimal | DecimalJsLike | number | string
-    cumulativeSpendUsd?: Decimal | DecimalJsLike | number | string
+    cumulativeSpendKgs?: Decimal | DecimalJsLike | number | string
     loyaltyLevel?: number
     dynamicDiscountRate?: Decimal | DecimalJsLike | number | string
     isMonthlyActive?: boolean
@@ -40504,7 +39321,7 @@ export namespace Prisma {
     passwordHash: string
     walletBalanceKgs?: Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: Decimal | DecimalJsLike | number | string
-    cumulativeSpendUsd?: Decimal | DecimalJsLike | number | string
+    cumulativeSpendKgs?: Decimal | DecimalJsLike | number | string
     loyaltyLevel?: number
     dynamicDiscountRate?: Decimal | DecimalJsLike | number | string
     isMonthlyActive?: boolean
@@ -40581,7 +39398,7 @@ export namespace Prisma {
     passwordHash?: StringFieldUpdateOperationsInput | string
     walletBalanceKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    cumulativeSpendUsd?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    cumulativeSpendKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     loyaltyLevel?: IntFieldUpdateOperationsInput | number
     dynamicDiscountRate?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     isMonthlyActive?: BoolFieldUpdateOperationsInput | boolean
@@ -40618,7 +39435,7 @@ export namespace Prisma {
     passwordHash?: StringFieldUpdateOperationsInput | string
     walletBalanceKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    cumulativeSpendUsd?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    cumulativeSpendKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     loyaltyLevel?: IntFieldUpdateOperationsInput | number
     dynamicDiscountRate?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     isMonthlyActive?: BoolFieldUpdateOperationsInput | boolean
@@ -40664,7 +39481,6 @@ export namespace Prisma {
     orderType?: string
     status?: string
     totalKgs: Decimal | DecimalJsLike | number | string
-    totalUsd: Decimal | DecimalJsLike | number | string
     paymentMethod: string
     customerName?: string | null
     customerPhone?: string | null
@@ -40684,7 +39500,6 @@ export namespace Prisma {
     orderType?: string
     status?: string
     totalKgs: Decimal | DecimalJsLike | number | string
-    totalUsd: Decimal | DecimalJsLike | number | string
     paymentMethod: string
     customerName?: string | null
     customerPhone?: string | null
@@ -40710,7 +39525,6 @@ export namespace Prisma {
     accordions?: string | null
     benefits?: string | null
     basePriceKgs: Decimal | DecimalJsLike | number | string
-    basePriceUsd: Decimal | DecimalJsLike | number | string
     translations?: string | null
     stockQuantity?: number
     minStockAlert?: number
@@ -40730,7 +39544,6 @@ export namespace Prisma {
     accordions?: string | null
     benefits?: string | null
     basePriceKgs: Decimal | DecimalJsLike | number | string
-    basePriceUsd: Decimal | DecimalJsLike | number | string
     translations?: string | null
     stockQuantity?: number
     minStockAlert?: number
@@ -40763,7 +39576,6 @@ export namespace Prisma {
     orderType?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
     totalKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    totalUsd?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     paymentMethod?: StringFieldUpdateOperationsInput | string
     customerName?: NullableStringFieldUpdateOperationsInput | string | null
     customerPhone?: NullableStringFieldUpdateOperationsInput | string | null
@@ -40783,7 +39595,6 @@ export namespace Prisma {
     orderType?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
     totalKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    totalUsd?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     paymentMethod?: StringFieldUpdateOperationsInput | string
     customerName?: NullableStringFieldUpdateOperationsInput | string | null
     customerPhone?: NullableStringFieldUpdateOperationsInput | string | null
@@ -40815,7 +39626,6 @@ export namespace Prisma {
     accordions?: NullableStringFieldUpdateOperationsInput | string | null
     benefits?: NullableStringFieldUpdateOperationsInput | string | null
     basePriceKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    basePriceUsd?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     translations?: NullableStringFieldUpdateOperationsInput | string | null
     stockQuantity?: IntFieldUpdateOperationsInput | number
     minStockAlert?: IntFieldUpdateOperationsInput | number
@@ -40835,7 +39645,6 @@ export namespace Prisma {
     accordions?: NullableStringFieldUpdateOperationsInput | string | null
     benefits?: NullableStringFieldUpdateOperationsInput | string | null
     basePriceKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    basePriceUsd?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     translations?: NullableStringFieldUpdateOperationsInput | string | null
     stockQuantity?: IntFieldUpdateOperationsInput | number
     minStockAlert?: IntFieldUpdateOperationsInput | number
@@ -40857,7 +39666,7 @@ export namespace Prisma {
     passwordHash: string
     walletBalanceKgs?: Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: Decimal | DecimalJsLike | number | string
-    cumulativeSpendUsd?: Decimal | DecimalJsLike | number | string
+    cumulativeSpendKgs?: Decimal | DecimalJsLike | number | string
     loyaltyLevel?: number
     dynamicDiscountRate?: Decimal | DecimalJsLike | number | string
     isMonthlyActive?: boolean
@@ -40894,7 +39703,7 @@ export namespace Prisma {
     passwordHash: string
     walletBalanceKgs?: Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: Decimal | DecimalJsLike | number | string
-    cumulativeSpendUsd?: Decimal | DecimalJsLike | number | string
+    cumulativeSpendKgs?: Decimal | DecimalJsLike | number | string
     loyaltyLevel?: number
     dynamicDiscountRate?: Decimal | DecimalJsLike | number | string
     isMonthlyActive?: boolean
@@ -40945,7 +39754,7 @@ export namespace Prisma {
     passwordHash?: StringFieldUpdateOperationsInput | string
     walletBalanceKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    cumulativeSpendUsd?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    cumulativeSpendKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     loyaltyLevel?: IntFieldUpdateOperationsInput | number
     dynamicDiscountRate?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     isMonthlyActive?: BoolFieldUpdateOperationsInput | boolean
@@ -40982,7 +39791,7 @@ export namespace Prisma {
     passwordHash?: StringFieldUpdateOperationsInput | string
     walletBalanceKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    cumulativeSpendUsd?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    cumulativeSpendKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     loyaltyLevel?: IntFieldUpdateOperationsInput | number
     dynamicDiscountRate?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     isMonthlyActive?: BoolFieldUpdateOperationsInput | boolean
@@ -41059,7 +39868,7 @@ export namespace Prisma {
     passwordHash: string
     walletBalanceKgs?: Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: Decimal | DecimalJsLike | number | string
-    cumulativeSpendUsd?: Decimal | DecimalJsLike | number | string
+    cumulativeSpendKgs?: Decimal | DecimalJsLike | number | string
     loyaltyLevel?: number
     dynamicDiscountRate?: Decimal | DecimalJsLike | number | string
     isMonthlyActive?: boolean
@@ -41096,7 +39905,7 @@ export namespace Prisma {
     passwordHash: string
     walletBalanceKgs?: Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: Decimal | DecimalJsLike | number | string
-    cumulativeSpendUsd?: Decimal | DecimalJsLike | number | string
+    cumulativeSpendKgs?: Decimal | DecimalJsLike | number | string
     loyaltyLevel?: number
     dynamicDiscountRate?: Decimal | DecimalJsLike | number | string
     isMonthlyActive?: boolean
@@ -41170,7 +39979,7 @@ export namespace Prisma {
     passwordHash?: StringFieldUpdateOperationsInput | string
     walletBalanceKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    cumulativeSpendUsd?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    cumulativeSpendKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     loyaltyLevel?: IntFieldUpdateOperationsInput | number
     dynamicDiscountRate?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     isMonthlyActive?: BoolFieldUpdateOperationsInput | boolean
@@ -41207,7 +40016,7 @@ export namespace Prisma {
     passwordHash?: StringFieldUpdateOperationsInput | string
     walletBalanceKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    cumulativeSpendUsd?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    cumulativeSpendKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     loyaltyLevel?: IntFieldUpdateOperationsInput | number
     dynamicDiscountRate?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     isMonthlyActive?: BoolFieldUpdateOperationsInput | boolean
@@ -41269,7 +40078,6 @@ export namespace Prisma {
     accordions?: string | null
     benefits?: string | null
     basePriceKgs: Decimal | DecimalJsLike | number | string
-    basePriceUsd: Decimal | DecimalJsLike | number | string
     translations?: string | null
     stockQuantity?: number
     minStockAlert?: number
@@ -41289,7 +40097,6 @@ export namespace Prisma {
     accordions?: string | null
     benefits?: string | null
     basePriceKgs: Decimal | DecimalJsLike | number | string
-    basePriceUsd: Decimal | DecimalJsLike | number | string
     translations?: string | null
     stockQuantity?: number
     minStockAlert?: number
@@ -41338,7 +40145,6 @@ export namespace Prisma {
     accordions?: StringNullableFilter<"Product"> | string | null
     benefits?: StringNullableFilter<"Product"> | string | null
     basePriceKgs?: DecimalFilter<"Product"> | Decimal | DecimalJsLike | number | string
-    basePriceUsd?: DecimalFilter<"Product"> | Decimal | DecimalJsLike | number | string
     translations?: StringNullableFilter<"Product"> | string | null
     stockQuantity?: IntFilter<"Product"> | number
     minStockAlert?: IntFilter<"Product"> | number
@@ -41355,7 +40161,6 @@ export namespace Prisma {
     accordions?: string | null
     benefits?: string | null
     basePriceKgs: Decimal | DecimalJsLike | number | string
-    basePriceUsd: Decimal | DecimalJsLike | number | string
     translations?: string | null
     stockQuantity?: number
     minStockAlert?: number
@@ -41375,7 +40180,6 @@ export namespace Prisma {
     accordions?: string | null
     benefits?: string | null
     basePriceKgs: Decimal | DecimalJsLike | number | string
-    basePriceUsd: Decimal | DecimalJsLike | number | string
     translations?: string | null
     stockQuantity?: number
     minStockAlert?: number
@@ -41411,7 +40215,6 @@ export namespace Prisma {
     accordions?: NullableStringFieldUpdateOperationsInput | string | null
     benefits?: NullableStringFieldUpdateOperationsInput | string | null
     basePriceKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    basePriceUsd?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     translations?: NullableStringFieldUpdateOperationsInput | string | null
     stockQuantity?: IntFieldUpdateOperationsInput | number
     minStockAlert?: IntFieldUpdateOperationsInput | number
@@ -41431,7 +40234,6 @@ export namespace Prisma {
     accordions?: NullableStringFieldUpdateOperationsInput | string | null
     benefits?: NullableStringFieldUpdateOperationsInput | string | null
     basePriceKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    basePriceUsd?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     translations?: NullableStringFieldUpdateOperationsInput | string | null
     stockQuantity?: IntFieldUpdateOperationsInput | number
     minStockAlert?: IntFieldUpdateOperationsInput | number
@@ -41551,7 +40353,6 @@ export namespace Prisma {
     accordions?: string | null
     benefits?: string | null
     basePriceKgs: Decimal | DecimalJsLike | number | string
-    basePriceUsd: Decimal | DecimalJsLike | number | string
     translations?: string | null
     stockQuantity?: number
     minStockAlert?: number
@@ -41571,7 +40372,6 @@ export namespace Prisma {
     accordions?: string | null
     benefits?: string | null
     basePriceKgs: Decimal | DecimalJsLike | number | string
-    basePriceUsd: Decimal | DecimalJsLike | number | string
     translations?: string | null
     stockQuantity?: number
     minStockAlert?: number
@@ -41598,7 +40398,7 @@ export namespace Prisma {
     passwordHash: string
     walletBalanceKgs?: Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: Decimal | DecimalJsLike | number | string
-    cumulativeSpendUsd?: Decimal | DecimalJsLike | number | string
+    cumulativeSpendKgs?: Decimal | DecimalJsLike | number | string
     loyaltyLevel?: number
     dynamicDiscountRate?: Decimal | DecimalJsLike | number | string
     isMonthlyActive?: boolean
@@ -41635,7 +40435,7 @@ export namespace Prisma {
     passwordHash: string
     walletBalanceKgs?: Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: Decimal | DecimalJsLike | number | string
-    cumulativeSpendUsd?: Decimal | DecimalJsLike | number | string
+    cumulativeSpendKgs?: Decimal | DecimalJsLike | number | string
     loyaltyLevel?: number
     dynamicDiscountRate?: Decimal | DecimalJsLike | number | string
     isMonthlyActive?: boolean
@@ -41684,7 +40484,6 @@ export namespace Prisma {
     accordions?: NullableStringFieldUpdateOperationsInput | string | null
     benefits?: NullableStringFieldUpdateOperationsInput | string | null
     basePriceKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    basePriceUsd?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     translations?: NullableStringFieldUpdateOperationsInput | string | null
     stockQuantity?: IntFieldUpdateOperationsInput | number
     minStockAlert?: IntFieldUpdateOperationsInput | number
@@ -41704,7 +40503,6 @@ export namespace Prisma {
     accordions?: NullableStringFieldUpdateOperationsInput | string | null
     benefits?: NullableStringFieldUpdateOperationsInput | string | null
     basePriceKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    basePriceUsd?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     translations?: NullableStringFieldUpdateOperationsInput | string | null
     stockQuantity?: IntFieldUpdateOperationsInput | number
     minStockAlert?: IntFieldUpdateOperationsInput | number
@@ -41737,7 +40535,7 @@ export namespace Prisma {
     passwordHash?: StringFieldUpdateOperationsInput | string
     walletBalanceKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    cumulativeSpendUsd?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    cumulativeSpendKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     loyaltyLevel?: IntFieldUpdateOperationsInput | number
     dynamicDiscountRate?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     isMonthlyActive?: BoolFieldUpdateOperationsInput | boolean
@@ -41774,7 +40572,7 @@ export namespace Prisma {
     passwordHash?: StringFieldUpdateOperationsInput | string
     walletBalanceKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    cumulativeSpendUsd?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    cumulativeSpendKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     loyaltyLevel?: IntFieldUpdateOperationsInput | number
     dynamicDiscountRate?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     isMonthlyActive?: BoolFieldUpdateOperationsInput | boolean
@@ -41809,7 +40607,7 @@ export namespace Prisma {
     passwordHash: string
     walletBalanceKgs?: Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: Decimal | DecimalJsLike | number | string
-    cumulativeSpendUsd?: Decimal | DecimalJsLike | number | string
+    cumulativeSpendKgs?: Decimal | DecimalJsLike | number | string
     loyaltyLevel?: number
     dynamicDiscountRate?: Decimal | DecimalJsLike | number | string
     isMonthlyActive?: boolean
@@ -41846,7 +40644,7 @@ export namespace Prisma {
     passwordHash: string
     walletBalanceKgs?: Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: Decimal | DecimalJsLike | number | string
-    cumulativeSpendUsd?: Decimal | DecimalJsLike | number | string
+    cumulativeSpendKgs?: Decimal | DecimalJsLike | number | string
     loyaltyLevel?: number
     dynamicDiscountRate?: Decimal | DecimalJsLike | number | string
     isMonthlyActive?: boolean
@@ -41897,7 +40695,7 @@ export namespace Prisma {
     passwordHash?: StringFieldUpdateOperationsInput | string
     walletBalanceKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    cumulativeSpendUsd?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    cumulativeSpendKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     loyaltyLevel?: IntFieldUpdateOperationsInput | number
     dynamicDiscountRate?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     isMonthlyActive?: BoolFieldUpdateOperationsInput | boolean
@@ -41934,7 +40732,7 @@ export namespace Prisma {
     passwordHash?: StringFieldUpdateOperationsInput | string
     walletBalanceKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    cumulativeSpendUsd?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    cumulativeSpendKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     loyaltyLevel?: IntFieldUpdateOperationsInput | number
     dynamicDiscountRate?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     isMonthlyActive?: BoolFieldUpdateOperationsInput | boolean
@@ -41969,7 +40767,7 @@ export namespace Prisma {
     passwordHash: string
     walletBalanceKgs?: Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: Decimal | DecimalJsLike | number | string
-    cumulativeSpendUsd?: Decimal | DecimalJsLike | number | string
+    cumulativeSpendKgs?: Decimal | DecimalJsLike | number | string
     loyaltyLevel?: number
     dynamicDiscountRate?: Decimal | DecimalJsLike | number | string
     isMonthlyActive?: boolean
@@ -42006,7 +40804,7 @@ export namespace Prisma {
     passwordHash: string
     walletBalanceKgs?: Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: Decimal | DecimalJsLike | number | string
-    cumulativeSpendUsd?: Decimal | DecimalJsLike | number | string
+    cumulativeSpendKgs?: Decimal | DecimalJsLike | number | string
     loyaltyLevel?: number
     dynamicDiscountRate?: Decimal | DecimalJsLike | number | string
     isMonthlyActive?: boolean
@@ -42057,7 +40855,7 @@ export namespace Prisma {
     passwordHash?: StringFieldUpdateOperationsInput | string
     walletBalanceKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    cumulativeSpendUsd?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    cumulativeSpendKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     loyaltyLevel?: IntFieldUpdateOperationsInput | number
     dynamicDiscountRate?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     isMonthlyActive?: BoolFieldUpdateOperationsInput | boolean
@@ -42094,7 +40892,7 @@ export namespace Prisma {
     passwordHash?: StringFieldUpdateOperationsInput | string
     walletBalanceKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    cumulativeSpendUsd?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    cumulativeSpendKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     loyaltyLevel?: IntFieldUpdateOperationsInput | number
     dynamicDiscountRate?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     isMonthlyActive?: BoolFieldUpdateOperationsInput | boolean
@@ -42129,7 +40927,7 @@ export namespace Prisma {
     passwordHash: string
     walletBalanceKgs?: Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: Decimal | DecimalJsLike | number | string
-    cumulativeSpendUsd?: Decimal | DecimalJsLike | number | string
+    cumulativeSpendKgs?: Decimal | DecimalJsLike | number | string
     loyaltyLevel?: number
     dynamicDiscountRate?: Decimal | DecimalJsLike | number | string
     isMonthlyActive?: boolean
@@ -42166,7 +40964,7 @@ export namespace Prisma {
     passwordHash: string
     walletBalanceKgs?: Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: Decimal | DecimalJsLike | number | string
-    cumulativeSpendUsd?: Decimal | DecimalJsLike | number | string
+    cumulativeSpendKgs?: Decimal | DecimalJsLike | number | string
     loyaltyLevel?: number
     dynamicDiscountRate?: Decimal | DecimalJsLike | number | string
     isMonthlyActive?: boolean
@@ -42217,7 +41015,7 @@ export namespace Prisma {
     passwordHash?: StringFieldUpdateOperationsInput | string
     walletBalanceKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    cumulativeSpendUsd?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    cumulativeSpendKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     loyaltyLevel?: IntFieldUpdateOperationsInput | number
     dynamicDiscountRate?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     isMonthlyActive?: BoolFieldUpdateOperationsInput | boolean
@@ -42254,7 +41052,7 @@ export namespace Prisma {
     passwordHash?: StringFieldUpdateOperationsInput | string
     walletBalanceKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    cumulativeSpendUsd?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    cumulativeSpendKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     loyaltyLevel?: IntFieldUpdateOperationsInput | number
     dynamicDiscountRate?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     isMonthlyActive?: BoolFieldUpdateOperationsInput | boolean
@@ -42289,7 +41087,7 @@ export namespace Prisma {
     passwordHash: string
     walletBalanceKgs?: Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: Decimal | DecimalJsLike | number | string
-    cumulativeSpendUsd?: Decimal | DecimalJsLike | number | string
+    cumulativeSpendKgs?: Decimal | DecimalJsLike | number | string
     loyaltyLevel?: number
     dynamicDiscountRate?: Decimal | DecimalJsLike | number | string
     isMonthlyActive?: boolean
@@ -42326,7 +41124,7 @@ export namespace Prisma {
     passwordHash: string
     walletBalanceKgs?: Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: Decimal | DecimalJsLike | number | string
-    cumulativeSpendUsd?: Decimal | DecimalJsLike | number | string
+    cumulativeSpendKgs?: Decimal | DecimalJsLike | number | string
     loyaltyLevel?: number
     dynamicDiscountRate?: Decimal | DecimalJsLike | number | string
     isMonthlyActive?: boolean
@@ -42377,7 +41175,7 @@ export namespace Prisma {
     passwordHash?: StringFieldUpdateOperationsInput | string
     walletBalanceKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    cumulativeSpendUsd?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    cumulativeSpendKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     loyaltyLevel?: IntFieldUpdateOperationsInput | number
     dynamicDiscountRate?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     isMonthlyActive?: BoolFieldUpdateOperationsInput | boolean
@@ -42414,7 +41212,7 @@ export namespace Prisma {
     passwordHash?: StringFieldUpdateOperationsInput | string
     walletBalanceKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    cumulativeSpendUsd?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    cumulativeSpendKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     loyaltyLevel?: IntFieldUpdateOperationsInput | number
     dynamicDiscountRate?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     isMonthlyActive?: BoolFieldUpdateOperationsInput | boolean
@@ -42449,7 +41247,7 @@ export namespace Prisma {
     passwordHash: string
     walletBalanceKgs?: Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: Decimal | DecimalJsLike | number | string
-    cumulativeSpendUsd?: Decimal | DecimalJsLike | number | string
+    cumulativeSpendKgs?: Decimal | DecimalJsLike | number | string
     loyaltyLevel?: number
     dynamicDiscountRate?: Decimal | DecimalJsLike | number | string
     isMonthlyActive?: boolean
@@ -42486,7 +41284,7 @@ export namespace Prisma {
     passwordHash: string
     walletBalanceKgs?: Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: Decimal | DecimalJsLike | number | string
-    cumulativeSpendUsd?: Decimal | DecimalJsLike | number | string
+    cumulativeSpendKgs?: Decimal | DecimalJsLike | number | string
     loyaltyLevel?: number
     dynamicDiscountRate?: Decimal | DecimalJsLike | number | string
     isMonthlyActive?: boolean
@@ -42526,7 +41324,7 @@ export namespace Prisma {
     passwordHash: string
     walletBalanceKgs?: Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: Decimal | DecimalJsLike | number | string
-    cumulativeSpendUsd?: Decimal | DecimalJsLike | number | string
+    cumulativeSpendKgs?: Decimal | DecimalJsLike | number | string
     loyaltyLevel?: number
     dynamicDiscountRate?: Decimal | DecimalJsLike | number | string
     isMonthlyActive?: boolean
@@ -42563,7 +41361,7 @@ export namespace Prisma {
     passwordHash: string
     walletBalanceKgs?: Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: Decimal | DecimalJsLike | number | string
-    cumulativeSpendUsd?: Decimal | DecimalJsLike | number | string
+    cumulativeSpendKgs?: Decimal | DecimalJsLike | number | string
     loyaltyLevel?: number
     dynamicDiscountRate?: Decimal | DecimalJsLike | number | string
     isMonthlyActive?: boolean
@@ -42614,7 +41412,7 @@ export namespace Prisma {
     passwordHash?: StringFieldUpdateOperationsInput | string
     walletBalanceKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    cumulativeSpendUsd?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    cumulativeSpendKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     loyaltyLevel?: IntFieldUpdateOperationsInput | number
     dynamicDiscountRate?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     isMonthlyActive?: BoolFieldUpdateOperationsInput | boolean
@@ -42651,7 +41449,7 @@ export namespace Prisma {
     passwordHash?: StringFieldUpdateOperationsInput | string
     walletBalanceKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    cumulativeSpendUsd?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    cumulativeSpendKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     loyaltyLevel?: IntFieldUpdateOperationsInput | number
     dynamicDiscountRate?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     isMonthlyActive?: BoolFieldUpdateOperationsInput | boolean
@@ -42697,7 +41495,7 @@ export namespace Prisma {
     passwordHash?: StringFieldUpdateOperationsInput | string
     walletBalanceKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    cumulativeSpendUsd?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    cumulativeSpendKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     loyaltyLevel?: IntFieldUpdateOperationsInput | number
     dynamicDiscountRate?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     isMonthlyActive?: BoolFieldUpdateOperationsInput | boolean
@@ -42734,7 +41532,7 @@ export namespace Prisma {
     passwordHash?: StringFieldUpdateOperationsInput | string
     walletBalanceKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    cumulativeSpendUsd?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    cumulativeSpendKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     loyaltyLevel?: IntFieldUpdateOperationsInput | number
     dynamicDiscountRate?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     isMonthlyActive?: BoolFieldUpdateOperationsInput | boolean
@@ -42769,7 +41567,7 @@ export namespace Prisma {
     passwordHash: string
     walletBalanceKgs?: Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: Decimal | DecimalJsLike | number | string
-    cumulativeSpendUsd?: Decimal | DecimalJsLike | number | string
+    cumulativeSpendKgs?: Decimal | DecimalJsLike | number | string
     loyaltyLevel?: number
     dynamicDiscountRate?: Decimal | DecimalJsLike | number | string
     isMonthlyActive?: boolean
@@ -42806,7 +41604,7 @@ export namespace Prisma {
     passwordHash: string
     walletBalanceKgs?: Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: Decimal | DecimalJsLike | number | string
-    cumulativeSpendUsd?: Decimal | DecimalJsLike | number | string
+    cumulativeSpendKgs?: Decimal | DecimalJsLike | number | string
     loyaltyLevel?: number
     dynamicDiscountRate?: Decimal | DecimalJsLike | number | string
     isMonthlyActive?: boolean
@@ -42857,7 +41655,7 @@ export namespace Prisma {
     passwordHash?: StringFieldUpdateOperationsInput | string
     walletBalanceKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    cumulativeSpendUsd?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    cumulativeSpendKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     loyaltyLevel?: IntFieldUpdateOperationsInput | number
     dynamicDiscountRate?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     isMonthlyActive?: BoolFieldUpdateOperationsInput | boolean
@@ -42894,7 +41692,7 @@ export namespace Prisma {
     passwordHash?: StringFieldUpdateOperationsInput | string
     walletBalanceKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    cumulativeSpendUsd?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    cumulativeSpendKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     loyaltyLevel?: IntFieldUpdateOperationsInput | number
     dynamicDiscountRate?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     isMonthlyActive?: BoolFieldUpdateOperationsInput | boolean
@@ -42929,7 +41727,7 @@ export namespace Prisma {
     passwordHash: string
     walletBalanceKgs?: Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: Decimal | DecimalJsLike | number | string
-    cumulativeSpendUsd?: Decimal | DecimalJsLike | number | string
+    cumulativeSpendKgs?: Decimal | DecimalJsLike | number | string
     loyaltyLevel?: number
     dynamicDiscountRate?: Decimal | DecimalJsLike | number | string
     isMonthlyActive?: boolean
@@ -42966,7 +41764,7 @@ export namespace Prisma {
     passwordHash: string
     walletBalanceKgs?: Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: Decimal | DecimalJsLike | number | string
-    cumulativeSpendUsd?: Decimal | DecimalJsLike | number | string
+    cumulativeSpendKgs?: Decimal | DecimalJsLike | number | string
     loyaltyLevel?: number
     dynamicDiscountRate?: Decimal | DecimalJsLike | number | string
     isMonthlyActive?: boolean
@@ -43006,7 +41804,7 @@ export namespace Prisma {
     passwordHash: string
     walletBalanceKgs?: Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: Decimal | DecimalJsLike | number | string
-    cumulativeSpendUsd?: Decimal | DecimalJsLike | number | string
+    cumulativeSpendKgs?: Decimal | DecimalJsLike | number | string
     loyaltyLevel?: number
     dynamicDiscountRate?: Decimal | DecimalJsLike | number | string
     isMonthlyActive?: boolean
@@ -43043,7 +41841,7 @@ export namespace Prisma {
     passwordHash: string
     walletBalanceKgs?: Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: Decimal | DecimalJsLike | number | string
-    cumulativeSpendUsd?: Decimal | DecimalJsLike | number | string
+    cumulativeSpendKgs?: Decimal | DecimalJsLike | number | string
     loyaltyLevel?: number
     dynamicDiscountRate?: Decimal | DecimalJsLike | number | string
     isMonthlyActive?: boolean
@@ -43094,7 +41892,7 @@ export namespace Prisma {
     passwordHash?: StringFieldUpdateOperationsInput | string
     walletBalanceKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    cumulativeSpendUsd?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    cumulativeSpendKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     loyaltyLevel?: IntFieldUpdateOperationsInput | number
     dynamicDiscountRate?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     isMonthlyActive?: BoolFieldUpdateOperationsInput | boolean
@@ -43131,7 +41929,7 @@ export namespace Prisma {
     passwordHash?: StringFieldUpdateOperationsInput | string
     walletBalanceKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    cumulativeSpendUsd?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    cumulativeSpendKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     loyaltyLevel?: IntFieldUpdateOperationsInput | number
     dynamicDiscountRate?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     isMonthlyActive?: BoolFieldUpdateOperationsInput | boolean
@@ -43177,7 +41975,7 @@ export namespace Prisma {
     passwordHash?: StringFieldUpdateOperationsInput | string
     walletBalanceKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    cumulativeSpendUsd?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    cumulativeSpendKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     loyaltyLevel?: IntFieldUpdateOperationsInput | number
     dynamicDiscountRate?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     isMonthlyActive?: BoolFieldUpdateOperationsInput | boolean
@@ -43214,7 +42012,7 @@ export namespace Prisma {
     passwordHash?: StringFieldUpdateOperationsInput | string
     walletBalanceKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    cumulativeSpendUsd?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    cumulativeSpendKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     loyaltyLevel?: IntFieldUpdateOperationsInput | number
     dynamicDiscountRate?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     isMonthlyActive?: BoolFieldUpdateOperationsInput | boolean
@@ -43249,7 +42047,7 @@ export namespace Prisma {
     passwordHash: string
     walletBalanceKgs?: Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: Decimal | DecimalJsLike | number | string
-    cumulativeSpendUsd?: Decimal | DecimalJsLike | number | string
+    cumulativeSpendKgs?: Decimal | DecimalJsLike | number | string
     loyaltyLevel?: number
     dynamicDiscountRate?: Decimal | DecimalJsLike | number | string
     isMonthlyActive?: boolean
@@ -43286,7 +42084,7 @@ export namespace Prisma {
     passwordHash: string
     walletBalanceKgs?: Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: Decimal | DecimalJsLike | number | string
-    cumulativeSpendUsd?: Decimal | DecimalJsLike | number | string
+    cumulativeSpendKgs?: Decimal | DecimalJsLike | number | string
     loyaltyLevel?: number
     dynamicDiscountRate?: Decimal | DecimalJsLike | number | string
     isMonthlyActive?: boolean
@@ -43337,7 +42135,7 @@ export namespace Prisma {
     passwordHash?: StringFieldUpdateOperationsInput | string
     walletBalanceKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    cumulativeSpendUsd?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    cumulativeSpendKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     loyaltyLevel?: IntFieldUpdateOperationsInput | number
     dynamicDiscountRate?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     isMonthlyActive?: BoolFieldUpdateOperationsInput | boolean
@@ -43374,7 +42172,7 @@ export namespace Prisma {
     passwordHash?: StringFieldUpdateOperationsInput | string
     walletBalanceKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    cumulativeSpendUsd?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    cumulativeSpendKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     loyaltyLevel?: IntFieldUpdateOperationsInput | number
     dynamicDiscountRate?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     isMonthlyActive?: BoolFieldUpdateOperationsInput | boolean
@@ -43409,7 +42207,7 @@ export namespace Prisma {
     passwordHash: string
     walletBalanceKgs?: Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: Decimal | DecimalJsLike | number | string
-    cumulativeSpendUsd?: Decimal | DecimalJsLike | number | string
+    cumulativeSpendKgs?: Decimal | DecimalJsLike | number | string
     loyaltyLevel?: number
     dynamicDiscountRate?: Decimal | DecimalJsLike | number | string
     isMonthlyActive?: boolean
@@ -43424,7 +42222,6 @@ export namespace Prisma {
     orderType?: string
     status?: string
     totalKgs: Decimal | DecimalJsLike | number | string
-    totalUsd: Decimal | DecimalJsLike | number | string
     paymentMethod: string
     customerName?: string | null
     customerPhone?: string | null
@@ -43518,7 +42315,6 @@ export namespace Prisma {
     lastProductName?: string | null
     lastProductImg?: string | null
     cartItems: string
-    cartTotalUsd: number
     cartTotalKgs: number
     status?: string
     lastActivityAt?: Date | string
@@ -43625,7 +42421,7 @@ export namespace Prisma {
     passwordHash?: StringFieldUpdateOperationsInput | string
     walletBalanceKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    cumulativeSpendUsd?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    cumulativeSpendKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     loyaltyLevel?: IntFieldUpdateOperationsInput | number
     dynamicDiscountRate?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     isMonthlyActive?: BoolFieldUpdateOperationsInput | boolean
@@ -43661,7 +42457,7 @@ export namespace Prisma {
     passwordHash?: StringFieldUpdateOperationsInput | string
     walletBalanceKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    cumulativeSpendUsd?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    cumulativeSpendKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     loyaltyLevel?: IntFieldUpdateOperationsInput | number
     dynamicDiscountRate?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     isMonthlyActive?: BoolFieldUpdateOperationsInput | boolean
@@ -43697,7 +42493,7 @@ export namespace Prisma {
     passwordHash?: StringFieldUpdateOperationsInput | string
     walletBalanceKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    cumulativeSpendUsd?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    cumulativeSpendKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     loyaltyLevel?: IntFieldUpdateOperationsInput | number
     dynamicDiscountRate?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     isMonthlyActive?: BoolFieldUpdateOperationsInput | boolean
@@ -43712,7 +42508,6 @@ export namespace Prisma {
     orderType?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
     totalKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    totalUsd?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     paymentMethod?: StringFieldUpdateOperationsInput | string
     customerName?: NullableStringFieldUpdateOperationsInput | string | null
     customerPhone?: NullableStringFieldUpdateOperationsInput | string | null
@@ -43731,7 +42526,6 @@ export namespace Prisma {
     orderType?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
     totalKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    totalUsd?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     paymentMethod?: StringFieldUpdateOperationsInput | string
     customerName?: NullableStringFieldUpdateOperationsInput | string | null
     customerPhone?: NullableStringFieldUpdateOperationsInput | string | null
@@ -43750,7 +42544,6 @@ export namespace Prisma {
     orderType?: StringFieldUpdateOperationsInput | string
     status?: StringFieldUpdateOperationsInput | string
     totalKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    totalUsd?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     paymentMethod?: StringFieldUpdateOperationsInput | string
     customerName?: NullableStringFieldUpdateOperationsInput | string | null
     customerPhone?: NullableStringFieldUpdateOperationsInput | string | null
@@ -43992,7 +42785,6 @@ export namespace Prisma {
     lastProductName?: NullableStringFieldUpdateOperationsInput | string | null
     lastProductImg?: NullableStringFieldUpdateOperationsInput | string | null
     cartItems?: StringFieldUpdateOperationsInput | string
-    cartTotalUsd?: FloatFieldUpdateOperationsInput | number
     cartTotalKgs?: FloatFieldUpdateOperationsInput | number
     status?: StringFieldUpdateOperationsInput | string
     lastActivityAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -44011,7 +42803,6 @@ export namespace Prisma {
     lastProductName?: NullableStringFieldUpdateOperationsInput | string | null
     lastProductImg?: NullableStringFieldUpdateOperationsInput | string | null
     cartItems?: StringFieldUpdateOperationsInput | string
-    cartTotalUsd?: FloatFieldUpdateOperationsInput | number
     cartTotalKgs?: FloatFieldUpdateOperationsInput | number
     status?: StringFieldUpdateOperationsInput | string
     lastActivityAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -44030,7 +42821,6 @@ export namespace Prisma {
     lastProductName?: NullableStringFieldUpdateOperationsInput | string | null
     lastProductImg?: NullableStringFieldUpdateOperationsInput | string | null
     cartItems?: StringFieldUpdateOperationsInput | string
-    cartTotalUsd?: FloatFieldUpdateOperationsInput | number
     cartTotalKgs?: FloatFieldUpdateOperationsInput | number
     status?: StringFieldUpdateOperationsInput | string
     lastActivityAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -44497,7 +43287,6 @@ export namespace Prisma {
     accordions?: string | null
     benefits?: string | null
     basePriceKgs: Decimal | DecimalJsLike | number | string
-    basePriceUsd: Decimal | DecimalJsLike | number | string
     translations?: string | null
     stockQuantity?: number
     minStockAlert?: number
@@ -44513,7 +43302,6 @@ export namespace Prisma {
     accordions?: NullableStringFieldUpdateOperationsInput | string | null
     benefits?: NullableStringFieldUpdateOperationsInput | string | null
     basePriceKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    basePriceUsd?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     translations?: NullableStringFieldUpdateOperationsInput | string | null
     stockQuantity?: IntFieldUpdateOperationsInput | number
     minStockAlert?: IntFieldUpdateOperationsInput | number
@@ -44533,7 +43321,6 @@ export namespace Prisma {
     accordions?: NullableStringFieldUpdateOperationsInput | string | null
     benefits?: NullableStringFieldUpdateOperationsInput | string | null
     basePriceKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    basePriceUsd?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     translations?: NullableStringFieldUpdateOperationsInput | string | null
     stockQuantity?: IntFieldUpdateOperationsInput | number
     minStockAlert?: IntFieldUpdateOperationsInput | number
@@ -44553,7 +43340,6 @@ export namespace Prisma {
     accordions?: NullableStringFieldUpdateOperationsInput | string | null
     benefits?: NullableStringFieldUpdateOperationsInput | string | null
     basePriceKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    basePriceUsd?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     translations?: NullableStringFieldUpdateOperationsInput | string | null
     stockQuantity?: IntFieldUpdateOperationsInput | number
     minStockAlert?: IntFieldUpdateOperationsInput | number
@@ -44658,10 +43444,6 @@ export namespace Prisma {
      * @deprecated Use TransactionDefaultArgs instead
      */
     export type TransactionArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = TransactionDefaultArgs<ExtArgs>
-    /**
-     * @deprecated Use ExchangeRateDefaultArgs instead
-     */
-    export type ExchangeRateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = ExchangeRateDefaultArgs<ExtArgs>
     /**
      * @deprecated Use SystemConfigDefaultArgs instead
      */

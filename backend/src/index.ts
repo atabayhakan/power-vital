@@ -16,7 +16,6 @@ import settingsRoutes from './routes/settings';
 import checkoutRoutes from './routes/checkout';
 import uploadRoutes from './routes/upload';
 import adminRoutes from './routes/admin';
-import exchangeRateRoutes from './routes/exchangeRate';
 import pagesRoutes from './routes/pages';
 // aiRoutes is no longer mounted — see comment above. The file is
 // kept for reference; we just don't wire it into the express app.
@@ -52,7 +51,6 @@ import { limit, RATE_LIMITS } from './utils/rateLimit';
 // Background Workers & Services
 import './workers/bonusWorker';
 import './workers/translationSweeper';
-import { startExchangeRateScheduler } from './services/exchangeRate';
 
 dotenv.config();
 
@@ -200,7 +198,6 @@ app.use('/api/v1/categories', categoryRoutes);
 app.use('/api/v1/settings', settingsRoutes);
 app.use('/api/v1/checkout', checkoutRoutes);
 app.use('/api/v1/upload', uploadRoutes);
-app.use('/api/v1/finance/exchange-rate', exchangeRateRoutes);
 app.use('/api/v1/pages', pagesRoutes);
 // /api/v1/ai is intentionally not mounted — the admin manually
 // owns translations now, and the public storefront falls back to
@@ -281,6 +278,4 @@ app.use(cacheStatsMiddleware);
 
 app.listen(PORT, () => {
   logger.info({ port: PORT, env: process.env.NODE_ENV || 'development' }, 'Server is listening');
-  // Boot the auto-fetch scheduler (honors SiteSettings.financeSettings.autoRateFetch)
-  startExchangeRateScheduler();
 });

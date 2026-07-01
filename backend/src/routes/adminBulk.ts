@@ -124,7 +124,7 @@ router.get('/users.csv', authenticateJWT, requireRole('admin'), async (req: Requ
       select: {
         id: true, name: true, email: true, role: true,
         walletBalanceKgs: true, walletBalanceUsd: true,
-        cumulativeSpendUsd: true, loyaltyLevel: true,
+        cumulativeSpendKgs: true, loyaltyLevel: true,
         isMonthlyActive: true, createdAt: true,
         sponsor: { select: { name: true, email: true } }
       },
@@ -138,7 +138,7 @@ router.get('/users.csv', authenticateJWT, requireRole('admin'), async (req: Requ
       { header: 'role',             value: (u) => u.role },
       { header: 'wallet_kgs',       value: (u) => Number(u.walletBalanceKgs || 0).toFixed(2) },
       { header: 'wallet_usd',       value: (u) => Number(u.walletBalanceUsd || 0).toFixed(2) },
-      { header: 'cumulative_usd',   value: (u) => Number(u.cumulativeSpendUsd || 0).toFixed(2) },
+      { header: 'cumulative_kgs',   value: (u) => Number(u.cumulativeSpendKgs || 0).toFixed(2) },
       { header: 'loyalty_level',    value: (u) => u.loyaltyLevel ?? 0 },
       { header: 'monthly_active',   value: (u) => u.isMonthlyActive ? 'yes' : 'no' },
       { header: 'sponsor',          value: (u) => u.sponsor?.name || '' },
@@ -162,7 +162,7 @@ router.get('/products.csv', authenticateJWT, requireRole('admin'), async (req: R
       where,
       select: {
         id: true, name: true, barcode: true,
-        basePriceKgs: true, basePriceUsd: true,
+        basePriceKgs: true,
         stockQuantity: true, minStockAlert: true,
         category: { select: { name: true } },
         createdAt: true, updatedAt: true
@@ -179,7 +179,6 @@ router.get('/products.csv', authenticateJWT, requireRole('admin'), async (req: R
       { header: 'name',        value: (p) => p.name },
       { header: 'category',    value: (p) => p.category?.name || '' },
       { header: 'price_kgs',   value: (p) => Number(p.basePriceKgs).toFixed(2) },
-      { header: 'price_usd',   value: (p) => Number(p.basePriceUsd).toFixed(2) },
       { header: 'stock',       value: (p) => p.stockQuantity },
       { header: 'low_stock',   value: (p) => p.stockQuantity <= (p.minStockAlert ?? 10) ? 'yes' : 'no' },
       { header: 'created_at',  value: (p) => safeDate(p.createdAt) },

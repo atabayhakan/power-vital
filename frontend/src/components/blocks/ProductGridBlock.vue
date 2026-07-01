@@ -48,14 +48,14 @@ const toggleFavorite = (e: Event, p: any) => {
     id: p.id,
     name: tField(p, 'name') || p.name || '',
     imageUrl: typeof firstImg === 'string' ? firstImg : '',
-    basePriceUsd: Number(p.basePriceUsd) || 0
+    basePriceKgs: Number(p.basePriceKgs) || 0
   });
 };
 
 // Discount % from compare-at price if present (real data only — never fabricated)
 const discountPercent = (p: any): number => {
-  const base = Number(p.basePriceUsd || 0);
-  const compare = Number(p.compareAtPriceUsd || p.oldPriceUsd || 0);
+  const base = Number(p.basePriceKgs || 0);
+  const compare = Number(p.compareAtPriceKgs || p.oldPriceKgs || 0);
   if (compare > base && base > 0) return Math.round((1 - base / compare) * 100);
   return 0;
 };
@@ -106,7 +106,7 @@ const onCompareToggle = (e: Event, p: any) => {
     id: p.id,
     name: tField(p, 'name') || p.name || '',
     imageUrl: typeof firstImg === 'string' ? firstImg : '',
-    basePriceUsd: Number(p.basePriceUsd) || 0,
+    basePriceKgs: Number(p.basePriceKgs) || 0,
     category: p.category?.name || p.category || '',
     slug: p.slug
   });
@@ -129,7 +129,7 @@ onMounted(async () => {
       {
         id: '1',
         name: 'Power Vital Karadut Özü',
-        basePriceUsd: 14.99,
+        basePriceKgs: 1300,
         images: [
           { imageUrl: 'https://cdn.myikas.com/images/c7afacdb-7cce-47a1-8553-35d2c163884c/abdf396c-433e-4dc4-ae67-5c43f805b42d/1080/karadut-01.webp' },
           { imageUrl: 'https://cdn.myikas.com/images/c7afacdb-7cce-47a1-8553-35d2c163884c/abdf396c-433e-4dc4-ae67-5c43f805b42d/1080/karadut-01.webp' }
@@ -138,7 +138,7 @@ onMounted(async () => {
       {
         id: '2',
         name: 'Power Vital Omega 3',
-        basePriceUsd: 20.50,
+        basePriceKgs: 1800,
         images: [
           { imageUrl: 'https://cdn.myikas.com/images/c7afacdb-7cce-47a1-8553-35d2c163884c/33ad56e8-87bc-4af9-b202-1a893bdea410/1080/omega30.webp' }
         ]
@@ -146,7 +146,7 @@ onMounted(async () => {
       {
         id: '3',
         name: 'Power Vital Magnezyum',
-        basePriceUsd: 25.00,
+        basePriceKgs: 2200,
         images: [
           { imageUrl: 'https://cdn.myikas.com/images/c7afacdb-7cce-47a1-8553-35d2c163884c/b0668799-333b-4bd0-9c9b-508ed5ed5ff3/1080/magnezyum-calisma-yuzeyi-1.webp' }
         ]
@@ -156,7 +156,7 @@ onMounted(async () => {
 });
 
 const getKgsPrice = (p: any): string => {
-  return formatPrice(getDiscountedKgs(Number(p.basePriceUsd || 0)));
+  return formatPrice(getDiscountedKgs(Number(p.basePriceKgs || 0)));
 };
 
 const hasSecondImage = (p: any): boolean => {
@@ -178,7 +178,7 @@ const addToCart = (e: Event, p: any) => {
   cartStore.addToCart({
     id: p.id,
     name: tField(p, 'name') || p.name,
-    basePriceUsd: Number(p.basePriceUsd),
+    basePriceKgs: Number(p.basePriceKgs),
     imageUrl: img
   }, 1);
 

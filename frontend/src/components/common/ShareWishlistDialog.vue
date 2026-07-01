@@ -8,7 +8,7 @@ import { ref, onMounted, onBeforeUnmount } from 'vue';
 import { useShareWishlist } from '../../composables/useShareWishlist';
 import { useTranslate } from '../../composables/useTranslate';
 import { useFavorites } from '../../composables/useFavorites';
-import { useCurrency } from '../../composables/useCurrency';
+import { formatPrice } from '../../utils/PriceEngine';
 import LazyImage from '../common/LazyImage.vue';
 
 const props = defineProps<{ isOpen: boolean }>();
@@ -17,7 +17,6 @@ const emit = defineEmits<{ (e: 'close'): void }>();
 const { items, shareUrl, body, channels, copy, open } = useShareWishlist();
 const { t } = useTranslate();
 const favorites = useFavorites();
-const { formatPrice } = useCurrency();
 
 const qrDataUrl = ref('');
 const isCopied = ref(false);
@@ -103,7 +102,7 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKey));
               </span>
               <div class="sw-info">
                 <span class="sw-name">{{ f.name }}</span>
-                <span class="sw-price">{{ formatPrice(f.basePriceUsd * 90) }}</span>
+                <span class="sw-price">{{ formatPrice(f.basePriceKgs) }} KGS</span>
               </div>
               <button class="sw-remove" @click="removeOne(f.id)" :aria-label="t('share.removeFromList')">✕</button>
             </li>

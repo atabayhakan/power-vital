@@ -3,34 +3,16 @@ import { ref, onMounted, computed } from 'vue';
 import axios from 'axios';
 import { useTranslation } from '../composables/useTranslation';
 import { useTranslate } from '../composables/useTranslate';
-import { useCurrency } from '../composables/useCurrency';
+import { formatPrice } from '../utils/PriceEngine';
 import { useCartStore } from '../stores/useCartStore';
 
 const settings = ref<any>({});
 const topbarPhone = ref('');
 const { tField } = useTranslation();
 const { t } = useTranslate();
-const { formatUsdRaw, currency, toggleCurrency } = useCurrency();
 const cart = useCartStore();
 
-/* The shipping message in the DB has a hardcoded USD amount like
-   "100$ ve Uzeri Siparislerinizde Kargo Ucretsiz". We split the
-   threshold out and re-render it in the visitor's active currency
-   (KGS for KG/RU visitors, USD for TR/EN) using useCurrency. */
-const SHIPPING_THRESHOLD_USD = 100;
-
-const topbarShippingMsg = computed(() => {
-  const raw = tField(settings.value, 'topbarShippingMsg');
-  if (!raw) return '';
-  const threshold = formatUsdRaw(SHIPPING_THRESHOLD_USD);
-  // Replace the first occurrence of a USD-style number with our
-  // locale-aware rendering. The DB string usually looks like
-  // "100$ ve Uzeri..." or "100 $ ve Uzeri..." — handle both.
-  return raw.replace(/100\s*\$|100\$/g, threshold);
-});
-// `currency` is a ref returned by useCurrency(); because we read it inside
-// the computed above, Vue tracks the dependency automatically and the
-// topbar re-renders the moment the visitor flips the toggle.
+const topbarShippingMsg = computed(() => tField(settings.value, 'topbarShippingMsg') || '');
 
 /* 🛡️ Defensive strip: legacy DB rows had emoji prefixes like
    "📞 +996 771 898 889". We strip everything before the first digit/+
@@ -66,14 +48,8 @@ const showProgress = computed(() => {
 
 const progressPercent = computed(() => Math.round(cart.shippingProgressPercent || 0));
 
-/* Amount the visitor still needs to add (rendered in their active currency). */
-const remainingForFreeShipping = computed(() => {
-  const fs = (cart as any).freeShippingThresholdUsd ?? 100;
-  const remainUsd = Math.max(0, fs - cart.cartTotalUsd);
-  // formatUsdRaw accepts a USD value and renders it in the active currency
-  // (KGS via exchange rate, or "$N" for USD).
-  return formatUsdRaw(remainUsd);
-});
+/* Amount the visitor still needs to add, in KGS. */
+const remainingForFreeShipping = computed(() => `${formatPrice(cart.remainingForFreeShipping)} KGS`);
 </script>
 
 <template>
@@ -109,24 +85,8 @@ const remainingForFreeShipping = computed(() => {
         </div>
       </div>
 
-      <!-- Right: Currency toggle + Phone CTA -->
+      <!-- Right: Phone CTA -->
       <div class="topbar-right">
-        <!-- Currency toggle: KGS ↔ USD. Auto-detected from locale on first
-             visit, persisted in localStorage, updates shipping message
-             and all prices across the site. -->
-        <button
-          type="button"
-          class="currency-toggle"
-          :aria-label="currency === 'KGS' ? 'Switch to USD' : 'Switch to KGS'"
-          @click="toggleCurrency"
-        >
-          <span class="currency-flag" aria-hidden="true">
-            {{ currency === 'KGS' ? '🇰🇬' : '💵' }}
-          </span>
-          <span class="currency-code">{{ currency }}</span>
-          <span class="currency-swap" aria-hidden="true">⇄</span>
-        </button>
-
         <a v-if="topbarPhone" :href="'tel:' + topbarPhone.replace(/[^0-9+]/g, '')" class="phone-link">
           <span class="phone-icon" aria-hidden="true">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">

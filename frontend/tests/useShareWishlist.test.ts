@@ -37,16 +37,16 @@ describe('useShareWishlist — buildShareUrl / hydrateFromUrl', () => {
   it('round-trips a list of favorites', async () => {
     const mod = await import('../src/composables/useShareWishlist');
     const items = [
-      { id: 'a', name: 'Vitamin C', imageUrl: '/uploads/x.webp', basePriceUsd: 10, addedAt: 1 },
-      { id: 'b', name: 'Omega 3', imageUrl: '', basePriceUsd: 20, addedAt: 2 }
+      { id: 'a', name: 'Vitamin C', imageUrl: '/uploads/x.webp', basePriceKgs: 10, addedAt: 1 },
+      { id: 'b', name: 'Omega 3', imageUrl: '', basePriceKgs: 20, addedAt: 2 }
     ];
     const url = mod.buildShareUrl(items);
     expect(url.startsWith('https://www.powervital.org/?w=')).toBe(true);
     const wParam = url.split('?w=')[1];
     const hydrated = mod.hydrateFromUrl(wParam);
     expect(hydrated.length).toBe(2);
-    expect(hydrated[0]).toMatchObject({ id: 'a', name: 'Vitamin C', basePriceUsd: 10 });
-    expect(hydrated[1]).toMatchObject({ id: 'b', name: 'Omega 3', basePriceUsd: 20 });
+    expect(hydrated[0]).toMatchObject({ id: 'a', name: 'Vitamin C', basePriceKgs: 10 });
+    expect(hydrated[1]).toMatchObject({ id: 'b', name: 'Omega 3', basePriceKgs: 20 });
   });
 
   it('returns an empty list when the URL has no w param', async () => {
@@ -98,8 +98,8 @@ describe('useFavorites — localStorage round-trip', () => {
   it('persists and re-hydrates across instances', async () => {
     const mod = await import('../src/composables/useFavorites');
     const f1 = mod.useFavorites();
-    f1.add({ id: 'a', name: 'A', imageUrl: '', basePriceUsd: 1 });
-    f1.add({ id: 'b', name: 'B', imageUrl: '', basePriceUsd: 2 });
+    f1.add({ id: 'a', name: 'A', imageUrl: '', basePriceKgs: 1 });
+    f1.add({ id: 'b', name: 'B', imageUrl: '', basePriceKgs: 2 });
     expect(f1.count.value).toBe(2);
 
     vi.resetModules();
@@ -113,9 +113,9 @@ describe('useFavorites — localStorage round-trip', () => {
   it('toggle() returns added=true the first time, added=false the second', async () => {
     const mod = await import('../src/composables/useFavorites');
     const f = mod.useFavorites();
-    const r1 = f.toggle({ id: 'x', name: 'X', imageUrl: '', basePriceUsd: 0 });
+    const r1 = f.toggle({ id: 'x', name: 'X', imageUrl: '', basePriceKgs: 0 });
     expect(r1.added).toBe(true);
-    const r2 = f.toggle({ id: 'x', name: 'X', imageUrl: '', basePriceUsd: 0 });
+    const r2 = f.toggle({ id: 'x', name: 'X', imageUrl: '', basePriceKgs: 0 });
     expect(r2.added).toBe(false);
     expect(f.count.value).toBe(0);
   });
@@ -123,10 +123,10 @@ describe('useFavorites — localStorage round-trip', () => {
   it('hydrate() merges incoming items with pre-existing ones', async () => {
     const mod = await import('../src/composables/useFavorites');
     const f = mod.useFavorites();
-    f.add({ id: 'a', name: 'A', imageUrl: '', basePriceUsd: 1 });
+    f.add({ id: 'a', name: 'A', imageUrl: '', basePriceKgs: 1 });
     const total = f.hydrate([
-      { id: 'b', name: 'B', imageUrl: '', basePriceUsd: 2 },
-      { id: 'a', name: 'A-updated', imageUrl: '', basePriceUsd: 99 }
+      { id: 'b', name: 'B', imageUrl: '', basePriceKgs: 2 },
+      { id: 'a', name: 'A-updated', imageUrl: '', basePriceKgs: 99 }
     ]);
     expect(total).toBe(2);
     expect(f.has('a')).toBe(true);

@@ -89,10 +89,10 @@ onMounted(async () => {
     categories.value = catRes.data || [];
   } catch (err) {
     allProducts.value = [
-      { id: '1', name: 'Karadut, Karamürver, Ahududu Özü - 680gr', basePriceUsd: 14.99, images: [{ imageUrl: 'https://cdn.myikas.com/images/c7afacdb-7cce-47a1-8553-35d2c163884c/abdf396c-433e-4dc4-ae67-5c43f805b42d/1080/karadut-01.webp' }] },
-      { id: '2', name: 'Collagen Tripeptide', basePriceUsd: 20.50, images: [{ imageUrl: 'https://cdn.myikas.com/images/c7afacdb-7cce-47a1-8553-35d2c163884c/33ad56e8-87bc-4af9-b202-1a893bdea410/1080/omega30.webp' }] },
-      { id: '3', name: 'Magnezyum Kompleks - Gece ve Gündüz', basePriceUsd: 25.00, images: [{ imageUrl: 'https://cdn.myikas.com/images/c7afacdb-7cce-47a1-8553-35d2c163884c/b0668799-333b-4bd0-9b9b-508ed5ed5ff3/1080/magnezyum-calisma-yuzeyi-1.webp' }] },
-      { id: '4', name: 'Omega 3 Kapsül', basePriceUsd: 18.00, images: [] }
+      { id: '1', name: 'Karadut, Karamürver, Ahududu Özü - 680gr', basePriceKgs: 1300, images: [{ imageUrl: 'https://cdn.myikas.com/images/c7afacdb-7cce-47a1-8553-35d2c163884c/abdf396c-433e-4dc4-ae67-5c43f805b42d/1080/karadut-01.webp' }] },
+      { id: '2', name: 'Collagen Tripeptide', basePriceKgs: 1800, images: [{ imageUrl: 'https://cdn.myikas.com/images/c7afacdb-7cce-47a1-8553-35d2c163884c/33ad56e8-87bc-4af9-b202-1a893bdea410/1080/omega30.webp' }] },
+      { id: '3', name: 'Magnezyum Kompleks - Gece ve Gündüz', basePriceKgs: 2200, images: [{ imageUrl: 'https://cdn.myikas.com/images/c7afacdb-7cce-47a1-8553-35d2c163884c/b0668799-333b-4bd0-9b9b-508ed5ed5ff3/1080/magnezyum-calisma-yuzeyi-1.webp' }] },
+      { id: '4', name: 'Omega 3 Kapsül', basePriceKgs: 1600, images: [] }
     ];
   } finally {
     loading.value = false;
@@ -109,7 +109,7 @@ const addToCart = (e: Event, p: any) => {
   cartStore.addToCart({
     id: p.id,
     name: p.name,
-    basePriceUsd: Number(p.basePriceUsd),
+    basePriceKgs: Number(p.basePriceKgs),
     imageUrl: img
   }, 1);
 
@@ -208,7 +208,7 @@ const isOutOfStock = (p: any) => p.stockQuantity === 0;
             </div>
 
             <div class="prod-price-row">
-              <span class="prod-price">{{ formatPrice(getDiscountedKgs(p.basePriceUsd)) }} <span class="prod-currency">KGS</span></span>
+              <span class="prod-price">{{ formatPrice(getDiscountedKgs(p.basePriceKgs)) }} <span class="prod-currency">KGS</span></span>
             </div>
 
             <!-- 2026: Dual-state CTA -->

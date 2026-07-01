@@ -326,7 +326,7 @@ onMounted(fetchUsers);
                       <span v-if="user.loyaltyLevel > 0" class="level-pill">Lvl {{ user.loyaltyLevel }}</span>
                     </div>
                   </td>
-                  <td class="money">${{ Number(user.cumulativeSpendUsd || 0).toLocaleString() }}</td>
+                  <td class="money">{{ Number(user.cumulativeSpendKgs || 0).toLocaleString() }} KGS</td>
                   <td class="money discount-col">%{{ Number(user.dynamicDiscountRate || 0) }}</td>
                   <td>
                     <span :class="['status-badge', user.isMonthlyActive ? 'active' : 'inactive']">

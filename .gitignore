@@ -33,3 +33,6 @@ prod.json
 # Deploy docs currently embed a root password + SSH key — scrub before tracking
 CI-CD.md
 PRODUCTION-DEPLOY.md
+
+# Claude Code local tool state — personal, not shared project config
+.claude/

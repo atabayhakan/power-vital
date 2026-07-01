@@ -15,8 +15,8 @@ const localStorageMock = {
 // @ts-expect-error test shim
 globalThis.localStorage = localStorageMock;
 
-const make = (id: string, name = `P ${id}`, basePriceUsd = 10) => ({
-  id, name, imageUrl: '/uploads/x.webp', basePriceUsd
+const make = (id: string, name = `P ${id}`, basePriceKgs = 10) => ({
+  id, name, imageUrl: '/uploads/x.webp', basePriceKgs
 });
 
 beforeEach(() => {
@@ -103,7 +103,7 @@ describe('useCompare — add/remove/toggle', () => {
 
   it('reads existing entries back on next use', async () => {
     localStorageMock.setItem('pv_compare', JSON.stringify([
-      { id: 'seed', name: 'Seed', imageUrl: '/x.webp', basePriceUsd: 5 }
+      { id: 'seed', name: 'Seed', imageUrl: '/x.webp', basePriceKgs: 5 }
     ]));
     vi.resetModules();
     const mod = await import('../src/composables/useCompare');

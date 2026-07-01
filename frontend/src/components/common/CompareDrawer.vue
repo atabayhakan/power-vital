@@ -10,7 +10,7 @@
 import { ref, onMounted, onBeforeUnmount, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { useCompare } from '../../composables/useCompare';
-import { useCurrency } from '../../composables/useCurrency';
+import { formatPrice } from '../../utils/PriceEngine';
 import { useTranslate } from '../../composables/useTranslate';
 import { useAuthStore } from '../../stores/useAuthStore';
 import { useCartStore } from '../../stores/useCartStore';
@@ -18,7 +18,6 @@ import LazyImage from '../common/LazyImage.vue';
 
 const router = useRouter();
 const compare = useCompare();
-const { formatPrice } = useCurrency();
 const { t } = useTranslate();
 const authStore = useAuthStore();
 const cartStore = useCartStore();
@@ -46,7 +45,7 @@ onBeforeUnmount(() => {
 const cheapest = computed(() => {
   if (compare.recent.value.length < 2) return null;
   return compare.recent.value.reduce((min, p) =>
-    (p.basePriceUsd || 0) < (min.basePriceUsd || Infinity) ? p : min
+    (p.basePriceKgs || 0) < (min.basePriceKgs || Infinity) ? p : min
   , compare.recent.value[0]);
 });
 
@@ -61,7 +60,7 @@ const addAllToCart = () => {
     cartStore.addToCart({
       id: p.id,
       name: p.name,
-      basePriceUsd: p.basePriceUsd,
+      basePriceKgs: p.basePriceKgs,
       imageUrl: p.imageUrl
     }, 1);
   }
@@ -133,7 +132,7 @@ const goToCompare = () => {
               <span class="cd-cat" v-if="p.category">{{ p.category }}</span>
               <span class="cd-name">{{ p.name }}</span>
               <span class="cd-price" :class="{ 'is-best-price': cheapest && cheapest.id === p.id }">
-                {{ formatPrice(p.basePriceUsd * 90) }}
+                {{ formatPrice(p.basePriceKgs) }} KGS
                 <span v-if="cheapest && cheapest.id === p.id" class="cd-best-badge">💰 {{ t('compare.bestPrice') }}</span>
               </span>
             </button>

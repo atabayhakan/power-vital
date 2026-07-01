@@ -7,17 +7,17 @@ const currentUser = useCurrentUser();
 const { t } = useTranslate();
 const user = computed(() => currentUser.value);
 
-// Loyalty tier thresholds (USD cumulative spend → level + permanent discount)
+// Loyalty tier thresholds (KGS cumulative spend → level + permanent discount)
 const thresholds = [
-  { level: 1, spend: 100, discount: 5 },
-  { level: 2, spend: 250, discount: 10 },
-  { level: 3, spend: 500, discount: 15 },
-  { level: 4, spend: 750, discount: 20 },
-  { level: 5, spend: 1000, discount: 25 },
+  { level: 1, spend: 9000, discount: 5 },
+  { level: 2, spend: 22000, discount: 10 },
+  { level: 3, spend: 44000, discount: 15 },
+  { level: 4, spend: 66000, discount: 20 },
+  { level: 5, spend: 88000, discount: 25 },
 ];
 
 const level = computed(() => Number(user.value?.loyaltyLevel || 0));
-const spend = computed(() => Number(user.value?.cumulativeSpendUsd || 0));
+const spend = computed(() => Number(user.value?.cumulativeSpendKgs || 0));
 const discount = computed(() => Number(user.value?.dynamicDiscountRate || 0));
 const walletKgs = computed(() => Number((user.value as any)?.walletBalanceKgs || 0));
 
@@ -32,7 +32,6 @@ const nextLevelData = computed(() => {
   return { targetLevel: nextTarget.level, amountNeeded, targetDiscount: nextTarget.discount, progressPct };
 });
 
-const usd = (n: number) => '$' + n.toFixed(2);
 const kgs = (n: number) => Math.round(n).toLocaleString('ru-RU') + ' KGS';
 </script>
 
@@ -58,7 +57,7 @@ const kgs = (n: number) => Math.round(n).toLocaleString('ru-RU') + ' KGS';
         <div class="wlt-stats">
           <div class="wlt-stat">
             <span class="wlt-stat__label">{{ t('wallet.totalSpend') }}</span>
-            <span class="wlt-stat__value">{{ usd(spend) }}</span>
+            <span class="wlt-stat__value">{{ kgs(spend) }}</span>
           </div>
           <div class="wlt-stat wlt-stat--accent">
             <span class="wlt-stat__label">{{ t('wallet.yourDiscount') }}</span>
@@ -73,7 +72,7 @@ const kgs = (n: number) => Math.round(n).toLocaleString('ru-RU') + ' KGS';
             <span class="wlt-progress__disc">{{ t('wallet.discountAmount', { n: nextLevelData.targetDiscount }) }}</span>
           </div>
           <div class="wlt-bar"><div class="wlt-bar__fill" :style="{ width: nextLevelData.progressPct + '%' }"/></div>
-          <p class="wlt-progress__text">{{ t('wallet.remainingToNext', { amount: usd(nextLevelData.amountNeeded) }) }}</p>
+          <p class="wlt-progress__text">{{ t('wallet.remainingToNext', { amount: kgs(nextLevelData.amountNeeded) }) }}</p>
         </div>
         <div v-else class="wlt-max">
           <span class="wlt-max__icon">👑</span>
@@ -98,7 +97,7 @@ const kgs = (n: number) => Math.round(n).toLocaleString('ru-RU') + ' KGS';
                 <span v-else>{{ th.level }}</span>
               </span>
               <span class="wlt-step__disc">%{{ th.discount }}</span>
-              <span class="wlt-step__spend">{{ t('wallet.spendLabel', { amount: usd(th.spend) }) }}</span>
+              <span class="wlt-step__spend">{{ t('wallet.spendLabel', { amount: kgs(th.spend) }) }}</span>
             </div>
           </div>
         </div>

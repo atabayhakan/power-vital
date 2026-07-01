@@ -7,15 +7,15 @@ import { useCurrentUser } from '../composables/useCurrentUser';
 export interface CartItem {
   id: string;
   name: string;
-  basePriceUsd: number;
+  basePriceKgs: number;
   quantity: number;
   imageUrl?: string;
 }
 
 export const useCartStore = defineStore('cart', () => {
   const LOCAL_KEY = 'pv_cart';
-  // Free shipping is ALWAYS the KGS equivalent of the configured USD threshold
-  // (default $100), matching the checkout logic exactly — single source of truth.
+  // Free shipping threshold is a fixed KGS amount (see checkoutShippingThresholdKgs
+  // in finance settings), matching the checkout logic exactly — single source of truth.
 
   const loadInitial = (): CartItem[] => {
     if (typeof window === 'undefined') return [];
@@ -26,7 +26,7 @@ export const useCartStore = defineStore('cart', () => {
         if (Array.isArray(parsed)) {
           return parsed.map((item: any) => ({
             ...item,
-            basePriceUsd: Number(item.basePriceUsd) || 0,
+            basePriceKgs: Number(item.basePriceKgs) || 0,
             quantity: Number(item.quantity) || 1
           }));
         }
@@ -113,10 +113,10 @@ export const useCartStore = defineStore('cart', () => {
           id: i.id,
           name: i.name,
           imageUrl: i.imageUrl,
-          basePriceUsd: Number(i.basePriceUsd) || 0,
+          basePriceKgs: Number(i.basePriceKgs) || 0,
           quantity: i.quantity
         })),
-        totals: { usd: cartTotalUsd.value, kgs: cartTotalKgs.value }
+        totals: { kgs: cartTotalKgs.value }
       };
       // Make sure the cookie is set for guest identification.
       // Cookies are HttpOnly-disabled here because the endpoint
@@ -203,7 +203,7 @@ export const useCartStore = defineStore('cart', () => {
     } catch { /* noop */ }
   };
 
-  const addToCart = (product: { id: string; name: string; basePriceUsd: number; imageUrl?: string }, qty = 1) => {
+  const addToCart = (product: { id: string; name: string; basePriceKgs: number; imageUrl?: string }, qty = 1) => {
     const current = items.value;
     const existing = current.find(item => item.id === product.id);
     let next: CartItem[];
@@ -254,41 +254,29 @@ export const useCartStore = defineStore('cart', () => {
     items.value.reduce((acc, item) => acc + item.quantity, 0)
   );
 
-  const cartTotalUsd = computed(() =>
-    items.value.reduce((acc, item) => acc + ((item.basePriceUsd || 0) * item.quantity), 0)
-  );
-
   const cartTotalKgs = computed(() => {
     const currentUser = useCurrentUser();
     const discountRate = currentUser.value?.dynamicDiscountRate ?? 0;
-    return items.value.reduce((acc, item) => acc + (calculatePrice(item.basePriceUsd || 0, discountRate) * item.quantity), 0);
+    return items.value.reduce((acc, item) => acc + (calculatePrice(item.basePriceKgs || 0, discountRate) * item.quantity), 0);
   });
 
-  // Threshold in USD (from finance settings, default 100) and its KGS equivalent.
-  const freeShippingThresholdUsd = computed(() => {
-    const fs = getFinanceSettings();
-    return Number(fs.checkoutShippingThresholdUsd) || 100;
-  });
-
+  // Free shipping threshold — a fixed KGS amount from finance settings.
   const freeShippingThresholdKgs = computed(() => {
     const fs = getFinanceSettings();
-    const rate = Number(fs.exchangeRate) || 88.5;
-    return freeShippingThresholdUsd.value * rate;
+    return Number(fs.checkoutShippingThresholdKgs) || 9000;
   });
 
-  const isFreeShipping = computed(() => cartTotalUsd.value >= freeShippingThresholdUsd.value);
+  const isFreeShipping = computed(() => cartTotalKgs.value >= freeShippingThresholdKgs.value);
 
   const shippingProgressPercent = computed(() => {
     if (isFreeShipping.value) return 100;
-    if (freeShippingThresholdUsd.value <= 0) return 100;
-    return Math.min(100, (cartTotalUsd.value / freeShippingThresholdUsd.value) * 100);
+    if (freeShippingThresholdKgs.value <= 0) return 100;
+    return Math.min(100, (cartTotalKgs.value / freeShippingThresholdKgs.value) * 100);
   });
 
-  // Remaining amount to reach free shipping, expressed in KGS for display.
+  // Remaining amount to reach free shipping, in KGS.
   const remainingForFreeShipping = computed(() => {
-    const remainingUsd = Math.max(0, freeShippingThresholdUsd.value - cartTotalUsd.value);
-    const rate = Number(getFinanceSettings().exchangeRate) || 88.5;
-    return remainingUsd * rate;
+    return Math.max(0, freeShippingThresholdKgs.value - cartTotalKgs.value);
   });
 
   return {
@@ -302,9 +290,7 @@ export const useCartStore = defineStore('cart', () => {
     sendHeartbeat,
     sendCleared,
     cartItemCount,
-    cartTotalUsd,
     cartTotalKgs,
-    freeShippingThresholdUsd,
     freeShippingThresholdKgs,
     isFreeShipping,
     shippingProgressPercent,

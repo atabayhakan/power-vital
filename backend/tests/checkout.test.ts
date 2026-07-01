@@ -15,18 +15,9 @@ const seedProduct = async (overrides: any = {}) => {
       barcode: 'PV-' + Math.random().toString(36).slice(2, 9),
       name: 'Test Product',
       basePriceKgs: 1000,
-      basePriceUsd: 11.36,
       stockQuantity: 10,
       ...overrides
     }
-  });
-};
-
-const seedRate = async (rate = 88.5) => {
-  return prisma.exchangeRate.upsert({
-    where: { currency: 'USD' },
-    update: { rateToKgs: rate },
-    create: { currency: 'USD', rateToKgs: rate }
   });
 };
 
@@ -35,11 +26,10 @@ describe('POST /api/v1/checkout', () => {
     await prisma.orderItem.deleteMany();
     await prisma.order.deleteMany();
     await prisma.product.deleteMany();
-    await seedRate();
   });
 
   it('creates a pending order with QR payload', async () => {
-    const product = await seedProduct({ basePriceKgs: 1500, basePriceUsd: 16.95 });
+    const product = await seedProduct({ basePriceKgs: 1500 });
 
     const res = await request(app)
       .post('/api/v1/checkout')
@@ -151,7 +141,6 @@ describe('GET /api/v1/checkout/:orderId', () => {
     await prisma.orderItem.deleteMany();
     await prisma.order.deleteMany();
     await prisma.product.deleteMany();
-    await seedRate();
   });
 
   it('returns the order with items + products', async () => {

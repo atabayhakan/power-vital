@@ -100,12 +100,9 @@ const onFocus = () => {
 };
 
 const priceFor = (p: any): string => {
-  const usd = Number(p.basePriceUsd || 0);
-  if (!isFinite(usd) || usd <= 0) return '';
-  // Live conversion uses the same 90 KGS/USD placeholder the rest
-  // of the home page uses. Frontend currency toggle will replace
-  // the rendered form when the visitor flips it.
-  return `${Math.round(usd * 90).toLocaleString('tr-TR')} KGS`;
+  const kgs = Number(p.basePriceKgs || 0);
+  if (!isFinite(kgs) || kgs <= 0) return '';
+  return `${Math.round(kgs).toLocaleString('tr-TR')} KGS`;
 };
 
 const imageOf = (p: any): string => {

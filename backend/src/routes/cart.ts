@@ -42,8 +42,8 @@ const heartbeatLimiter = limit({
  * POST /api/v1/cart/heartbeat
  *
  * Body:
- *   items: [{ id, name, imageUrl?, basePriceUsd, quantity }, ...]
- *   totals: { usd: number; kgs: number }
+ *   items: [{ id, name, imageUrl?, basePriceKgs, quantity }, ...]
+ *   totals: { kgs: number }
  *
  * Returns 204 on success (no body needed — UI doesn't need
  * to wait for our DB write).
@@ -61,7 +61,7 @@ router.post('/heartbeat', heartbeatLimiter, authenticateJWT, validate({ body: Ca
     const guestId = (req as any).cookies?.pv_guest_id || null;
     const body = req.body as {
       items: any[];
-      totals: { usd: number; kgs: number };
+      totals: { kgs: number };
     };
 
     if (!userId && !guestId) {
@@ -71,7 +71,6 @@ router.post('/heartbeat', heartbeatLimiter, authenticateJWT, validate({ body: Ca
     }
 
     const items = Array.isArray(body.items) ? body.items : [];
-    const totalUsd = Number(body.totals?.usd) || 0;
     const totalKgs = Number(body.totals?.kgs) || 0;
 
     await trackActivity({
@@ -81,10 +80,9 @@ router.post('/heartbeat', heartbeatLimiter, authenticateJWT, validate({ body: Ca
         id: String(i.id || ''),
         name: String(i.name || ''),
         imageUrl: i.imageUrl ? String(i.imageUrl) : undefined,
-        basePriceUsd: Number(i.basePriceUsd) || 0,
+        basePriceKgs: Number(i.basePriceKgs) || 0,
         quantity: Math.max(1, Math.floor(Number(i.quantity) || 1))
       })),
-      totalUsd,
       totalKgs
     });
 

@@ -30,7 +30,6 @@ const makeOrderWithReceipt = async (totalKgs = 1000) => {
     data: {
       status: 'pending',
       totalKgs,
-      totalUsd: 0,
       paymentMethod: 'qr_transfer',
       customerName: 'OCR Test',
       customerPhone: '+996555000000',
@@ -78,7 +77,6 @@ describe('POST /api/v1/checkout/:orderId/verify (OCR strict mode)', () => {
       data: {
         status: 'pending',
         totalKgs: 1000,
-        totalUsd: 0,
         paymentMethod: 'qr_transfer',
         customerName: 'X',
         customerPhone: '+996'
