@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, onUnmounted } from 'vue';
 import axios from 'axios';
 import { useI18n } from 'vue-i18n';
 import { calculatePrice } from '../utils/PriceEngine';
@@ -133,6 +133,12 @@ const openModal = (product?: Product) => {
 };
 
 const closeModal = () => { isModalOpen.value = false; editingProductId.value = null; };
+
+const onModalKeydown = (e: KeyboardEvent) => {
+  if (e.key === 'Escape' && isModalOpen.value) closeModal();
+};
+onMounted(() => window.addEventListener('keydown', onModalKeydown));
+onUnmounted(() => window.removeEventListener('keydown', onModalKeydown));
 
 const uploadImage = async (e: Event) => {
   const input = e.target as HTMLInputElement;
@@ -350,7 +356,7 @@ onMounted(fetchProducts);
 
     <!-- Modal -->
     <div v-if="isModalOpen" class="modal-overlay">
-      <div class="glass-modal">
+      <div class="product-edit-modal">
         <div class="modal-header">
           <div style="display: flex; align-items: center; gap: 12px;">
             <h3>{{ editingProductId ? 'Ürünü Düzenle' : 'Yeni Ürün Ekle' }}</h3>
@@ -568,9 +574,9 @@ onMounted(fetchProducts);
 
 /* ═══ MODAL ═══ */
 .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 24px; }
-.glass-modal { background: #ffffff; border: 1px solid #e5e7eb; border-radius: 24px; width: 100%; max-width: 640px; max-height: 90vh; overflow-y: auto; padding: 32px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04); }
-.glass-modal::-webkit-scrollbar { width: 6px; }
-.glass-modal::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 6px; }
+.product-edit-modal { background: #ffffff; border: 1px solid #e5e7eb; border-radius: 24px; width: 100%; max-width: 640px; max-height: 90vh; overflow-y: auto; padding: 32px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04); }
+.product-edit-modal::-webkit-scrollbar { width: 6px; }
+.product-edit-modal::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 6px; }
 
 .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
 .modal-header h3 { font-size: 1.5rem; font-family: var(--font-display); font-weight: 800; color: #111827; margin: 0; }

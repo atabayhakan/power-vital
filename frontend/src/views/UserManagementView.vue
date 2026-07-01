@@ -85,7 +85,13 @@ const focusUser = (user: { id: string; name: string; email: string; role: string
 import { onUnmounted } from 'vue';
 onUnmounted(() => {
   if (flashTimer) clearTimeout(flashTimer);
+  window.removeEventListener('keydown', onImpersonateModalKeydown);
 });
+
+const onImpersonateModalKeydown = (e: KeyboardEvent) => {
+  if (e.key === 'Escape' && showImpersonateModal.value) showImpersonateModal.value = false;
+};
+onMounted(() => window.addEventListener('keydown', onImpersonateModalKeydown));
 
 const openImpersonate = (user: any) => {
   impersonateTarget.value = { id: user.id, name: user.name, email: user.email, role: user.role };

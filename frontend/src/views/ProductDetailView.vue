@@ -172,6 +172,12 @@ const handleScroll = () => {
 
 onMounted(() => { window.addEventListener('scroll', handleScroll, { passive: true }); });
 onUnmounted(() => { window.removeEventListener('scroll', handleScroll); });
+
+const onLightboxKeydown = (e: KeyboardEvent) => {
+  if (e.key === 'Escape' && isLightboxOpen.value) isLightboxOpen.value = false;
+};
+onMounted(() => window.addEventListener('keydown', onLightboxKeydown));
+onUnmounted(() => window.removeEventListener('keydown', onLightboxKeydown));
 </script>
 
 <template>

@@ -14,7 +14,13 @@
 // Adding/removing fields on the backend will surface as a compile-time error here.
 
 import type { paths } from './types';
-import api from '@/utils/api';
+import api from '../utils/api';
+
+// The shared `api` axios instance sets baseURL '/api/v1'. The generated `paths`
+// keys are FULL paths ('/api/v1/...'), so passing them straight through would
+// produce a doubled '/api/v1/api/v1/...' URL (→ 404). Strip the prefix here so
+// baseURL re-adds exactly one copy.
+const rel = (p: string): string => p.replace(/^\/api\/v1(?=\/|$)/, '');
 
 type Method = 'get' | 'post' | 'put' | 'patch' | 'delete';
 
@@ -62,7 +68,7 @@ export interface TypedResponse<T> {
 }
 
 export async function apiGet<P extends ApiPath>(path: P, opts: RequestOptions<P> = {}): Promise<TypedResponse<SuccessResponse<P, 'get'>>> {
-  const res = await api.get(path, {
+  const res = await api.get(rel(path), {
     params: opts.query as Record<string, unknown> | undefined,
     signal: opts.signal,
   });
@@ -74,7 +80,7 @@ export async function apiPost<P extends ApiPath>(
   body: RequestBody<P, 'post'>,
   opts: RequestOptions<P> = {}
 ): Promise<TypedResponse<SuccessResponse<P, 'post'>>> {
-  const res = await api.post(path, body, {
+  const res = await api.post(rel(path), body, {
     params: opts.query as Record<string, unknown> | undefined,
     signal: opts.signal,
   });
@@ -86,7 +92,7 @@ export async function apiPut<P extends ApiPath>(
   body: RequestBody<P, 'put'>,
   opts: RequestOptions<P> = {}
 ): Promise<TypedResponse<SuccessResponse<P, 'put'>>> {
-  const res = await api.put(path, body, {
+  const res = await api.put(rel(path), body, {
     params: opts.query as Record<string, unknown> | undefined,
     signal: opts.signal,
   });
@@ -98,7 +104,7 @@ export async function apiPatch<P extends ApiPath>(
   body: RequestBody<P, 'patch'>,
   opts: RequestOptions<P> = {}
 ): Promise<TypedResponse<SuccessResponse<P, 'patch'>>> {
-  const res = await api.patch(path, body, {
+  const res = await api.patch(rel(path), body, {
     params: opts.query as Record<string, unknown> | undefined,
     signal: opts.signal,
   });
@@ -109,7 +115,7 @@ export async function apiDelete<P extends ApiPath>(
   path: P,
   opts: RequestOptions<P> = {}
 ): Promise<TypedResponse<SuccessResponse<P, 'delete'>>> {
-  const res = await api.delete(path, {
+  const res = await api.delete(rel(path), {
     params: opts.query as Record<string, unknown> | undefined,
     signal: opts.signal,
   });

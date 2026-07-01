@@ -119,6 +119,14 @@ const moveBlockBy = (id: string, dir: -1 | 1) => {
 const blockToDelete = ref<string | null>(null);
 const confirmDelete = (id: string) => { blockToDelete.value = id; };
 const cancelDelete = () => { blockToDelete.value = null; };
+
+const onModalKeydown = (e: KeyboardEvent) => {
+  if (e.key !== 'Escape') return;
+  if (libraryOpen.value) libraryOpen.value = false;
+  else if (blockToDelete.value) cancelDelete();
+};
+onMounted(() => window.addEventListener('keydown', onModalKeydown));
+onBeforeUnmount(() => window.removeEventListener('keydown', onModalKeydown));
 const performDelete = () => {
   if (!blockToDelete.value) return;
   if (selectedBlockId.value === blockToDelete.value) selectedBlockId.value = null;

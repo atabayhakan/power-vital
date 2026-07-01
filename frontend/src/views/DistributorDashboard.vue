@@ -234,7 +234,7 @@ const markAllAsRead = () => {
 
 .stat-change {
   font-size: 12px;
-  color: #888;
+  color: var(--color-text-muted);
 }
 
 .main-widgets {
@@ -269,7 +269,7 @@ const markAllAsRead = () => {
   justify-content: center;
   gap: 12px;
   text-decoration: none;
-  color: white;
+  color: var(--color-text-main);
   transition: all 0.3s ease;
   cursor: pointer;
 }
@@ -295,7 +295,7 @@ const markAllAsRead = () => {
 .data-table th, .data-table td { padding: 16px; border-bottom: 1px solid rgba(255,255,255,0.05); }
 .data-table th { color: var(--color-text-muted); font-size: 12px; text-transform: uppercase; letter-spacing: 1px; }
 .mono { font-family: monospace; }
-.bold { font-weight: 700; color: #f4f4f5; }
+.bold { font-weight: 700; color: var(--color-text-main); }
 .status-badge { padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 700; }
 
 @media (max-width: 768px) {
@@ -342,7 +342,7 @@ const markAllAsRead = () => {
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 2px solid #0A0A0C;
+  border: 2px solid var(--color-bg-dark);
 }
 
 .glow-badge {

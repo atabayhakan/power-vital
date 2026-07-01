@@ -256,7 +256,7 @@ const submitForm = async () => {
   text-align: center;
   background: rgba(0,0,0,0.02);
   border-radius: 16px;
-  color: #71717a;
+  color: var(--text-muted, #71717a);
   border: 1px dashed rgba(0,0,0,0.1);
 }
 
@@ -321,7 +321,7 @@ const submitForm = async () => {
 
 .success-msg {
   background: rgba(16, 185, 129, 0.1);
-  color: #059669;
+  color: var(--color-success, #059669);
   padding: 16px;
   border-radius: 12px;
   font-weight: 600;

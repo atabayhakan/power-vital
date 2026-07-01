@@ -1,9 +1,15 @@
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue';
+import { ref, computed, watch, onMounted, onUnmounted } from 'vue';
 import axios from 'axios';
 
 const props = defineProps<{ isOpen: boolean }>();
 const emit = defineEmits(['close', 'select']);
+
+const onKeydown = (e: KeyboardEvent) => {
+  if (e.key === 'Escape' && props.isOpen) emit('close');
+};
+onMounted(() => window.addEventListener('keydown', onKeydown));
+onUnmounted(() => window.removeEventListener('keydown', onKeydown));
 
 const token = () => localStorage.getItem('token') || '';
 const authHeaders = () => token() ? { Authorization: `Bearer ${token()}` } : {};

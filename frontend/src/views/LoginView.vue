@@ -74,46 +74,49 @@ const login = async () => {
 
 <style scoped>
 .auth-wrapper {
-  height: 100vh;
-  width: 100vw;
+  min-height: 100vh;
+  min-height: 100dvh;
+  width: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #f8f9fa;
-  font-family: 'Poppins', sans-serif;
+  padding: var(--space-lg, 20px);
+  background: var(--surface-page);
+  font-family: var(--font-body);
 }
 
 .auth-card {
   width: 100%;
   max-width: 420px;
-  background: white;
-  padding: 40px;
-  border-radius: 12px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.05);
-  border: 1px solid #eee;
+  background: var(--surface-card);
+  padding: var(--space-2xl, 40px);
+  border-radius: var(--radius-xl, 24px);
+  box-shadow: var(--clay-shadow-lg);
+  border: 1px solid rgba(255, 255, 255, 0.4);
 }
 
 .auth-header {
   text-align: center;
-  margin-bottom: 30px;
+  margin-bottom: var(--space-2xl, 30px);
 }
 
 .brand-text {
-  font-size: 28px;
-  font-weight: 800;
-  color: #000;
+  font-family: var(--font-display);
+  font-size: 1.75rem;
+  font-weight: 900;
+  color: var(--text-primary);
   margin: 0;
   letter-spacing: -0.5px;
 }
 
 .brand-text .vital {
-  color: var(--color-primary);
+  color: var(--pv-red);
 }
 
 .auth-header p {
-  color: #666;
+  color: var(--text-muted);
   font-size: 14px;
-  margin-top: 8px;
+  margin-top: var(--space-sm, 8px);
 }
 
 .auth-form {
@@ -130,51 +133,36 @@ const login = async () => {
 
 .form-group label {
   font-size: 13px;
-  font-weight: 600;
-  color: #333;
+  font-weight: 700;
+  color: var(--text-secondary);
 }
 
 .light-input {
   padding: 12px 16px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
+  border: 1px solid var(--surface-inset);
+  border-radius: var(--radius-sm, 8px);
   font-size: 15px;
   outline: none;
-  transition: border-color 0.2s;
-  background: #fff;
-  color: #000;
+  transition: border-color var(--duration-fast, 0.2s) var(--ease-smooth);
+  background: var(--surface-white);
+  color: var(--text-primary);
 }
 
 .light-input:focus {
-  border-color: var(--color-primary);
+  border-color: var(--pv-red);
 }
 
 .auth-btn {
   width: 100%;
-  padding: 14px;
-  font-size: 16px;
-  font-weight: 600;
   margin-top: 10px;
-  background: #000;
-  border-radius: 8px;
-  transition: background 0.3s;
-}
-
-.auth-btn:hover {
-  background: var(--color-primary);
-}
-
-.auth-btn:disabled {
-  opacity: 0.7;
-  cursor: not-allowed;
 }
 
 .error-msg {
-  color: #e74c3c;
+  color: var(--color-error);
   font-size: 13px;
-  background: rgba(231, 76, 60, 0.1);
+  background: rgba(197, 48, 48, 0.1);
   padding: 10px;
-  border-radius: 6px;
+  border-radius: var(--radius-sm, 6px);
   text-align: center;
 }
 
@@ -182,12 +170,12 @@ const login = async () => {
   margin-top: 24px;
   text-align: center;
   font-size: 14px;
-  color: #666;
+  color: var(--text-muted);
 }
 
 .auth-footer a {
-  color: var(--color-primary);
-  font-weight: 600;
+  color: var(--pv-red);
+  font-weight: 700;
   text-decoration: none;
 }
 </style>

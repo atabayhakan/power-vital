@@ -9,7 +9,7 @@
 //   • It's a small focused view; a dedicated /admin/impersonation/sessions
 //     route is overkill.
 
-import { ref, computed, watch } from 'vue';
+import { ref, computed, watch, onMounted, onUnmounted } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { apiGet } from '@/api/openapi-client';
 import { useCursorPagination } from '../../composables/useCursorPagination';
@@ -64,6 +64,12 @@ const fmtDuration = (startIso: string, endIso: string | null) => {
 };
 
 const visibleItems = computed(() => list.items.value);
+
+const onKeydown = (e: KeyboardEvent) => {
+  if (e.key === 'Escape' && props.open) emit('close');
+};
+onMounted(() => window.addEventListener('keydown', onKeydown));
+onUnmounted(() => window.removeEventListener('keydown', onKeydown));
 </script>
 
 <template>

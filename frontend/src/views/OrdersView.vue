@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted, onUnmounted, computed } from 'vue';
 import axios from 'axios';
 import { apiPost } from '@/api/openapi-client';
 import { useAuthStore } from '../stores/useAuthStore';
@@ -179,15 +179,31 @@ const updateStatus = async (id: string, newStatus: string) => {
   }
 };
 
-// Revert an order's progress back to the initial "pending" state so the admin
-// can re-process or delete it. We reset to 'pending' (rather than stepping one
-// status back) on purpose: 'pending' triggers no side effects, whereas
-// re-applying 'paid'/'completed' would re-run bonus/ascension logic.
-// NOTE: bonuses already awarded on earlier paid/completed transitions are NOT
-// auto-reversed — this only resets the workflow state.
-const revertOrder = (order: any) => {
+// Full revert ("Geri Al"): reset to pending AND undo every financial/career
+// effect — claw back MLM bonuses from upline wallets + recompute the buyer's
+// loyalty level / discount / role. Backend does it atomically + idempotently.
+const revertOrder = async (order: any) => {
   if (order.status === 'pending') return;
-  updateStatus(order.id, 'pending');
+  const shortId = String(order.id).slice(0, 8).toUpperCase();
+  const ok = (globalThis as any).confirm?.(
+    `#${shortId} siparişi GERİ ALINACAK:\n` +
+    `• Durum "Bekliyor"a dönecek\n` +
+    `• Bu siparişten dağıtılan tüm bonus/prim ilgili cüzdanlardan geri alınacak (bakiye eksiye düşebilir)\n` +
+    `• Alıcının kariyer/seviye/indirimi yeniden hesaplanacak\n\nDevam edilsin mi?`
+  );
+  if (!ok) return;
+  try {
+    const { data } = await axios.post(`/api/v1/orders/${order.id}/revert`, {}, { headers: headers() });
+    const o = orders.value.find(x => x.id === order.id);
+    if (o) o.status = 'pending';
+    const n = (data as any)?.reversedBonusCount ?? 0;
+    const kgs = Math.round((data as any)?.reversedBonusKgs ?? 0);
+    triggerToast(n > 0 ? `Geri alındı — ${n} prim (${kgs.toLocaleString('ru-RU')} KGS) iade edildi.` : 'Sipariş geri alındı (Bekliyor).');
+    setTimeout(() => fetchOrders(true), 500);
+  } catch (e: any) {
+    console.error('Revert failed:', e);
+    triggerToast('Geri alınamadı: ' + (e?.response?.data?.error || e.message));
+  }
 };
 
 // Permanently delete an order (admin only) — irreversible, hence the confirm.
@@ -260,6 +276,12 @@ const closeDetail = () => {
   selectedOrder.value = null;
   if (typeof document !== 'undefined') document.body.style.overflow = '';
 };
+
+const onDetailKeydown = (e: KeyboardEvent) => {
+  if (e.key === 'Escape' && selectedOrder.value) closeDetail();
+};
+onMounted(() => window.addEventListener('keydown', onDetailKeydown));
+onUnmounted(() => window.removeEventListener('keydown', onDetailKeydown));
 const paymentLabel = (m: string) => {
   if (m === 'cash') return t('orders.payCash');
   if (m === 'qr_transfer') return t('orders.payTransfer');

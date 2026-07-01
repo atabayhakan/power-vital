@@ -8,7 +8,7 @@
 //   4. Top senders — most active admins (last 30 days)
 //
 // Backend: GET /api/v1/push/analytics
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, onUnmounted } from 'vue';
 import axios from 'axios';
 import { usePolling } from '../composables/usePolling';
 import { useTranslate } from '../composables/useTranslate';
@@ -149,6 +149,12 @@ const closeDrillDown = () => {
   drillDown.value = null;
   drillDownEventKey.value = '';
 };
+
+const onDrillDownKeydown = (e: KeyboardEvent) => {
+  if (e.key === 'Escape' && drillDownEventKey.value) closeDrillDown();
+};
+onMounted(() => window.addEventListener('keydown', onDrillDownKeydown));
+onUnmounted(() => window.removeEventListener('keydown', onDrillDownKeydown));
 
 const changeDrillDownHours = async (h: number) => {
   drillDownHours.value = h;

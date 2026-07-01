@@ -626,7 +626,7 @@ const isOutOfStock = (p: any) => p.stockQuantity === 0;
   text-align: center; padding: 12px 20px; margin-bottom: 16px;
   background: rgba(245, 158, 11, 0.12);
   border: 1px solid rgba(245, 158, 11, 0.3);
-  color: #fbbf24; border-radius: 12px;
+  color: var(--text-warning); border-radius: 12px;
   font-size: 14px; font-weight: 600;
   font-family: var(--font-body);
 }

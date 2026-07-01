@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useCartStore } from '../stores/useCartStore';
 import { useRouter } from 'vue-router';
-import { computed, ref, onMounted } from 'vue';
+import { computed, ref, onMounted, onUnmounted } from 'vue';
 import api from '../utils/api';
 import { formatPrice } from '../utils/PriceEngine';
 import { useGamification } from '../composables/useGamification';
@@ -17,6 +17,12 @@ const router = useRouter();
 const closeCart = () => { cartStore.isCartOpen = false; };
 const closeCartAndExplore = () => { closeCart(); router.push('/katalog'); };
 const goToCheckout = () => { closeCart(); router.push('/checkout'); };
+
+const onKeydown = (e: KeyboardEvent) => {
+  if (e.key === 'Escape' && cartStore.isCartOpen) closeCart();
+};
+onMounted(() => window.addEventListener('keydown', onKeydown));
+onUnmounted(() => window.removeEventListener('keydown', onKeydown));
 
 // Free shipping uses the SINGLE source of truth from the cart store
 // (KGS equivalent of the configured $100 USD threshold — matches checkout).

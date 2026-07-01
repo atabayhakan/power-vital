@@ -1310,18 +1310,6 @@ input, select, textarea {
   -webkit-overflow-scrolling: touch; 
 }
 
-/* Mobile White Background Overrides */
-@media (max-width: 768px) {
-  :root {
-    --surface-page: #FFFFFF;
-    --surface-card: #FFFFFF;
-    --color-bg-storefront: #FFFFFF;
-    --color-bg: #FFFFFF;
-    --surface-section-alt: #F9F6F1;
-    --surface-section-warm: #F9F6F1;
-  }
-}
-
 /* Fix for dark modals in light mode */
 [data-theme='light'] .glass-modal h1, 
 [data-theme='light'] .glass-modal h2, 

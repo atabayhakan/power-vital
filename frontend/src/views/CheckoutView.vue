@@ -102,6 +102,8 @@ const submitOrder = async () => {
 
 const goToUpload = () => { step.value = 3; };
 
+const isPdfReceipt = computed(() => receiptFile.value?.type === 'application/pdf');
+
 const onFileChange = (e: Event) => {
   const input = e.target as HTMLInputElement;
   if (input.files && input.files[0]) {
@@ -329,7 +331,7 @@ const copyAndOpen = async (account: string, deepLink: string, targetName: string
         </div>
 
         <div class="co-quick-pay" v-if="bankInfo.mbankAccount || bankInfo.kaspiAccount || bankInfo.optimaAccount">
-          <p class="co-sub" style="font-size:0.85rem; margin-bottom:12px; color: #a1a1aa;">🚀 {{ t('checkout.quickPay') }}</p>
+          <p class="co-sub" style="font-size:0.85rem; margin-bottom:12px; color: var(--text-muted);">🚀 {{ t('checkout.quickPay') }}</p>
           <div class="bank-btn-group">
             <button v-if="bankInfo.mbankAccount" class="bank-btn mbank" @click="copyAndOpen(bankInfo.mbankAccount, 'mbank://', 'mbank')">
               <img src="https://www.google.com/s2/favicons?domain=mbank.kg&sz=64" alt="MBank Logo" class="bank-logo-img" />
@@ -374,6 +376,10 @@ const copyAndOpen = async (account: string, deepLink: string, targetName: string
             <p class="up-title">{{ t('checkout.uploadHint') }}</p>
             <small class="up-sub">{{ t('checkout.uploadFormats') }}</small>
           </template>
+          <div v-else-if="isPdfReceipt" class="co-upload-pdf">
+            <span class="co-upload-pdf-icon">📄</span>
+            <span class="co-upload-pdf-name">{{ receiptFile?.name }}</span>
+          </div>
           <img v-else :src="receiptPreview" class="co-upload-preview" />
         </div>
         <input ref="fileInput" type="file" accept="image/*,.pdf" @change="onFileChange" style="display:none" />
@@ -615,11 +621,14 @@ const copyAndOpen = async (account: string, deepLink: string, targetName: string
 .up-title { font-size: 1.2rem; font-weight: 800; font-family: var(--font-display); color: var(--text-primary); margin: 0 0 8px 0; }
 .up-sub { font-size: 0.95rem; color: var(--text-secondary); }
 .co-upload-preview { max-height: 300px; max-width: 100%; border-radius: 12px; object-fit: contain; }
+.co-upload-pdf { display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 24px; }
+.co-upload-pdf-icon { font-size: 56px; }
+.co-upload-pdf-name { font-size: 0.9rem; font-weight: 700; color: var(--text-primary); word-break: break-all; max-width: 260px; }
 
 /* Result */
 .co-result-icon { font-size: 100px; margin-bottom: 24px; display: inline-block; }
 .co-result-icon.success { color: var(--color-success); }
-.co-result-icon.pending { color: #f59e0b; }
+.co-result-icon.pending { color: var(--color-warning); }
 .scale-in { animation: scaleIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
 @keyframes scaleIn { from { transform: scale(0); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 .pulse { animation: pulseAnim 2s infinite; }
@@ -639,13 +648,13 @@ const copyAndOpen = async (account: string, deepLink: string, targetName: string
   margin: 24px 0;
   border-radius: 14px;
   background: linear-gradient(135deg, rgba(245,158,11,0.14), rgba(239,68,68,0.08));
-  border: 1.5px solid #f59e0b;
+  border: 1.5px solid var(--color-warning);
   box-shadow: 0 4px 16px rgba(245,158,11,0.12);
   text-align: left;
 }
 .verify-alert-icon { font-size: 1.8rem; line-height: 1; flex-shrink: 0; }
 .verify-alert-body { display: flex; flex-direction: column; gap: 4px; }
-.verify-alert-title { color: #b45309; font-weight: 800; font-family: var(--font-display); font-size: 1.05rem; }
+.verify-alert-title { color: var(--text-warning); font-weight: 800; font-family: var(--font-display); font-size: 1.05rem; }
 .verify-alert-text { color: var(--text-body); font-size: 0.92rem; line-height: 1.45; }
 
 .co-quick-pay {
