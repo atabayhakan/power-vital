@@ -4,7 +4,7 @@
 // Pulls from /api/v1/errors/recent and lets the admin mark each
 // error as resolved with an optional note. Uses ErrorBoundary so a
 // broken card doesn't take down the whole page.
-import { ref, onMounted } from 'vue';
+import { ref, reactive, onMounted } from 'vue';
 import { apiGet, apiPost } from '@/api/openapi-client';
 import ErrorBoundary from '../components/ErrorBoundary.vue';
 
@@ -22,13 +22,17 @@ interface ClientErrorRow {
 const errors = ref<ClientErrorRow[]>([]);
 const isLoading = ref(false);
 const errorMsg = ref('');
+const successMsg = ref('');
 const includeResolved = ref(false);
 const resolvingId = ref<string | null>(null);
-const resolveNote = ref('');
+// Keyed by row id, not a single shared ref, so typing a note in one
+// row's input doesn't leak into every other row's input.
+const resolveNotes = reactive<Record<string, string>>({});
 
 const load = async () => {
   isLoading.value = true;
   errorMsg.value = '';
+  successMsg.value = '';
   try {
     const query: Record<string, string | number> = { limit: 200 };
     if (includeResolved.value) query.resolved = 'true';
@@ -49,14 +53,17 @@ const fmtDate = (iso: string): string => {
 
 const resolve = async (id: string) => {
   resolvingId.value = id;
+  errorMsg.value = '';
+  successMsg.value = '';
   try {
     // The id is dynamic (route param), so the literal-path typing in
     // openapi-client can't see this specific value. We cast to `any`
     // only at the call site to keep the rest of the function strict.
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    await (apiPost as any)(`/api/v1/errors/${id}/resolve`, { resolvedNote: resolveNote.value || undefined });
+    await (apiPost as any)(`/api/v1/errors/${id}/resolve`, { resolvedNote: resolveNotes[id] || undefined });
+    delete resolveNotes[id];
     await load();
-    resolveNote.value = '';
+    successMsg.value = 'Çözüldü olarak işaretlendi.';
   } catch (e: any) {
     errorMsg.value = e.response?.data?.error || 'Çözüldü olarak işaretlenemedi';
   } finally {
@@ -82,6 +89,7 @@ onMounted(load);
       </header>
 
       <p v-if="errorMsg" class="ae-error">{{ errorMsg }}</p>
+      <p v-if="successMsg" class="ae-success">{{ successMsg }}</p>
 
       <p v-if="!isLoading && errors.length === 0" class="ae-empty">
         Aktif hata kaydı yok 🎉
@@ -97,7 +105,7 @@ onMounted(load);
           </div>
           <pre class="ae-message">{{ row.message }}</pre>
           <div class="ae-actions">
-            <input v-model="resolveNote" type="text" placeholder="Çözüm notu (opsiyonel)" class="ae-note" />
+            <input v-model="resolveNotes[row.id]" type="text" placeholder="Çözüm notu (opsiyonel)" class="ae-note" />
             <button type="button"
                     class="ae-resolve"
                     :disabled="row.resolved || resolvingId === row.id"
@@ -143,6 +151,12 @@ onMounted(load);
 .ae-error {
   color: #b00020;
   background: #fff5f5;
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+}
+.ae-success {
+  color: #1a7a1a;
+  background: #f2fbf2;
   padding: 0.5rem 0.75rem;
   border-radius: 6px;
 }

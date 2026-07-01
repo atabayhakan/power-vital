@@ -18,8 +18,19 @@ import prisma from '../lib/prisma';
 import { logger } from '../utils/logger';
 import { z } from 'zod';
 import { authenticateJWT } from '../middleware/auth';
+import { limit } from '../utils/rateLimit';
 
 const router = Router();
+
+// Only the public, unauthenticated /report endpoint needs abuse
+// protection. Scoping it here (rather than at the router mount in
+// index.ts) keeps it from also wrapping the admin-only /recent and
+// /:id/resolve routes below.
+const reportLimiter = limit({
+  name: 'errors:report',
+  max: 60,
+  windowSeconds: 300
+});
 
 // Limits — keep generous for "real" crash reports, low enough that a
 // malicious client can't fill the table in seconds.
@@ -50,7 +61,7 @@ const ReportSchema = z.object({
   clientTimestamp: z.string().datetime().optional(),
 });
 
-router.post('/report', async (req: Request, res: Response) => {
+router.post('/report', reportLimiter, async (req: Request, res: Response) => {
   const parsed = ReportSchema.safeParse(req.body);
   if (!parsed.success) {
     res.status(400).json({ error: 'invalid payload', details: parsed.error.flatten() });

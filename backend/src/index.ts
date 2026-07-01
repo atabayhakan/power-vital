@@ -233,14 +233,11 @@ app.use('/api/v1/presence', presenceRoutes);
 app.use('/api/v1/inventory', inventoryRoutes);
 
 // Front-end error ingestion. Mounted BEFORE the admin catch-all so
-// the public /report endpoint doesn't get shadowed.
+// the public /report endpoint doesn't get shadowed. Rate limiting for
+// the public /report route is applied inside errors.ts itself, scoped
+// to just that route (not the admin-only /recent and /:id/resolve).
 import errorsRoutes from './routes/errors';
-const errorsReportLimiter = limit({
-  name: 'errors:report',
-  max: 60,
-  windowSeconds: 300
-});
-app.use('/api/v1/errors', errorsReportLimiter as any, errorsRoutes);
+app.use('/api/v1/errors', errorsRoutes);
 
 // Serve uploaded files
 // Use UPLOAD_DIR env var if set, else fallback relative to compiled __dirname
