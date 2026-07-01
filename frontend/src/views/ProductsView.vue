@@ -95,8 +95,16 @@ const parseAccordions = (raw: any): AccordionEntry[] => {
 const fetchProducts = async () => {
   isLoading.value = true;
   try {
+    // GET /api/v1/products serves the public storefront catalogue too, so
+    // it's sent with Cache-Control: public, max-age=60 — the server's own
+    // Redis cache is correctly invalidated on save, but without this the
+    // BROWSER's HTTP cache would keep serving the pre-edit response to this
+    // exact URL for up to 60s, so a just-saved price change wouldn't show
+    // until the cache window happened to expire (e.g. after navigating
+    // away and back). 'no-cache' forces revalidation with the server on
+    // every admin fetch instead of trusting the stale local copy.
     const [pRes, cRes] = await Promise.all([
-      axios.get('/api/v1/products', { headers: headers() }),
+      axios.get('/api/v1/products', { headers: { ...headers(), 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' } }),
       axios.get('/api/v1/categories', { headers: headers() })
     ]);
     products.value = (pRes.data || []).filter((p: Product) => p.id !== 'default-product' && p.barcode !== '000000');
