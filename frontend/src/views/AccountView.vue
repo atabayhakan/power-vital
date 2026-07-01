@@ -478,7 +478,11 @@ const logout = () => { authStore.logout(); router.push('/login'); };
   .acc { padding: 20px 16px 48px; }
   .acc-hero__title { font-size: 1.5rem; }
   .acc-hero__actions { width: 100%; }
-  .acc-hero__actions .acc-btn { flex: 1; justify-content: center; }
+  /* min-width:0 overrides the flex-item default (min-width:auto), which was
+     otherwise forcing each button to at least its content's un-wrapped width —
+     with the long "Соодалашууну улантуу" label that alone ate ~75% of the row,
+     leaving "Чыгуу" squeezed to a sliver instead of the intended 50/50 split. */
+  .acc-hero__actions .acc-btn { flex: 1; min-width: 0; justify-content: center; white-space: normal; text-align: center; }
   .acc-campaign__cta { width: 100%; justify-content: center; }
 }
 </style>
