@@ -53,53 +53,53 @@ const routes = [
   { path: '/pv-hq-admin', name: 'AdminLogin', component: () => import('../views/AdminLoginView.vue'), meta: { layout: 'public' } },
 
   // --- Dashboard Routes ---
-  { path: '/account', name: 'AccountDashboard', component: AccountView, meta: { layout: 'dashboard' } }, // Profile & Orders
-  { path: '/account/wallet', name: 'WalletDashboard', component: () => import('../views/WalletView.vue'), meta: { layout: 'dashboard' } }, // Gamification & Wallet
-  { path: '/account/support', name: 'Support', component: () => import('../views/SupportView.vue'), meta: { layout: 'dashboard' } }, // Support Dashboard
-  { path: '/admin', name: 'AdminDashboard', component: () => import('../components/AdminDashboard.vue'), meta: { layout: 'dashboard', role: 'admin' } },
-  { path: '/dashboard', name: 'DistributorDashboard', component: DistributorDashboard, meta: { layout: 'dashboard', role: 'distributor' } },
+  { path: '/account', name: 'AccountDashboard', component: AccountView, meta: { layout: 'dashboard', title: 'Hesabım' } }, // Profile & Orders
+  { path: '/account/wallet', name: 'WalletDashboard', component: () => import('../views/WalletView.vue'), meta: { layout: 'dashboard', title: 'Cüzdanım' } }, // Gamification & Wallet
+  { path: '/account/support', name: 'Support', component: () => import('../views/SupportView.vue'), meta: { layout: 'dashboard', title: 'Destek' } }, // Support Dashboard
+  { path: '/admin', name: 'AdminDashboard', component: () => import('../components/AdminDashboard.vue'), meta: { layout: 'dashboard', role: 'admin', title: 'Yönetim Paneli' } },
+  { path: '/dashboard', name: 'DistributorDashboard', component: DistributorDashboard, meta: { layout: 'dashboard', role: 'distributor', title: 'Distribütör Paneli' } },
 
   // ═══════════════════════════════════════════════════════════════
   //  TRI-MODAL COMMERCE — E-COMMERCE / POS / MLM
   // ═══════════════════════════════════════════════════════════════
 
   // --- 🛒 RETAIL E-COMMERCE (always active) ---
-  { path: '/orders', name: 'Orders', component: OrdersView, meta: { layout: 'dashboard', group: 'retail' } },
-  { path: '/products', name: 'Products', component: ProductsView, meta: { layout: 'dashboard', role: 'admin', group: 'retail' } },
-  { path: '/categories', name: 'Categories', component: () => import('../views/AdminCategoryManager.vue'), meta: { layout: 'dashboard', role: 'admin', group: 'retail' } },
+  { path: '/orders', name: 'Orders', component: OrdersView, meta: { layout: 'dashboard', group: 'retail', title: 'Siparişler' } },
+  { path: '/products', name: 'Products', component: ProductsView, meta: { layout: 'dashboard', role: 'admin', group: 'retail', title: 'Ürün Yönetimi' } },
+  { path: '/categories', name: 'Categories', component: () => import('../views/AdminCategoryManager.vue'), meta: { layout: 'dashboard', role: 'admin', group: 'retail', title: 'Kategoriler' } },
 
   // --- 💵 POS / PHYSICAL SALES (cashier + admin) ---
-  { path: '/pos', name: 'POS', component: PosView, meta: { layout: 'dashboard', group: 'pos' } },
+  { path: '/pos', name: 'POS', component: PosView, meta: { layout: 'dashboard', group: 'pos', title: 'POS Terminal' } },
 
   // --- 🌳 MLM / NETWORK (guarded by kill switch + role) ---
-  { path: '/network', name: 'Network', component: NetworkView, meta: { layout: 'dashboard', mlm: true, group: 'mlm' } },
-  { path: '/bonus-control', name: 'BonusControl', component: BonusControlView, meta: { layout: 'dashboard', role: 'admin', mlm: true, group: 'mlm' } },
-  { path: '/simulation', name: 'Simulation', component: SimulationView, meta: { layout: 'dashboard', role: 'admin', mlm: true, group: 'mlm' } },
+  { path: '/network', name: 'Network', component: NetworkView, meta: { layout: 'dashboard', mlm: true, group: 'mlm', title: 'Distribütör Ağı' } },
+  { path: '/bonus-control', name: 'BonusControl', component: BonusControlView, meta: { layout: 'dashboard', role: 'admin', mlm: true, group: 'mlm', title: 'Bonus Kontrolü' } },
+  { path: '/simulation', name: 'Simulation', component: SimulationView, meta: { layout: 'dashboard', role: 'admin', mlm: true, group: 'mlm', title: 'Simülasyon' } },
 
   // ═══════════════════════════════════════════════════════════════
   //  ADMIN MANAGEMENT — People / Finance / System / CMS
   // ═══════════════════════════════════════════════════════════════
 
   // --- 👥 PEOPLE & ACCESS (admin) ---
-  { path: '/user-management', name: 'UserManagement', component: UserManagementView, meta: { layout: 'dashboard', role: 'admin', group: 'people' } },
+  { path: '/user-management', name: 'UserManagement', component: UserManagementView, meta: { layout: 'dashboard', role: 'admin', group: 'people', title: 'Kullanıcılar' } },
 
   // --- 💰 FINANCE & PAYMENTS (admin) ---
-  { path: '/finance-payouts', name: 'FinancePayouts', component: FinancePayoutsView, meta: { layout: 'dashboard', role: 'admin', group: 'finance' } },
-  { path: '/finance-settings', name: 'FinanceSettings', component: () => import('../views/AdminFinanceSettings.vue'), meta: { layout: 'dashboard', role: 'admin', group: 'finance' } },
+  { path: '/finance-payouts', name: 'FinancePayouts', component: FinancePayoutsView, meta: { layout: 'dashboard', role: 'admin', group: 'finance', title: 'Çekim Talepleri' } },
+  { path: '/finance-settings', name: 'FinanceSettings', component: () => import('../views/AdminFinanceSettings.vue'), meta: { layout: 'dashboard', role: 'admin', group: 'finance', title: 'Finansal Ayarlar' } },
 
   // --- 🏢 SYSTEM (admin) ---
-  { path: '/site-settings', name: 'SiteSettings', component: SiteSettingsView, meta: { layout: 'dashboard', role: 'admin', group: 'system' } },
-  { path: '/i18n', name: 'I18nCenter', component: AdminI18nView, meta: { layout: 'dashboard', role: 'admin', group: 'system' } },
+  { path: '/site-settings', name: 'SiteSettings', component: SiteSettingsView, meta: { layout: 'dashboard', role: 'admin', group: 'system', title: 'Site Ayarları' } },
+  { path: '/i18n', name: 'I18nCenter', component: AdminI18nView, meta: { layout: 'dashboard', role: 'admin', group: 'system', title: 'Çeviri Merkezi' } },
   // Static UI-strings editor must precede the :model param route so it isn't
   // captured as a model slug.
-  { path: '/i18n/ui-strings', name: 'I18nUiStrings', component: () => import('../views/AdminI18nUiStringsView.vue'), meta: { layout: 'dashboard', role: 'admin', group: 'system' } },
-  { path: '/i18n/:model', name: 'I18nModel', component: () => import('../views/AdminI18nModelView.vue'), meta: { layout: 'dashboard', role: 'admin', group: 'system' } },
-  { path: '/admin-logs', name: 'AdminLogs', component: AdminLogsView, meta: { layout: 'dashboard', role: 'admin', group: 'system' } },
-  { path: '/admin-errors', name: 'AdminErrors', component: () => import('../views/AdminErrorsView.vue'), meta: { layout: 'dashboard', role: 'admin', group: 'system' } },
-  { path: '/admin-broadcast', name: 'AdminBroadcast', component: AdminBroadcastView, meta: { layout: 'dashboard', role: 'admin', group: 'system' } },
-  { path: '/admin-push-analytics', name: 'AdminPushAnalytics', component: AdminPushAnalyticsView, meta: { layout: 'dashboard', role: 'admin', group: 'system' } },
-  { path: '/admin-scheduled', name: 'AdminScheduled', component: AdminScheduledView, meta: { layout: 'dashboard', role: 'admin', group: 'system' } },
-  { path: '/admin-cart-recovery', name: 'AdminCartRecovery', component: () => import('../views/CartRecoveryView.vue'), meta: { layout: 'dashboard', role: 'admin', group: 'system' } },
+  { path: '/i18n/ui-strings', name: 'I18nUiStrings', component: () => import('../views/AdminI18nUiStringsView.vue'), meta: { layout: 'dashboard', role: 'admin', group: 'system', title: 'UI Metinleri' } },
+  { path: '/i18n/:model', name: 'I18nModel', component: () => import('../views/AdminI18nModelView.vue'), meta: { layout: 'dashboard', role: 'admin', group: 'system', title: 'Çeviri Modeli' } },
+  { path: '/admin-logs', name: 'AdminLogs', component: AdminLogsView, meta: { layout: 'dashboard', role: 'admin', group: 'system', title: 'Canlı Log' } },
+  { path: '/admin-errors', name: 'AdminErrors', component: () => import('../views/AdminErrorsView.vue'), meta: { layout: 'dashboard', role: 'admin', group: 'system', title: 'İstemci Hataları' } },
+  { path: '/admin-broadcast', name: 'AdminBroadcast', component: AdminBroadcastView, meta: { layout: 'dashboard', role: 'admin', group: 'system', title: 'Push Broadcast' } },
+  { path: '/admin-push-analytics', name: 'AdminPushAnalytics', component: AdminPushAnalyticsView, meta: { layout: 'dashboard', role: 'admin', group: 'system', title: 'Push Analitik' } },
+  { path: '/admin-scheduled', name: 'AdminScheduled', component: AdminScheduledView, meta: { layout: 'dashboard', role: 'admin', group: 'system', title: 'Planlı Broadcast' } },
+  { path: '/admin-cart-recovery', name: 'AdminCartRecovery', component: () => import('../views/CartRecoveryView.vue'), meta: { layout: 'dashboard', role: 'admin', group: 'system', title: 'Sepet Kurtarma' } },
 
   // (Removed) Manual i18n Translation Center — translation is now fully automatic
   // (auto-translate on save + continuous TranslationSweeper worker).
@@ -108,12 +108,12 @@ const routes = [
   // Nested under /cms/ for logical grouping. Old top-level paths kept as
   // aliases for backwards compatibility with bookmarks / external links.
   { path: '/cms', redirect: '/cms/page-builder' },
-  { path: '/cms/page-builder', name: 'PageBuilder', component: () => import('../views/PageBuilderView.vue'), meta: { layout: 'dashboard', role: 'admin', group: 'cms' } },
-  { path: '/cms/pages', name: 'PageManage', component: () => import('../views/PageManageView.vue'), meta: { layout: 'dashboard', role: 'admin', group: 'cms' } },
-  { path: '/cms/slider-manage', name: 'SliderManage', component: () => import('../views/SliderManageView.vue'), meta: { layout: 'dashboard', role: 'admin', group: 'cms' } },
-  { path: '/cms/media-library', name: 'MediaLibrary', component: AdminMediaLibrary, meta: { layout: 'dashboard', role: 'admin', group: 'cms' } },
+  { path: '/cms/page-builder', name: 'PageBuilder', component: () => import('../views/PageBuilderView.vue'), meta: { layout: 'dashboard', role: 'admin', group: 'cms', title: 'Sayfa Kurucu' } },
+  { path: '/cms/pages', name: 'PageManage', component: () => import('../views/PageManageView.vue'), meta: { layout: 'dashboard', role: 'admin', group: 'cms', title: 'İçerik Sayfaları' } },
+  { path: '/cms/slider-manage', name: 'SliderManage', component: () => import('../views/SliderManageView.vue'), meta: { layout: 'dashboard', role: 'admin', group: 'cms', title: 'Slider Yönetimi' } },
+  { path: '/cms/media-library', name: 'MediaLibrary', component: AdminMediaLibrary, meta: { layout: 'dashboard', role: 'admin', group: 'cms', title: 'Medya Kütüphanesi' } },
 
-  { path: '/cms/reviews', name: 'ReviewManager', component: () => import('../views/AdminReviewManager.vue'), meta: { layout: 'dashboard', role: 'admin', group: 'cms' } },
+  { path: '/cms/reviews', name: 'ReviewManager', component: () => import('../views/AdminReviewManager.vue'), meta: { layout: 'dashboard', role: 'admin', group: 'cms', title: 'Yorum Moderasyonu' } },
 
   // Backwards-compatible redirects (old paths → new CMS paths)
   { path: '/page-builder', redirect: '/cms/page-builder' },

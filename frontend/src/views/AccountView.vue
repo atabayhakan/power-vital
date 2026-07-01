@@ -475,8 +475,10 @@ const logout = () => { authStore.logout(); router.push('/login'); };
   .acc-grid { grid-template-columns: 1fr; }
 }
 @media (max-width: 560px) {
-  .acc { padding: 20px 16px 48px; }
-  .acc-hero__title { font-size: 1.5rem; }
+  .acc__inner { padding: 20px 16px 48px; }
+  .acc-hero { margin-bottom: 20px; }
+  .acc-hero__title { font-size: 1.4rem; }
+  .acc-hero__sub { font-size: 0.9rem; }
   .acc-hero__actions { width: 100%; }
   /* min-width:0 overrides the flex-item default (min-width:auto), which was
      otherwise forcing each button to at least its content's un-wrapped width —
@@ -484,5 +486,20 @@ const logout = () => { authStore.logout(); router.push('/login'); };
      leaving "Чыгуу" squeezed to a sliver instead of the intended 50/50 split. */
   .acc-hero__actions .acc-btn { flex: 1; min-width: 0; justify-content: center; white-space: normal; text-align: center; }
   .acc-campaign__cta { width: 100%; justify-content: center; }
+
+  /* Tighter, more compact stat tiles — the default padding/icon/font sizes
+     were tuned for a 4-across desktop row; at 2-across mobile width they
+     made each tile feel oversized and caused "Коло мүчө" to wrap awkwardly. */
+  .acc-stats { gap: 10px; margin-bottom: 18px; }
+  .acc-stat { padding: 14px; gap: 4px; border-radius: 14px; }
+  .acc-stat__icon { width: 34px; height: 34px; border-radius: 9px; margin-bottom: 2px; }
+  .acc-stat__icon svg { width: 17px; height: 17px; }
+  .acc-stat__value { font-size: 1.2rem; }
+  .acc-stat__label { font-size: 0.74rem; }
+
+  .acc-progress { padding: 14px 16px; margin-bottom: 18px; border-radius: 14px; }
+  .acc-campaign { padding: 20px; margin-bottom: 22px; border-radius: 16px; }
+  .acc-card { padding: 16px; border-radius: 16px; }
+  .acc-section { margin-bottom: 22px; }
 }
 </style>

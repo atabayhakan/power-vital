@@ -22,6 +22,19 @@
 .admin-light-mode .sidebar .logout-btn { color: #4B5563 !important; }
 .admin-light-mode .sidebar .logout-btn:hover { color: var(--pv-red) !important; background: rgba(188, 74, 60, 0.08) !important; }
 
+/* Mobile Topbar Light */
+.admin-light-mode .mobile-topbar {
+  background: rgba(255, 255, 255, 0.92) !important;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06) !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04) !important;
+}
+.admin-light-mode .mobile-topbar__title { color: #1F2937 !important; }
+.admin-light-mode .mobile-hamburger {
+  background: rgba(0, 0, 0, 0.04) !important;
+  border-color: rgba(0, 0, 0, 0.08) !important;
+  color: #1F2937 !important;
+}
+
 /* Dashboard Content */
 .admin-light-mode .page-title { color: #111827 !important; }
 

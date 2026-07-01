@@ -70,10 +70,13 @@ watch(() => route.path, (p) => {
 </script>
 
 <template>
-  <button class="mobile-hamburger" @click="toggleMobileMenu">
-    <span v-if="!isMobileOpen">☰</span>
-    <span v-else>✕</span>
-  </button>
+  <header class="mobile-topbar">
+    <button class="mobile-hamburger" @click="toggleMobileMenu" :aria-label="isMobileOpen ? 'Menüyü kapat' : 'Menüyü aç'">
+      <span v-if="!isMobileOpen">☰</span>
+      <span v-else>✕</span>
+    </button>
+    <span class="mobile-topbar__title">{{ (route.meta.title as string) || 'Power Vital' }}</span>
+  </header>
 
   <div class="sidebar-overlay" v-if="isMobileOpen" @click="closeMobile"/>
 
@@ -501,20 +504,34 @@ watch(() => route.path, (p) => {
 }
 .logout-btn:hover { background: rgba(239, 68, 68, 0.1); color: #EF4444; }
 
-/* Mobile Hamburger */
+/* Mobile Topbar — real app-bar (not a floating button over blank space):
+   houses the hamburger + current page title, sits flush at the top with
+   a background/border of its own so mobile dashboard pages read as a
+   proper app screen instead of a loose page under a floating icon. */
+.mobile-topbar {
+  display: none; position: fixed; top: 0; left: 0; right: 0; height: 56px; z-index: 1000;
+  align-items: center; gap: 12px; padding: 0 16px;
+  background: rgba(16, 16, 20, 0.92); backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  box-shadow: 0 2px 12px rgba(0,0,0,0.25);
+}
+.mobile-topbar__title {
+  color: #fff; font-weight: 700; font-size: 1.05rem;
+  font-family: var(--font-display, inherit);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
 .mobile-hamburger {
-  display: none; position: fixed; top: 16px; left: 16px; z-index: 1000;
-  background: rgba(16, 16, 20, 0.8); backdrop-filter: blur(8px);
-  color: #fff; border: 1px solid rgba(255,255,255,0.1);
-  width: 44px; height: 44px; border-radius: 12px;
-  font-size: 1.5rem; cursor: pointer;
-  align-items: center; justify-content: center;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  flex-shrink: 0;
+  background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.14);
+  color: #fff;
+  width: 40px; height: 40px; border-radius: 10px;
+  font-size: 1.3rem; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
 }
 
 /* Responsive Mobile */
 @media (max-width: 900px) {
-  .mobile-hamburger { display: flex; }
+  .mobile-topbar { display: flex; }
   .sidebar { position: fixed; left: -300px; transition: left 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
   .sidebar.is-mobile-open { left: 0; }
   .sidebar-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); z-index: 90; }
