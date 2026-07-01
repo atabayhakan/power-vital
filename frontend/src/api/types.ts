@@ -502,6 +502,8 @@ export interface paths {
                         basePriceKgs?: number | string;
                         /** @default 0 */
                         stockQuantity?: number;
+                        /** @default 10 */
+                        minStockAlert?: number;
                         categoryId?: string | null;
                         imageUrls?: string[];
                         benefits?: string[] | string | null;
@@ -4750,6 +4752,8 @@ export interface components {
             basePriceKgs: number | string;
             /** @default 0 */
             stockQuantity: number;
+            /** @default 10 */
+            minStockAlert: number;
             categoryId?: string | null;
             imageUrls?: string[];
             benefits?: string[] | string | null;

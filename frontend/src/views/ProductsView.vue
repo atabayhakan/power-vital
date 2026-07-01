@@ -10,7 +10,7 @@ interface AccordionEntry {
 }
 interface Product {
   id: string; barcode: string; name: string; description: string;
-  basePriceKgs: string; stockQuantity: number;
+  basePriceKgs: string; stockQuantity: number; minStockAlert: number;
   categoryId: string | null; category?: { id: string; name: string } | null;
   images?: { id: string; imageUrl: string }[];
   accordions?: AccordionEntry[] | null;
@@ -56,7 +56,7 @@ const token = () => localStorage.getItem('token') || '';
 const headers = () => ({ Authorization: `Bearer ${token()}` });
 
 const form = ref({
-  barcode: '', name: '', description: '', basePriceKgs: 0, stockQuantity: 0,
+  barcode: '', name: '', description: '', basePriceKgs: 0, stockQuantity: 0, minStockAlert: 10,
   categoryId: '', imageUrls: [] as string[],
   accordions: [] as AccordionEntry[],
   benefits: [] as string[],
@@ -116,6 +116,7 @@ const openModal = (product?: Product) => {
       description: product.description || '',
       basePriceKgs: parseFloat(product.basePriceKgs),
       stockQuantity: product.stockQuantity,
+      minStockAlert: product.minStockAlert ?? 10,
       categoryId: product.categoryId || '',
       imageUrls: product.images?.map(i => i.imageUrl) || [],
       accordions: parseAccordions(product.accordions),
@@ -125,7 +126,7 @@ const openModal = (product?: Product) => {
   } else {
     editingProductId.value = null;
     form.value = {
-      barcode: '', name: '', description: '', basePriceKgs: 0, stockQuantity: 0,
+      barcode: '', name: '', description: '', basePriceKgs: 0, stockQuantity: 0, minStockAlert: 10,
       categoryId: '', imageUrls: [], accordions: [], benefits: [], translations: {}
     };
   }
@@ -331,7 +332,7 @@ onMounted(fetchProducts);
               </td>
               <td class="font-bold price-kgs-cell">{{ fmtKgs(calculatePrice(Number(product.basePriceKgs), 0)) }} <span class="currency-label">сом</span></td>
               <td>
-                <span class="status-badge" :class="product.stockQuantity < 10 ? 'st-cancelled' : 'st-paid'">
+                <span class="status-badge" :class="product.stockQuantity <= (product.minStockAlert ?? 10) ? 'st-cancelled' : 'st-paid'">
                   {{ product.stockQuantity }}
                 </span>
               </td>
@@ -437,6 +438,11 @@ onMounted(fetchProducts);
             <div class="form-group">
               <label>Fiyat (KGS)</label>
               <div class="input-with-icon"><span class="icon">сом</span><input type="number" class="admin-input" step="1" min="0" v-model="form.basePriceKgs" required /></div>
+            </div>
+            <div class="form-group">
+              <label>Düşük Stok Eşiği</label>
+              <input type="number" class="admin-input" min="0" v-model="form.minStockAlert" />
+              <small class="hint">Stok bu sayının altına düşünce "az kaldı" uyarısı gösterilir.</small>
             </div>
           </div>
 
@@ -588,8 +594,8 @@ onMounted(fetchProducts);
 .admin-input { background: #f9fafb; border: 1px solid #d1d5db; color: #111827; padding: 12px 16px; border-radius: 12px; font-family: var(--font-body); font-size: 0.95rem; transition: border-color 0.2s; }
 .admin-input:focus { outline: none; border-color: var(--pv-red); background: #ffffff; box-shadow: 0 0 0 2px rgba(188, 74, 60, 0.1); }
 .input-with-icon { position: relative; display: flex; align-items: center; }
-.input-with-icon .icon { position: absolute; left: 16px; color: #9ca3af; font-weight: 700; }
-.input-with-icon input { padding-left: 32px; width: 100%; }
+.input-with-icon .icon { position: absolute; left: 16px; color: #9ca3af; font-weight: 700; font-size: 0.9rem; pointer-events: none; }
+.input-with-icon input { padding-left: 52px; width: 100%; }
 
 .hint { font-size: 0.8rem; color: #6b7280; }
 

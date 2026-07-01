@@ -114,6 +114,7 @@ export const ProductCreateSchema = z.object({
     z.string().regex(/^\d+(\.\d+)?$/).transform(Number)
   ]),
   stockQuantity: z.number().int().min(0).optional().default(0),
+  minStockAlert: z.number().int().min(0).optional().default(10),
   categoryId: z.string().min(1).optional().nullable(),
   imageUrls: z.array(ImageUrlSchema).max(20).optional(),
   benefits: z.union([z.array(BenefitItem), z.string()]).optional().nullable(),

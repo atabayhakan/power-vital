@@ -168,6 +168,11 @@
             "minimum": 0,
             "default": 0
           },
+          "minStockAlert": {
+            "type": "integer",
+            "minimum": 0,
+            "default": 10
+          },
           "categoryId": {
             "type": [
               "string",
@@ -1484,6 +1489,11 @@
                     "type": "integer",
                     "minimum": 0,
                     "default": 0
+                  },
+                  "minStockAlert": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "default": 10
                   },
                   "categoryId": {
                     "type": [

@@ -77,6 +77,21 @@ const mergeAccordions = (raw: any, langTranslations?: any): any[] => {
       merged.push({ ...def });
     }
   }
+  // Any remaining stored entries are admin-added custom accordions (keys
+  // outside the 4 standard ones) — carry them through too, or "+ Yeni
+  // Accordion" would save fine but the section would never actually reach
+  // the storefront.
+  for (const [key, existing] of byKey) {
+    const tr = byKeyTr.get(key) || {};
+    merged.push({
+      key,
+      icon: existing.icon || '📄',
+      title: tr.title || existing.title || 'Bölüm',
+      content: typeof tr.content === 'string' ? tr.content : (typeof existing.content === 'string' ? existing.content : ''),
+      isOpen: !!existing.isOpen,
+      sortOrder: Number(existing.sortOrder) || (DEFAULT_ACCORDIONS.length + 1)
+    });
+  }
   // Sort by sortOrder
   merged.sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0));
   return merged;
@@ -277,7 +292,7 @@ router.get('/barcode/:barcode', async (req: Request, res: Response) => {
 // POST /api/v1/products - Create a new product
 router.post('/', authenticateJWT, requireRole('admin'), validate({ body: ProductCreateSchema }), async (req: Request, res: Response) => {
   try {
-    const { barcode, name, description, basePriceKgs, stockQuantity, categoryId, imageUrls, benefits, accordions, translations } = req.body as ProductCreateInput;
+    const { barcode, name, description, basePriceKgs, stockQuantity, minStockAlert, categoryId, imageUrls, benefits, accordions, translations } = req.body as ProductCreateInput;
 
     // benefits: array of strings → JSON
     let benefitsJson: string | null = null;
@@ -307,6 +322,7 @@ router.post('/', authenticateJWT, requireRole('admin'), validate({ body: Product
         description,
         basePriceKgs,
         stockQuantity: stockQuantity || 0,
+        minStockAlert: minStockAlert ?? 10,
         ...categoryRelation,
         accordions: accordionsJson,
         benefits: benefitsJson,
@@ -330,6 +346,9 @@ router.post('/', authenticateJWT, requireRole('admin'), validate({ body: Product
     deleteCache('products:list:v1').catch(() => {});
   } catch (error: any) {
     logger.error({ err: error }, 'Create Product Error:');
+    if (error.code === 'P2002') {
+      return res.status(400).json({ error: 'Bu barkod zaten kullanılıyor. Başka bir barkod deneyin.' });
+    }
     res.status(500).json({ error: 'Failed to create product: ' + (error.message || 'unknown') });
   }
 });
@@ -338,7 +357,7 @@ router.post('/', authenticateJWT, requireRole('admin'), validate({ body: Product
 router.put('/:id', authenticateJWT, requireRole('admin'), validate({ body: ProductUpdateSchema, params: IdParamSchema }), async (req: Request, res: Response) => {
   try {
     const { id } = req.params as { id: string };
-    const { barcode, name, description, basePriceKgs, stockQuantity, categoryId, imageUrls, benefits, accordions, translations } = req.body as ProductUpdateInput;
+    const { barcode, name, description, basePriceKgs, stockQuantity, minStockAlert, categoryId, imageUrls, benefits, accordions, translations } = req.body as ProductUpdateInput;
 
     // If imageUrls provided, replace all images
     if (imageUrls) {
@@ -387,6 +406,7 @@ router.put('/:id', authenticateJWT, requireRole('admin'), validate({ body: Produ
         description,
         basePriceKgs,
         stockQuantity,
+        minStockAlert,
         ...categoryRelationUpdate,
         ...(accordionsJson !== undefined ? { accordions: accordionsJson } : {}),
         // ⚠️ For optional fields, only include in update if defined (so undefined
@@ -407,6 +427,9 @@ router.put('/:id', authenticateJWT, requireRole('admin'), validate({ body: Produ
     res.json(expandProduct(product, req.headers['accept-language']));
   } catch (error: any) {
     logger.error({ err: error }, 'Update Product Error:');
+    if (error.code === 'P2002') {
+      return res.status(400).json({ error: 'Bu barkod zaten kullanılıyor. Başka bir barkod deneyin.' });
+    }
     res.status(500).json({ error: 'Failed to update product: ' + (error.message || 'unknown') });
   }
 });

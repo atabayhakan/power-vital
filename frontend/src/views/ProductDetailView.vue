@@ -50,6 +50,11 @@ const quantity = ref(1);
 const expandedAccordion = ref<string>('benefits');
 const justAdded = ref(false);
 
+// Admin's per-section GÖRÜNÜR/GİZLİ toggle (isOpen) controls whether a
+// section reaches the storefront at all — hidden sections (isOpen === false)
+// are filtered out here rather than just rendered collapsed.
+const visibleAccordions = computed(() => (product.value?.accordions || []).filter((acc: any) => acc.isOpen !== false));
+
 // Magnifier and Lightbox state
 const isZooming = ref(false);
 const zoomStyle = ref({});
@@ -329,7 +334,7 @@ onUnmounted(() => window.removeEventListener('keydown', onLightboxKeydown));
 
         <!-- 2026: Glassmorphism Accordions with Grid Transition -->
         <div class="pdp-details">
-          <div class="pdp-info__accordions" v-if="product.accordions?.length || product.benefits?.length || product.usage">
+          <div class="pdp-info__accordions" v-if="visibleAccordions.length || product.benefits?.length || product.usage">
 
             <!-- Benefits -->
             <div class="pdp-accordion" :class="{ 'is-open': expandedAccordion === 'benefits' }" v-if="product.benefits?.length">
@@ -362,9 +367,15 @@ onUnmounted(() => window.removeEventListener('keydown', onLightboxKeydown));
               </div>
             </div>
 
-            <!-- Dynamic Accordions -->
-            <div class="pdp-accordion" :class="{ 'is-open': expandedAccordion === acc.id }" v-for="acc in product.accordions" :key="acc.id">
-              <button class="pdp-accordion__header" @click="toggleAccordion(acc.id)" :aria-expanded="expandedAccordion === acc.id">
+            <!-- Dynamic Accordions — only sections the admin marked visible
+                 (acc.isOpen !== false) are shown to customers at all; isOpen
+                 doubles as "visible on storefront" per the admin form's
+                 GÖRÜNÜR/GİZLİ toggle. Keyed by acc.key (the stable identity
+                 from the backend), not acc.id — accordion objects never had
+                 an id field, so every section previously shared `undefined`
+                 as its key, making all of them expand/collapse together. -->
+            <div class="pdp-accordion" :class="{ 'is-open': expandedAccordion === acc.key }" v-for="acc in visibleAccordions" :key="acc.key">
+              <button class="pdp-accordion__header" @click="toggleAccordion(acc.key)" :aria-expanded="expandedAccordion === acc.key">
                 <span class="pdp-accordion__title">
                   <span v-if="acc.icon" style="margin-right: 8px;">{{ acc.icon }}</span>
                   {{ accField(acc, 'title') }}
