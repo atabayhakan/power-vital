@@ -101,9 +101,9 @@ const yMax = computed(() => {
 });
 
 const fmtRevenue = (n: number) => {
-  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M ₽`;
-  if (n >= 1_000) return `${(n / 1_000).toFixed(1)}K ₽`;
-  return `${Math.round(n)} ₽`;
+  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M KGS`;
+  if (n >= 1_000) return `${(n / 1_000).toFixed(1)}K KGS`;
+  return `${Math.round(n)} KGS`;
 };
 const fmtCount = (n: number) => n.toLocaleString('ru-RU');
 

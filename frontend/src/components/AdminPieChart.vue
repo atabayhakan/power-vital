@@ -16,7 +16,7 @@
 //   • data: [{ name, value, color? }] — value is a non-negative number.
 //     Items with value === 0 are skipped (don't draw a zero-width arc).
 //   • title / subtitle — shown in the card header.
-//   • unit — symbol for the center label (default "₽" for KGS).
+//   • unit — symbol for the center label (default "KGS").
 import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 
@@ -50,7 +50,7 @@ const props = withDefaults(defineProps<{
   unit?: string;
   centerValue?: string;
   centerLabel?: string;
-}>(), { unit: '₽', centerValue: undefined, centerLabel: undefined });
+}>(), { unit: 'KGS', centerValue: undefined, centerLabel: undefined });
 
 // 8-colour palette. Tuned for a warm-light admin surface; works in
 // light + dark contexts.

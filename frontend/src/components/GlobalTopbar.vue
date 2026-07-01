@@ -104,7 +104,7 @@ const remainingForFreeShipping = computed(() => `${formatPrice(cart.remainingFor
 <style scoped>
 /* ═══ 2026 PREMIUM TOPBAR ═══
    The topbar is the visitor's first read of the brand promise: free
-   shipping above 100 USD. We layer a deep red gradient, a moving
+   shipping above the configured KGS threshold. We layer a deep red gradient, a moving
    shimmer, a soft mesh pattern, a frosted glass content row, and an
    optional live progress bar that nudges the visitor toward the
    threshold without stealing screen real estate. */
@@ -334,54 +334,12 @@ const remainingForFreeShipping = computed(() => `${formatPrice(cart.remainingFor
   font-size: 0.85rem;
 }
 
-/* ───── Right: currency toggle + phone CTA ───── */
+/* ───── Right: phone CTA ───── */
 .topbar-right {
   display: flex;
   align-items: center;
   gap: 10px;
   flex-shrink: 0;
-}
-
-/* Currency toggle: KGS ↔ USD, sits left of the phone link.
-   Glassy pill with a swap arrow on hover. */
-.currency-toggle {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 5px 10px 5px 8px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.14);
-  border: 1px solid rgba(255, 255, 255, 0.32);
-  color: #fff;
-  font-family: inherit;
-  font-size: 0.78rem;
-  font-weight: 800;
-  letter-spacing: 0.06em;
-  cursor: pointer;
-  text-transform: uppercase;
-  transition: background var(--duration-fast, 0.2s) var(--ease-smooth, ease),
-              transform var(--duration-fast, 0.2s) var(--ease-spring, ease),
-              box-shadow var(--duration-fast, 0.2s) var(--ease-smooth, ease);
-  position: relative;
-  overflow: hidden;
-}
-.currency-toggle:hover {
-  background: rgba(255, 255, 255, 0.26);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-}
-.currency-toggle:active { transform: scale(0.96); }
-.currency-flag { font-size: 0.95rem; line-height: 1; }
-.currency-code { font-size: 0.72rem; opacity: 0.98; }
-.currency-swap {
-  font-size: 0.78rem;
-  opacity: 0.55;
-  margin-left: 2px;
-  transition: transform 0.3s var(--ease-spring, ease), opacity 0.2s ease;
-}
-.currency-toggle:hover .currency-swap {
-  transform: rotate(180deg);
-  opacity: 1;
 }
 
 /* Phone link — frosted glass pill with a circular icon + pulse ring. */
@@ -460,9 +418,9 @@ const remainingForFreeShipping = computed(() => `${formatPrice(cart.remainingFor
     padding: 8px 10px;
   }
   .topbar-left { width: 100%; align-items: center; gap: 7px; }
-  /* On phones the right-side controls (currency toggle + phone CTA) collide
-     with the shipping/free-shipping message. Hide them — the message
-     is the primary value and the right side lives in the bottom nav. */
+  /* On phones the right-side phone CTA collides with the shipping/
+     free-shipping message. Hide it — the message is the primary value
+     and the right side lives in the bottom nav. */
   .topbar-right { display: none; }
   .shipping-msg {
     /* Kirghiz / Russian locales push the message past 360px; let it
@@ -515,13 +473,6 @@ const remainingForFreeShipping = computed(() => `${formatPrice(cart.remainingFor
   .phone-icon { width: 18px; height: 18px; }
   .phone-icon svg { width: 10px; height: 10px; }
   .phone-number { font-size: 0.7rem; letter-spacing: 0.02em; }
-  .currency-toggle {
-    font-size: 0.62rem;
-    padding: 2px 6px 2px 5px;
-    gap: 3px;
-  }
-  .currency-flag { font-size: 0.75rem; }
-  .currency-swap { display: none; }
 }
 
 /* ═══ REDUCED MOTION ═══ */

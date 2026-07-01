@@ -25,7 +25,7 @@ onMounted(() => window.addEventListener('keydown', onKeydown));
 onUnmounted(() => window.removeEventListener('keydown', onKeydown));
 
 // Free shipping uses the SINGLE source of truth from the cart store
-// (KGS equivalent of the configured $100 USD threshold — matches checkout).
+// (the configured KGS threshold — matches checkout).
 const remainingForFreeShipping = computed(() => cartStore.remainingForFreeShipping);
 const shippingProgressPercent = computed(() => cartStore.shippingProgressPercent);
 
