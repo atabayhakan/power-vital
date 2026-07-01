@@ -28,6 +28,13 @@ model User {
   email        String @unique
   passwordHash String
 
+  // Self-editable profile details — filled in by the customer/distributor
+  // on their own account page. Not collected at registration; all optional.
+  phone     String?
+  address   String?
+  city      String?
+  birthDate DateTime?
+
   walletBalanceKgs Decimal @default(0.00)
   walletBalanceUsd Decimal @default(0.00)
 

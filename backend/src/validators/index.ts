@@ -71,6 +71,17 @@ export const ChangePasswordSchema = z.object({
 });
 export type ChangePasswordInput = z.infer<typeof ChangePasswordSchema>;
 
+export const ProfileUpdateSchema = z.object({
+  name: z.string().trim().min(1, 'Name is required').max(200).optional(),
+  phone: z.string().trim().max(30).optional().nullable().or(z.literal('').transform(() => undefined)),
+  address: z.string().trim().max(500).optional().nullable().or(z.literal('').transform(() => undefined)),
+  city: z.string().trim().max(100).optional().nullable().or(z.literal('').transform(() => undefined)),
+  birthDate: z.string().datetime().optional().nullable().or(z.literal('').transform(() => undefined))
+}).strict().openapi('ProfileUpdateRequest', {
+  description: 'Authenticated user updates their own profile details (name, phone, address, city, birth date). Email/role/wallet are never editable here.'
+});
+export type ProfileUpdateInput = z.infer<typeof ProfileUpdateSchema>;
+
 // Refresh token: send the raw token in the request body OR rely on the
 // HttpOnly cookie (cookie takes precedence if present). Either way the
 // body is optional — the caller can be JS or curl.

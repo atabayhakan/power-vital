@@ -2,7 +2,7 @@ import { Router, Request, Response } from 'express';
 import prisma from '../lib/prisma';
 import bcrypt from 'bcryptjs';
 import { authenticateJWT } from '../middleware/auth';
-import { validate, RegisterSchema, LoginSchema, ChangePasswordSchema, RefreshTokenSchema } from '../validators';
+import { validate, RegisterSchema, LoginSchema, ChangePasswordSchema, RefreshTokenSchema, ProfileUpdateSchema, ProfileUpdateInput } from '../validators';
 import { logger } from '../utils/logger';
 import { limit, RATE_LIMITS } from '../utils/rateLimit';
 import {
@@ -91,6 +91,10 @@ router.post('/login', limit(RATE_LIMITS.auth.login), validate({ body: LoginSchem
         name: user.name,
         email: user.email,
         role: user.role,
+        phone: user.phone,
+        address: user.address,
+        city: user.city,
+        birthDate: user.birthDate,
         walletBalanceKgs: user.walletBalanceKgs,
         walletBalanceUsd: user.walletBalanceUsd,
         cumulativeSpendKgs: user.cumulativeSpendKgs,
@@ -178,6 +182,10 @@ router.get('/me', authenticateJWT, async (req: any, res: Response) => {
         name: true,
         email: true,
         role: true,
+        phone: true,
+        address: true,
+        city: true,
+        birthDate: true,
         walletBalanceKgs: true,
         walletBalanceUsd: true,
         cumulativeSpendKgs: true,
@@ -187,12 +195,42 @@ router.get('/me', authenticateJWT, async (req: any, res: Response) => {
         createdAt: true
       }
     });
-    
+
     if (!user) return res.status(404).json({ error: 'User not found' });
-    
+
     res.json(user);
   } catch (error) {
     res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+// PUT /api/v1/auth/me — self-service profile edit (name/phone/address/city/
+// birthDate only; email/role/wallet/loyalty are never editable here).
+router.put('/me', authenticateJWT, validate({ body: ProfileUpdateSchema }), async (req: any, res: Response) => {
+  try {
+    const userId = req.user.id;
+    const { name, phone, address, city, birthDate } = req.body as ProfileUpdateInput;
+    const user = await prisma.user.update({
+      where: { id: userId },
+      data: {
+        ...(name !== undefined ? { name } : {}),
+        ...(phone !== undefined ? { phone } : {}),
+        ...(address !== undefined ? { address } : {}),
+        ...(city !== undefined ? { city } : {}),
+        ...(birthDate !== undefined ? { birthDate: birthDate ? new Date(birthDate) : null } : {})
+      },
+      select: {
+        id: true, name: true, email: true, role: true,
+        phone: true, address: true, city: true, birthDate: true,
+        walletBalanceKgs: true, walletBalanceUsd: true,
+        cumulativeSpendKgs: true, loyaltyLevel: true, dynamicDiscountRate: true,
+        sponsorId: true, createdAt: true
+      }
+    });
+    res.json(user);
+  } catch (error) {
+    logger.error({ err: error }, 'Update Profile Error:');
+    res.status(500).json({ error: 'Failed to update profile' });
   }
 });
 

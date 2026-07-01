@@ -1,11 +1,29 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue';
+import { ref, computed, onMounted, onUnmounted } from 'vue';
+import { useRoute } from 'vue-router';
 import { useTranslate } from '../composables/useTranslate';
+import { useAuthStore } from '../stores/useAuthStore';
 
 const { t } = useTranslate();
+const route = useRoute();
+const authStore = useAuthStore();
 const cartItemCount = ref(0);
 const lastScrollY = ref(0);
 const visible = ref(true);
+
+// The Account tab used to hard-link to /login regardless of auth state, so
+// it never showed as "active" while an authenticated user browsed /account,
+// /account/wallet, /dashboard, etc. — clicking it also bounced a logged-in
+// visitor through an unnecessary /login → redirect round-trip.
+const accountTarget = computed(() => {
+  if (!authStore.isAuthenticated) return '/login';
+  if (authStore.userRole === 'distributor') return '/dashboard';
+  return '/account';
+});
+const isAccountActive = computed(() => {
+  const p = route.path;
+  return p === '/account' || p.startsWith('/account/') || p === '/dashboard' || p === '/login';
+});
 
 const updateCartCount = () => {
   const saved = localStorage.getItem('pv_cart');
@@ -85,7 +103,7 @@ const openCart = () => {
       <span class="bn-label">{{ t('bottomNav.cart') }}</span>
     </button>
 
-    <router-link to="/login" class="bn-item" active-class="is-active">
+    <router-link :to="accountTarget" class="bn-item" :class="{ 'is-active': isAccountActive }">
       <span class="bn-icon-wrap">
         <span class="bn-icon">👤</span>
         <span class="bn-dot"/>
@@ -220,6 +238,26 @@ const openCart = () => {
   filter: grayscale(0);
   opacity: 1;
   transform: scale(1.1);
+  /* Re-plays every time this class attaches (i.e. every time navigation
+     lands on this tab) since it's only ever declared on the .is-active
+     rule — a small spring-in pop rather than a flat opacity/scale swap. */
+  animation: bnIconPop 0.45s var(--ease-spring, cubic-bezier(0.34, 1.56, 0.64, 1));
+}
+.bn-item.is-active .bn-label {
+  animation: bnLabelRise 0.3s var(--ease-spring, cubic-bezier(0.34, 1.56, 0.64, 1));
+}
+@keyframes bnIconPop {
+  0%   { transform: scale(0.7); }
+  55%  { transform: scale(1.22); }
+  100% { transform: scale(1.1); }
+}
+@keyframes bnLabelRise {
+  0%   { transform: translateY(3px); opacity: 0.6; }
+  100% { transform: translateY(0); opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .bn-item.is-active .bn-icon,
+  .bn-item.is-active .bn-label { animation: none; }
 }
 
 /* Icon wrapper with dot indicator */

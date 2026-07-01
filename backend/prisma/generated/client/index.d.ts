@@ -3273,6 +3273,10 @@ export namespace Prisma {
     name: string | null
     email: string | null
     passwordHash: string | null
+    phone: string | null
+    address: string | null
+    city: string | null
+    birthDate: Date | null
     walletBalanceKgs: Decimal | null
     walletBalanceUsd: Decimal | null
     cumulativeSpendKgs: Decimal | null
@@ -3294,6 +3298,10 @@ export namespace Prisma {
     name: string | null
     email: string | null
     passwordHash: string | null
+    phone: string | null
+    address: string | null
+    city: string | null
+    birthDate: Date | null
     walletBalanceKgs: Decimal | null
     walletBalanceUsd: Decimal | null
     cumulativeSpendKgs: Decimal | null
@@ -3315,6 +3323,10 @@ export namespace Prisma {
     name: number
     email: number
     passwordHash: number
+    phone: number
+    address: number
+    city: number
+    birthDate: number
     walletBalanceKgs: number
     walletBalanceUsd: number
     cumulativeSpendKgs: number
@@ -3354,6 +3366,10 @@ export namespace Prisma {
     name?: true
     email?: true
     passwordHash?: true
+    phone?: true
+    address?: true
+    city?: true
+    birthDate?: true
     walletBalanceKgs?: true
     walletBalanceUsd?: true
     cumulativeSpendKgs?: true
@@ -3375,6 +3391,10 @@ export namespace Prisma {
     name?: true
     email?: true
     passwordHash?: true
+    phone?: true
+    address?: true
+    city?: true
+    birthDate?: true
     walletBalanceKgs?: true
     walletBalanceUsd?: true
     cumulativeSpendKgs?: true
@@ -3396,6 +3416,10 @@ export namespace Prisma {
     name?: true
     email?: true
     passwordHash?: true
+    phone?: true
+    address?: true
+    city?: true
+    birthDate?: true
     walletBalanceKgs?: true
     walletBalanceUsd?: true
     cumulativeSpendKgs?: true
@@ -3504,6 +3528,10 @@ export namespace Prisma {
     name: string
     email: string
     passwordHash: string
+    phone: string | null
+    address: string | null
+    city: string | null
+    birthDate: Date | null
     walletBalanceKgs: Decimal
     walletBalanceUsd: Decimal
     cumulativeSpendKgs: Decimal
@@ -3544,6 +3572,10 @@ export namespace Prisma {
     name?: boolean
     email?: boolean
     passwordHash?: boolean
+    phone?: boolean
+    address?: boolean
+    city?: boolean
+    birthDate?: boolean
     walletBalanceKgs?: boolean
     walletBalanceUsd?: boolean
     cumulativeSpendKgs?: boolean
@@ -3584,6 +3616,10 @@ export namespace Prisma {
     name?: boolean
     email?: boolean
     passwordHash?: boolean
+    phone?: boolean
+    address?: boolean
+    city?: boolean
+    birthDate?: boolean
     walletBalanceKgs?: boolean
     walletBalanceUsd?: boolean
     cumulativeSpendKgs?: boolean
@@ -3647,6 +3683,10 @@ export namespace Prisma {
       name: string
       email: string
       passwordHash: string
+      phone: string | null
+      address: string | null
+      city: string | null
+      birthDate: Date | null
       walletBalanceKgs: Prisma.Decimal
       walletBalanceUsd: Prisma.Decimal
       cumulativeSpendKgs: Prisma.Decimal
@@ -4051,6 +4091,10 @@ export namespace Prisma {
     readonly name: FieldRef<"User", 'String'>
     readonly email: FieldRef<"User", 'String'>
     readonly passwordHash: FieldRef<"User", 'String'>
+    readonly phone: FieldRef<"User", 'String'>
+    readonly address: FieldRef<"User", 'String'>
+    readonly city: FieldRef<"User", 'String'>
+    readonly birthDate: FieldRef<"User", 'DateTime'>
     readonly walletBalanceKgs: FieldRef<"User", 'Decimal'>
     readonly walletBalanceUsd: FieldRef<"User", 'Decimal'>
     readonly cumulativeSpendKgs: FieldRef<"User", 'Decimal'>
@@ -28916,6 +28960,10 @@ export namespace Prisma {
     name: 'name',
     email: 'email',
     passwordHash: 'passwordHash',
+    phone: 'phone',
+    address: 'address',
+    city: 'city',
+    birthDate: 'birthDate',
     walletBalanceKgs: 'walletBalanceKgs',
     walletBalanceUsd: 'walletBalanceUsd',
     cumulativeSpendKgs: 'cumulativeSpendKgs',
@@ -29365,6 +29413,13 @@ export namespace Prisma {
 
 
   /**
+   * Reference to a field of type 'DateTime'
+   */
+  export type DateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime'>
+    
+
+
+  /**
    * Reference to a field of type 'Decimal'
    */
   export type DecimalFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Decimal'>
@@ -29382,13 +29437,6 @@ export namespace Prisma {
    * Reference to a field of type 'Boolean'
    */
   export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
-    
-
-
-  /**
-   * Reference to a field of type 'DateTime'
-   */
-  export type DateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime'>
     
 
 
@@ -29414,6 +29462,10 @@ export namespace Prisma {
     name?: StringFilter<"User"> | string
     email?: StringFilter<"User"> | string
     passwordHash?: StringFilter<"User"> | string
+    phone?: StringNullableFilter<"User"> | string | null
+    address?: StringNullableFilter<"User"> | string | null
+    city?: StringNullableFilter<"User"> | string | null
+    birthDate?: DateTimeNullableFilter<"User"> | Date | string | null
     walletBalanceKgs?: DecimalFilter<"User"> | Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: DecimalFilter<"User"> | Decimal | DecimalJsLike | number | string
     cumulativeSpendKgs?: DecimalFilter<"User"> | Decimal | DecimalJsLike | number | string
@@ -29452,6 +29504,10 @@ export namespace Prisma {
     name?: SortOrder
     email?: SortOrder
     passwordHash?: SortOrder
+    phone?: SortOrderInput | SortOrder
+    address?: SortOrderInput | SortOrder
+    city?: SortOrderInput | SortOrder
+    birthDate?: SortOrderInput | SortOrder
     walletBalanceKgs?: SortOrder
     walletBalanceUsd?: SortOrder
     cumulativeSpendKgs?: SortOrder
@@ -29493,6 +29549,10 @@ export namespace Prisma {
     legPosition?: StringNullableFilter<"User"> | string | null
     name?: StringFilter<"User"> | string
     passwordHash?: StringFilter<"User"> | string
+    phone?: StringNullableFilter<"User"> | string | null
+    address?: StringNullableFilter<"User"> | string | null
+    city?: StringNullableFilter<"User"> | string | null
+    birthDate?: DateTimeNullableFilter<"User"> | Date | string | null
     walletBalanceKgs?: DecimalFilter<"User"> | Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: DecimalFilter<"User"> | Decimal | DecimalJsLike | number | string
     cumulativeSpendKgs?: DecimalFilter<"User"> | Decimal | DecimalJsLike | number | string
@@ -29531,6 +29591,10 @@ export namespace Prisma {
     name?: SortOrder
     email?: SortOrder
     passwordHash?: SortOrder
+    phone?: SortOrderInput | SortOrder
+    address?: SortOrderInput | SortOrder
+    city?: SortOrderInput | SortOrder
+    birthDate?: SortOrderInput | SortOrder
     walletBalanceKgs?: SortOrder
     walletBalanceUsd?: SortOrder
     cumulativeSpendKgs?: SortOrder
@@ -29560,6 +29624,10 @@ export namespace Prisma {
     name?: StringWithAggregatesFilter<"User"> | string
     email?: StringWithAggregatesFilter<"User"> | string
     passwordHash?: StringWithAggregatesFilter<"User"> | string
+    phone?: StringNullableWithAggregatesFilter<"User"> | string | null
+    address?: StringNullableWithAggregatesFilter<"User"> | string | null
+    city?: StringNullableWithAggregatesFilter<"User"> | string | null
+    birthDate?: DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
     walletBalanceKgs?: DecimalWithAggregatesFilter<"User"> | Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: DecimalWithAggregatesFilter<"User"> | Decimal | DecimalJsLike | number | string
     cumulativeSpendKgs?: DecimalWithAggregatesFilter<"User"> | Decimal | DecimalJsLike | number | string
@@ -31659,6 +31727,10 @@ export namespace Prisma {
     name: string
     email: string
     passwordHash: string
+    phone?: string | null
+    address?: string | null
+    city?: string | null
+    birthDate?: Date | string | null
     walletBalanceKgs?: Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: Decimal | DecimalJsLike | number | string
     cumulativeSpendKgs?: Decimal | DecimalJsLike | number | string
@@ -31697,6 +31769,10 @@ export namespace Prisma {
     name: string
     email: string
     passwordHash: string
+    phone?: string | null
+    address?: string | null
+    city?: string | null
+    birthDate?: Date | string | null
     walletBalanceKgs?: Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: Decimal | DecimalJsLike | number | string
     cumulativeSpendKgs?: Decimal | DecimalJsLike | number | string
@@ -31733,6 +31809,10 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
     passwordHash?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    city?: NullableStringFieldUpdateOperationsInput | string | null
+    birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     walletBalanceKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     cumulativeSpendKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
@@ -31771,6 +31851,10 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
     passwordHash?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    city?: NullableStringFieldUpdateOperationsInput | string | null
+    birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     walletBalanceKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     cumulativeSpendKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
@@ -31808,6 +31892,10 @@ export namespace Prisma {
     name: string
     email: string
     passwordHash: string
+    phone?: string | null
+    address?: string | null
+    city?: string | null
+    birthDate?: Date | string | null
     walletBalanceKgs?: Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: Decimal | DecimalJsLike | number | string
     cumulativeSpendKgs?: Decimal | DecimalJsLike | number | string
@@ -31828,6 +31916,10 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
     passwordHash?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    city?: NullableStringFieldUpdateOperationsInput | string | null
+    birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     walletBalanceKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     cumulativeSpendKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
@@ -31849,6 +31941,10 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
     passwordHash?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    city?: NullableStringFieldUpdateOperationsInput | string | null
+    birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     walletBalanceKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     cumulativeSpendKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
@@ -34208,6 +34304,17 @@ export namespace Prisma {
     not?: NestedStringNullableFilter<$PrismaModel> | string | null
   }
 
+  export type DateTimeNullableFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
+    in?: Date[] | string[] | null
+    notIn?: Date[] | string[] | null
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
+  }
+
   export type DecimalFilter<$PrismaModel = never> = {
     equals?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
     in?: Decimal[] | DecimalJsLike[] | number[] | string[]
@@ -34233,17 +34340,6 @@ export namespace Prisma {
   export type BoolFilter<$PrismaModel = never> = {
     equals?: boolean | BooleanFieldRefInput<$PrismaModel>
     not?: NestedBoolFilter<$PrismaModel> | boolean
-  }
-
-  export type DateTimeNullableFilter<$PrismaModel = never> = {
-    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
-    in?: Date[] | string[] | null
-    notIn?: Date[] | string[] | null
-    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
   }
 
   export type DateTimeFilter<$PrismaModel = never> = {
@@ -34416,6 +34512,10 @@ export namespace Prisma {
     name?: SortOrder
     email?: SortOrder
     passwordHash?: SortOrder
+    phone?: SortOrder
+    address?: SortOrder
+    city?: SortOrder
+    birthDate?: SortOrder
     walletBalanceKgs?: SortOrder
     walletBalanceUsd?: SortOrder
     cumulativeSpendKgs?: SortOrder
@@ -34445,6 +34545,10 @@ export namespace Prisma {
     name?: SortOrder
     email?: SortOrder
     passwordHash?: SortOrder
+    phone?: SortOrder
+    address?: SortOrder
+    city?: SortOrder
+    birthDate?: SortOrder
     walletBalanceKgs?: SortOrder
     walletBalanceUsd?: SortOrder
     cumulativeSpendKgs?: SortOrder
@@ -34466,6 +34570,10 @@ export namespace Prisma {
     name?: SortOrder
     email?: SortOrder
     passwordHash?: SortOrder
+    phone?: SortOrder
+    address?: SortOrder
+    city?: SortOrder
+    birthDate?: SortOrder
     walletBalanceKgs?: SortOrder
     walletBalanceUsd?: SortOrder
     cumulativeSpendKgs?: SortOrder
@@ -34520,6 +34628,20 @@ export namespace Prisma {
     _max?: NestedStringNullableFilter<$PrismaModel>
   }
 
+  export type DateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
+    in?: Date[] | string[] | null
+    notIn?: Date[] | string[] | null
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeNullableWithAggregatesFilter<$PrismaModel> | Date | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedDateTimeNullableFilter<$PrismaModel>
+    _max?: NestedDateTimeNullableFilter<$PrismaModel>
+  }
+
   export type DecimalWithAggregatesFilter<$PrismaModel = never> = {
     equals?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
     in?: Decimal[] | DecimalJsLike[] | number[] | string[]
@@ -34558,20 +34680,6 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedBoolFilter<$PrismaModel>
     _max?: NestedBoolFilter<$PrismaModel>
-  }
-
-  export type DateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
-    in?: Date[] | string[] | null
-    notIn?: Date[] | string[] | null
-    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    not?: NestedDateTimeNullableWithAggregatesFilter<$PrismaModel> | Date | string | null
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _min?: NestedDateTimeNullableFilter<$PrismaModel>
-    _max?: NestedDateTimeNullableFilter<$PrismaModel>
   }
 
   export type DateTimeWithAggregatesFilter<$PrismaModel = never> = {
@@ -36091,6 +36199,10 @@ export namespace Prisma {
     set?: string | null
   }
 
+  export type NullableDateTimeFieldUpdateOperationsInput = {
+    set?: Date | string | null
+  }
+
   export type DecimalFieldUpdateOperationsInput = {
     set?: Decimal | DecimalJsLike | number | string
     increment?: Decimal | DecimalJsLike | number | string
@@ -36109,10 +36221,6 @@ export namespace Prisma {
 
   export type BoolFieldUpdateOperationsInput = {
     set?: boolean
-  }
-
-  export type NullableDateTimeFieldUpdateOperationsInput = {
-    set?: Date | string | null
   }
 
   export type DateTimeFieldUpdateOperationsInput = {
@@ -37289,6 +37397,17 @@ export namespace Prisma {
     not?: NestedStringNullableFilter<$PrismaModel> | string | null
   }
 
+  export type NestedDateTimeNullableFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
+    in?: Date[] | string[] | null
+    notIn?: Date[] | string[] | null
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
+  }
+
   export type NestedDecimalFilter<$PrismaModel = never> = {
     equals?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
     in?: Decimal[] | DecimalJsLike[] | number[] | string[]
@@ -37314,17 +37433,6 @@ export namespace Prisma {
   export type NestedBoolFilter<$PrismaModel = never> = {
     equals?: boolean | BooleanFieldRefInput<$PrismaModel>
     not?: NestedBoolFilter<$PrismaModel> | boolean
-  }
-
-  export type NestedDateTimeNullableFilter<$PrismaModel = never> = {
-    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
-    in?: Date[] | string[] | null
-    notIn?: Date[] | string[] | null
-    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
   }
 
   export type NestedDateTimeFilter<$PrismaModel = never> = {
@@ -37383,6 +37491,20 @@ export namespace Prisma {
     not?: NestedIntNullableFilter<$PrismaModel> | number | null
   }
 
+  export type NestedDateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
+    in?: Date[] | string[] | null
+    notIn?: Date[] | string[] | null
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeNullableWithAggregatesFilter<$PrismaModel> | Date | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedDateTimeNullableFilter<$PrismaModel>
+    _max?: NestedDateTimeNullableFilter<$PrismaModel>
+  }
+
   export type NestedDecimalWithAggregatesFilter<$PrismaModel = never> = {
     equals?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
     in?: Decimal[] | DecimalJsLike[] | number[] | string[]
@@ -37434,20 +37556,6 @@ export namespace Prisma {
     _max?: NestedBoolFilter<$PrismaModel>
   }
 
-  export type NestedDateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
-    in?: Date[] | string[] | null
-    notIn?: Date[] | string[] | null
-    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    not?: NestedDateTimeNullableWithAggregatesFilter<$PrismaModel> | Date | string | null
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _min?: NestedDateTimeNullableFilter<$PrismaModel>
-    _max?: NestedDateTimeNullableFilter<$PrismaModel>
-  }
-
   export type NestedDateTimeWithAggregatesFilter<$PrismaModel = never> = {
     equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     in?: Date[] | string[]
@@ -37486,6 +37594,10 @@ export namespace Prisma {
     name: string
     email: string
     passwordHash: string
+    phone?: string | null
+    address?: string | null
+    city?: string | null
+    birthDate?: Date | string | null
     walletBalanceKgs?: Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: Decimal | DecimalJsLike | number | string
     cumulativeSpendKgs?: Decimal | DecimalJsLike | number | string
@@ -37523,6 +37635,10 @@ export namespace Prisma {
     name: string
     email: string
     passwordHash: string
+    phone?: string | null
+    address?: string | null
+    city?: string | null
+    birthDate?: Date | string | null
     walletBalanceKgs?: Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: Decimal | DecimalJsLike | number | string
     cumulativeSpendKgs?: Decimal | DecimalJsLike | number | string
@@ -37563,6 +37679,10 @@ export namespace Prisma {
     name: string
     email: string
     passwordHash: string
+    phone?: string | null
+    address?: string | null
+    city?: string | null
+    birthDate?: Date | string | null
     walletBalanceKgs?: Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: Decimal | DecimalJsLike | number | string
     cumulativeSpendKgs?: Decimal | DecimalJsLike | number | string
@@ -37599,6 +37719,10 @@ export namespace Prisma {
     name: string
     email: string
     passwordHash: string
+    phone?: string | null
+    address?: string | null
+    city?: string | null
+    birthDate?: Date | string | null
     walletBalanceKgs?: Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: Decimal | DecimalJsLike | number | string
     cumulativeSpendKgs?: Decimal | DecimalJsLike | number | string
@@ -38196,6 +38320,10 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
     passwordHash?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    city?: NullableStringFieldUpdateOperationsInput | string | null
+    birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     walletBalanceKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     cumulativeSpendKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
@@ -38233,6 +38361,10 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
     passwordHash?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    city?: NullableStringFieldUpdateOperationsInput | string | null
+    birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     walletBalanceKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     cumulativeSpendKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
@@ -38288,6 +38420,10 @@ export namespace Prisma {
     name?: StringFilter<"User"> | string
     email?: StringFilter<"User"> | string
     passwordHash?: StringFilter<"User"> | string
+    phone?: StringNullableFilter<"User"> | string | null
+    address?: StringNullableFilter<"User"> | string | null
+    city?: StringNullableFilter<"User"> | string | null
+    birthDate?: DateTimeNullableFilter<"User"> | Date | string | null
     walletBalanceKgs?: DecimalFilter<"User"> | Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: DecimalFilter<"User"> | Decimal | DecimalJsLike | number | string
     cumulativeSpendKgs?: DecimalFilter<"User"> | Decimal | DecimalJsLike | number | string
@@ -38770,6 +38906,10 @@ export namespace Prisma {
     name: string
     email: string
     passwordHash: string
+    phone?: string | null
+    address?: string | null
+    city?: string | null
+    birthDate?: Date | string | null
     walletBalanceKgs?: Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: Decimal | DecimalJsLike | number | string
     cumulativeSpendKgs?: Decimal | DecimalJsLike | number | string
@@ -38807,6 +38947,10 @@ export namespace Prisma {
     name: string
     email: string
     passwordHash: string
+    phone?: string | null
+    address?: string | null
+    city?: string | null
+    birthDate?: Date | string | null
     walletBalanceKgs?: Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: Decimal | DecimalJsLike | number | string
     cumulativeSpendKgs?: Decimal | DecimalJsLike | number | string
@@ -38858,6 +39002,10 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
     passwordHash?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    city?: NullableStringFieldUpdateOperationsInput | string | null
+    birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     walletBalanceKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     cumulativeSpendKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
@@ -38895,6 +39043,10 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
     passwordHash?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    city?: NullableStringFieldUpdateOperationsInput | string | null
+    birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     walletBalanceKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     cumulativeSpendKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
@@ -39282,6 +39434,10 @@ export namespace Prisma {
     name: string
     email: string
     passwordHash: string
+    phone?: string | null
+    address?: string | null
+    city?: string | null
+    birthDate?: Date | string | null
     walletBalanceKgs?: Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: Decimal | DecimalJsLike | number | string
     cumulativeSpendKgs?: Decimal | DecimalJsLike | number | string
@@ -39319,6 +39475,10 @@ export namespace Prisma {
     name: string
     email: string
     passwordHash: string
+    phone?: string | null
+    address?: string | null
+    city?: string | null
+    birthDate?: Date | string | null
     walletBalanceKgs?: Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: Decimal | DecimalJsLike | number | string
     cumulativeSpendKgs?: Decimal | DecimalJsLike | number | string
@@ -39396,6 +39556,10 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
     passwordHash?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    city?: NullableStringFieldUpdateOperationsInput | string | null
+    birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     walletBalanceKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     cumulativeSpendKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
@@ -39433,6 +39597,10 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
     passwordHash?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    city?: NullableStringFieldUpdateOperationsInput | string | null
+    birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     walletBalanceKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     cumulativeSpendKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
@@ -39664,6 +39832,10 @@ export namespace Prisma {
     name: string
     email: string
     passwordHash: string
+    phone?: string | null
+    address?: string | null
+    city?: string | null
+    birthDate?: Date | string | null
     walletBalanceKgs?: Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: Decimal | DecimalJsLike | number | string
     cumulativeSpendKgs?: Decimal | DecimalJsLike | number | string
@@ -39701,6 +39873,10 @@ export namespace Prisma {
     name: string
     email: string
     passwordHash: string
+    phone?: string | null
+    address?: string | null
+    city?: string | null
+    birthDate?: Date | string | null
     walletBalanceKgs?: Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: Decimal | DecimalJsLike | number | string
     cumulativeSpendKgs?: Decimal | DecimalJsLike | number | string
@@ -39752,6 +39928,10 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
     passwordHash?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    city?: NullableStringFieldUpdateOperationsInput | string | null
+    birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     walletBalanceKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     cumulativeSpendKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
@@ -39789,6 +39969,10 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
     passwordHash?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    city?: NullableStringFieldUpdateOperationsInput | string | null
+    birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     walletBalanceKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     cumulativeSpendKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
@@ -39866,6 +40050,10 @@ export namespace Prisma {
     name: string
     email: string
     passwordHash: string
+    phone?: string | null
+    address?: string | null
+    city?: string | null
+    birthDate?: Date | string | null
     walletBalanceKgs?: Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: Decimal | DecimalJsLike | number | string
     cumulativeSpendKgs?: Decimal | DecimalJsLike | number | string
@@ -39903,6 +40091,10 @@ export namespace Prisma {
     name: string
     email: string
     passwordHash: string
+    phone?: string | null
+    address?: string | null
+    city?: string | null
+    birthDate?: Date | string | null
     walletBalanceKgs?: Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: Decimal | DecimalJsLike | number | string
     cumulativeSpendKgs?: Decimal | DecimalJsLike | number | string
@@ -39977,6 +40169,10 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
     passwordHash?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    city?: NullableStringFieldUpdateOperationsInput | string | null
+    birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     walletBalanceKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     cumulativeSpendKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
@@ -40014,6 +40210,10 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
     passwordHash?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    city?: NullableStringFieldUpdateOperationsInput | string | null
+    birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     walletBalanceKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     cumulativeSpendKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
@@ -40396,6 +40596,10 @@ export namespace Prisma {
     name: string
     email: string
     passwordHash: string
+    phone?: string | null
+    address?: string | null
+    city?: string | null
+    birthDate?: Date | string | null
     walletBalanceKgs?: Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: Decimal | DecimalJsLike | number | string
     cumulativeSpendKgs?: Decimal | DecimalJsLike | number | string
@@ -40433,6 +40637,10 @@ export namespace Prisma {
     name: string
     email: string
     passwordHash: string
+    phone?: string | null
+    address?: string | null
+    city?: string | null
+    birthDate?: Date | string | null
     walletBalanceKgs?: Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: Decimal | DecimalJsLike | number | string
     cumulativeSpendKgs?: Decimal | DecimalJsLike | number | string
@@ -40533,6 +40741,10 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
     passwordHash?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    city?: NullableStringFieldUpdateOperationsInput | string | null
+    birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     walletBalanceKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     cumulativeSpendKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
@@ -40570,6 +40782,10 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
     passwordHash?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    city?: NullableStringFieldUpdateOperationsInput | string | null
+    birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     walletBalanceKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     cumulativeSpendKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
@@ -40605,6 +40821,10 @@ export namespace Prisma {
     name: string
     email: string
     passwordHash: string
+    phone?: string | null
+    address?: string | null
+    city?: string | null
+    birthDate?: Date | string | null
     walletBalanceKgs?: Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: Decimal | DecimalJsLike | number | string
     cumulativeSpendKgs?: Decimal | DecimalJsLike | number | string
@@ -40642,6 +40862,10 @@ export namespace Prisma {
     name: string
     email: string
     passwordHash: string
+    phone?: string | null
+    address?: string | null
+    city?: string | null
+    birthDate?: Date | string | null
     walletBalanceKgs?: Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: Decimal | DecimalJsLike | number | string
     cumulativeSpendKgs?: Decimal | DecimalJsLike | number | string
@@ -40693,6 +40917,10 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
     passwordHash?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    city?: NullableStringFieldUpdateOperationsInput | string | null
+    birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     walletBalanceKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     cumulativeSpendKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
@@ -40730,6 +40958,10 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
     passwordHash?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    city?: NullableStringFieldUpdateOperationsInput | string | null
+    birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     walletBalanceKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     cumulativeSpendKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
@@ -40765,6 +40997,10 @@ export namespace Prisma {
     name: string
     email: string
     passwordHash: string
+    phone?: string | null
+    address?: string | null
+    city?: string | null
+    birthDate?: Date | string | null
     walletBalanceKgs?: Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: Decimal | DecimalJsLike | number | string
     cumulativeSpendKgs?: Decimal | DecimalJsLike | number | string
@@ -40802,6 +41038,10 @@ export namespace Prisma {
     name: string
     email: string
     passwordHash: string
+    phone?: string | null
+    address?: string | null
+    city?: string | null
+    birthDate?: Date | string | null
     walletBalanceKgs?: Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: Decimal | DecimalJsLike | number | string
     cumulativeSpendKgs?: Decimal | DecimalJsLike | number | string
@@ -40853,6 +41093,10 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
     passwordHash?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    city?: NullableStringFieldUpdateOperationsInput | string | null
+    birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     walletBalanceKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     cumulativeSpendKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
@@ -40890,6 +41134,10 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
     passwordHash?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    city?: NullableStringFieldUpdateOperationsInput | string | null
+    birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     walletBalanceKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     cumulativeSpendKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
@@ -40925,6 +41173,10 @@ export namespace Prisma {
     name: string
     email: string
     passwordHash: string
+    phone?: string | null
+    address?: string | null
+    city?: string | null
+    birthDate?: Date | string | null
     walletBalanceKgs?: Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: Decimal | DecimalJsLike | number | string
     cumulativeSpendKgs?: Decimal | DecimalJsLike | number | string
@@ -40962,6 +41214,10 @@ export namespace Prisma {
     name: string
     email: string
     passwordHash: string
+    phone?: string | null
+    address?: string | null
+    city?: string | null
+    birthDate?: Date | string | null
     walletBalanceKgs?: Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: Decimal | DecimalJsLike | number | string
     cumulativeSpendKgs?: Decimal | DecimalJsLike | number | string
@@ -41013,6 +41269,10 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
     passwordHash?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    city?: NullableStringFieldUpdateOperationsInput | string | null
+    birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     walletBalanceKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     cumulativeSpendKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
@@ -41050,6 +41310,10 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
     passwordHash?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    city?: NullableStringFieldUpdateOperationsInput | string | null
+    birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     walletBalanceKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     cumulativeSpendKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
@@ -41085,6 +41349,10 @@ export namespace Prisma {
     name: string
     email: string
     passwordHash: string
+    phone?: string | null
+    address?: string | null
+    city?: string | null
+    birthDate?: Date | string | null
     walletBalanceKgs?: Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: Decimal | DecimalJsLike | number | string
     cumulativeSpendKgs?: Decimal | DecimalJsLike | number | string
@@ -41122,6 +41390,10 @@ export namespace Prisma {
     name: string
     email: string
     passwordHash: string
+    phone?: string | null
+    address?: string | null
+    city?: string | null
+    birthDate?: Date | string | null
     walletBalanceKgs?: Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: Decimal | DecimalJsLike | number | string
     cumulativeSpendKgs?: Decimal | DecimalJsLike | number | string
@@ -41173,6 +41445,10 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
     passwordHash?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    city?: NullableStringFieldUpdateOperationsInput | string | null
+    birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     walletBalanceKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     cumulativeSpendKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
@@ -41210,6 +41486,10 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
     passwordHash?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    city?: NullableStringFieldUpdateOperationsInput | string | null
+    birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     walletBalanceKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     cumulativeSpendKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
@@ -41245,6 +41525,10 @@ export namespace Prisma {
     name: string
     email: string
     passwordHash: string
+    phone?: string | null
+    address?: string | null
+    city?: string | null
+    birthDate?: Date | string | null
     walletBalanceKgs?: Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: Decimal | DecimalJsLike | number | string
     cumulativeSpendKgs?: Decimal | DecimalJsLike | number | string
@@ -41282,6 +41566,10 @@ export namespace Prisma {
     name: string
     email: string
     passwordHash: string
+    phone?: string | null
+    address?: string | null
+    city?: string | null
+    birthDate?: Date | string | null
     walletBalanceKgs?: Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: Decimal | DecimalJsLike | number | string
     cumulativeSpendKgs?: Decimal | DecimalJsLike | number | string
@@ -41322,6 +41610,10 @@ export namespace Prisma {
     name: string
     email: string
     passwordHash: string
+    phone?: string | null
+    address?: string | null
+    city?: string | null
+    birthDate?: Date | string | null
     walletBalanceKgs?: Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: Decimal | DecimalJsLike | number | string
     cumulativeSpendKgs?: Decimal | DecimalJsLike | number | string
@@ -41359,6 +41651,10 @@ export namespace Prisma {
     name: string
     email: string
     passwordHash: string
+    phone?: string | null
+    address?: string | null
+    city?: string | null
+    birthDate?: Date | string | null
     walletBalanceKgs?: Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: Decimal | DecimalJsLike | number | string
     cumulativeSpendKgs?: Decimal | DecimalJsLike | number | string
@@ -41410,6 +41706,10 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
     passwordHash?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    city?: NullableStringFieldUpdateOperationsInput | string | null
+    birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     walletBalanceKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     cumulativeSpendKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
@@ -41447,6 +41747,10 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
     passwordHash?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    city?: NullableStringFieldUpdateOperationsInput | string | null
+    birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     walletBalanceKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     cumulativeSpendKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
@@ -41493,6 +41797,10 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
     passwordHash?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    city?: NullableStringFieldUpdateOperationsInput | string | null
+    birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     walletBalanceKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     cumulativeSpendKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
@@ -41530,6 +41838,10 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
     passwordHash?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    city?: NullableStringFieldUpdateOperationsInput | string | null
+    birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     walletBalanceKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     cumulativeSpendKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
@@ -41565,6 +41877,10 @@ export namespace Prisma {
     name: string
     email: string
     passwordHash: string
+    phone?: string | null
+    address?: string | null
+    city?: string | null
+    birthDate?: Date | string | null
     walletBalanceKgs?: Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: Decimal | DecimalJsLike | number | string
     cumulativeSpendKgs?: Decimal | DecimalJsLike | number | string
@@ -41602,6 +41918,10 @@ export namespace Prisma {
     name: string
     email: string
     passwordHash: string
+    phone?: string | null
+    address?: string | null
+    city?: string | null
+    birthDate?: Date | string | null
     walletBalanceKgs?: Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: Decimal | DecimalJsLike | number | string
     cumulativeSpendKgs?: Decimal | DecimalJsLike | number | string
@@ -41653,6 +41973,10 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
     passwordHash?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    city?: NullableStringFieldUpdateOperationsInput | string | null
+    birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     walletBalanceKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     cumulativeSpendKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
@@ -41690,6 +42014,10 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
     passwordHash?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    city?: NullableStringFieldUpdateOperationsInput | string | null
+    birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     walletBalanceKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     cumulativeSpendKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
@@ -41725,6 +42053,10 @@ export namespace Prisma {
     name: string
     email: string
     passwordHash: string
+    phone?: string | null
+    address?: string | null
+    city?: string | null
+    birthDate?: Date | string | null
     walletBalanceKgs?: Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: Decimal | DecimalJsLike | number | string
     cumulativeSpendKgs?: Decimal | DecimalJsLike | number | string
@@ -41762,6 +42094,10 @@ export namespace Prisma {
     name: string
     email: string
     passwordHash: string
+    phone?: string | null
+    address?: string | null
+    city?: string | null
+    birthDate?: Date | string | null
     walletBalanceKgs?: Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: Decimal | DecimalJsLike | number | string
     cumulativeSpendKgs?: Decimal | DecimalJsLike | number | string
@@ -41802,6 +42138,10 @@ export namespace Prisma {
     name: string
     email: string
     passwordHash: string
+    phone?: string | null
+    address?: string | null
+    city?: string | null
+    birthDate?: Date | string | null
     walletBalanceKgs?: Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: Decimal | DecimalJsLike | number | string
     cumulativeSpendKgs?: Decimal | DecimalJsLike | number | string
@@ -41839,6 +42179,10 @@ export namespace Prisma {
     name: string
     email: string
     passwordHash: string
+    phone?: string | null
+    address?: string | null
+    city?: string | null
+    birthDate?: Date | string | null
     walletBalanceKgs?: Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: Decimal | DecimalJsLike | number | string
     cumulativeSpendKgs?: Decimal | DecimalJsLike | number | string
@@ -41890,6 +42234,10 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
     passwordHash?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    city?: NullableStringFieldUpdateOperationsInput | string | null
+    birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     walletBalanceKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     cumulativeSpendKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
@@ -41927,6 +42275,10 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
     passwordHash?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    city?: NullableStringFieldUpdateOperationsInput | string | null
+    birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     walletBalanceKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     cumulativeSpendKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
@@ -41973,6 +42325,10 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
     passwordHash?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    city?: NullableStringFieldUpdateOperationsInput | string | null
+    birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     walletBalanceKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     cumulativeSpendKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
@@ -42010,6 +42366,10 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
     passwordHash?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    city?: NullableStringFieldUpdateOperationsInput | string | null
+    birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     walletBalanceKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     cumulativeSpendKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
@@ -42045,6 +42405,10 @@ export namespace Prisma {
     name: string
     email: string
     passwordHash: string
+    phone?: string | null
+    address?: string | null
+    city?: string | null
+    birthDate?: Date | string | null
     walletBalanceKgs?: Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: Decimal | DecimalJsLike | number | string
     cumulativeSpendKgs?: Decimal | DecimalJsLike | number | string
@@ -42082,6 +42446,10 @@ export namespace Prisma {
     name: string
     email: string
     passwordHash: string
+    phone?: string | null
+    address?: string | null
+    city?: string | null
+    birthDate?: Date | string | null
     walletBalanceKgs?: Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: Decimal | DecimalJsLike | number | string
     cumulativeSpendKgs?: Decimal | DecimalJsLike | number | string
@@ -42133,6 +42501,10 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
     passwordHash?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    city?: NullableStringFieldUpdateOperationsInput | string | null
+    birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     walletBalanceKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     cumulativeSpendKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
@@ -42170,6 +42542,10 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
     passwordHash?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    city?: NullableStringFieldUpdateOperationsInput | string | null
+    birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     walletBalanceKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     cumulativeSpendKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
@@ -42205,6 +42581,10 @@ export namespace Prisma {
     name: string
     email: string
     passwordHash: string
+    phone?: string | null
+    address?: string | null
+    city?: string | null
+    birthDate?: Date | string | null
     walletBalanceKgs?: Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: Decimal | DecimalJsLike | number | string
     cumulativeSpendKgs?: Decimal | DecimalJsLike | number | string
@@ -42419,6 +42799,10 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
     passwordHash?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    city?: NullableStringFieldUpdateOperationsInput | string | null
+    birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     walletBalanceKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     cumulativeSpendKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
@@ -42455,6 +42839,10 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
     passwordHash?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    city?: NullableStringFieldUpdateOperationsInput | string | null
+    birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     walletBalanceKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     cumulativeSpendKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
@@ -42491,6 +42879,10 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
     passwordHash?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    city?: NullableStringFieldUpdateOperationsInput | string | null
+    birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     walletBalanceKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     walletBalanceUsd?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
     cumulativeSpendKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string

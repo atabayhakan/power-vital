@@ -85,8 +85,54 @@ const fallbackProducts = [
   { id: 'd4', name: 'Collagen Tripeptide', basePriceKgs: 1950, images: [] },
 ];
 
+// ═══ Editable profile fields (phone/address/city/birthDate) ═══
+// Populated from the raw auth-store user (not the curated useCurrentUser
+// snapshot, which only exposes loyalty-related fields) since these are
+// self-editable details specific to this form.
+const profileForm = ref({ name: '', phone: '', city: '', address: '', birthDate: '' });
+const savingProfile = ref(false);
+const profileSaved = ref(false);
+const profileError = ref('');
+
+const populateProfileForm = () => {
+  const u = authStore.user as any;
+  if (!u) return;
+  profileForm.value = {
+    name: u.name || '',
+    phone: u.phone || '',
+    city: u.city || '',
+    address: u.address || '',
+    birthDate: u.birthDate ? String(u.birthDate).slice(0, 10) : ''
+  };
+};
+
+const saveProfile = async () => {
+  savingProfile.value = true;
+  profileSaved.value = false;
+  profileError.value = '';
+  try {
+    const payload: any = {
+      name: profileForm.value.name,
+      phone: profileForm.value.phone || null,
+      city: profileForm.value.city || null,
+      address: profileForm.value.address || null,
+      birthDate: profileForm.value.birthDate ? new Date(profileForm.value.birthDate).toISOString() : null
+    };
+    const res = await api.put('/auth/me', payload);
+    authStore.user = res.data;
+    localStorage.setItem('userProfile', JSON.stringify(res.data));
+    profileSaved.value = true;
+    setTimeout(() => { profileSaved.value = false; }, 2500);
+  } catch (e: any) {
+    profileError.value = e.response?.data?.error || t('account.profileSaveError');
+  } finally {
+    savingProfile.value = false;
+  }
+};
+
 onMounted(async () => {
   if (!user.value) { router.push('/login'); return; }
+  populateProfileForm();
 
   try {
     const res = await api.get('/orders');
@@ -281,24 +327,47 @@ const logout = () => { authStore.logout(); router.push('/login'); };
             {{ t('account.profileInfo') }}
           </h2>
         </div>
-        <div class="acc-profile">
+        <form class="acc-profile" @submit.prevent="saveProfile">
           <div class="acc-field">
             <label>{{ t('account.name') }}</label>
-            <div class="acc-field__val">{{ user?.name }}</div>
+            <input v-model="profileForm.name" type="text" class="acc-field__input" required />
           </div>
           <div class="acc-field">
             <label>{{ t('account.email') }}</label>
             <div class="acc-field__val">{{ user?.email }}</div>
           </div>
           <div class="acc-field">
+            <label>{{ t('account.phone') }}</label>
+            <input v-model="profileForm.phone" type="tel" class="acc-field__input" :placeholder="t('account.phonePlaceholder')" />
+          </div>
+          <div class="acc-field">
+            <label>{{ t('account.city') }}</label>
+            <input v-model="profileForm.city" type="text" class="acc-field__input" :placeholder="t('account.cityPlaceholder')" />
+          </div>
+          <div class="acc-field">
+            <label>{{ t('account.address') }}</label>
+            <textarea v-model="profileForm.address" class="acc-field__input acc-field__input--textarea" rows="2" :placeholder="t('account.addressPlaceholder')"/>
+          </div>
+          <div class="acc-field">
+            <label>{{ t('account.birthDate') }}</label>
+            <input v-model="profileForm.birthDate" type="date" class="acc-field__input" />
+          </div>
+          <div class="acc-field">
             <label>{{ t('account.role') }}</label>
             <div class="acc-field__val acc-field__val--role">{{ roleLabel }}</div>
           </div>
+
+          <button type="submit" class="acc-btn acc-btn--primary acc-profile__save" :disabled="savingProfile">
+            {{ savingProfile ? t('account.saving') : t('account.saveProfile') }}
+          </button>
+          <p v-if="profileSaved" class="acc-profile__success">✓ {{ t('account.profileSaved') }}</p>
+          <p v-if="profileError" class="acc-profile__error">{{ profileError }}</p>
+
           <router-link to="/account/wallet" class="acc-btn acc-btn--soft acc-profile__wallet">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
             {{ t('account.loyaltyCta') }}
           </router-link>
-        </div>
+        </form>
       </section>
 
       <!-- Web Push opt-in (only meaningful for customers/distributors) -->
@@ -466,6 +535,16 @@ const logout = () => { authStore.logout(); router.push('/login'); };
 .acc-field label { font-size: 0.74rem; font-weight: 700; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.4px; }
 .acc-field__val { background: #f7f4ef; border: 1px solid #efece6; padding: 11px 14px; border-radius: 11px; color: #1f2937; font-size: 0.92rem; font-weight: 500; }
 .acc-field__val--role { color: #BC4A3C; font-weight: 700; background: #fdf4f2; border-color: #f3dcd6; }
+.acc-field__input {
+  background: #fff; border: 1px solid #e5e7eb; padding: 11px 14px; border-radius: 11px;
+  color: #1f2937; font-size: 0.92rem; font-weight: 500; font-family: inherit;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.acc-field__input:focus { outline: none; border-color: #BC4A3C; box-shadow: 0 0 0 3px rgba(188,74,60,0.1); }
+.acc-field__input--textarea { resize: vertical; min-height: 52px; line-height: 1.4; }
+.acc-profile__save { margin-top: 4px; justify-content: center; }
+.acc-profile__success { margin: 0; color: #10B981; font-size: 0.85rem; font-weight: 700; text-align: center; }
+.acc-profile__error { margin: 0; color: #EF4444; font-size: 0.85rem; font-weight: 600; text-align: center; }
 .acc-profile__wallet { margin-top: 4px; justify-content: center; }
 
 /* ═══ RESPONSIVE ═══ */

@@ -7,32 +7,46 @@
 // /api/v1/push/preferences (keyed per eventKey).
 import { ref, onMounted, onUnmounted, computed } from 'vue';
 import { usePushSubscription } from '../../composables/usePushSubscription';
+import { useTranslate } from '../../composables/useTranslate';
 import axios from 'axios';
 
+const { t } = useTranslate();
 const { state, isSubscribed, error, subscribe, unsubscribe, onSwMessage } = usePushSubscription();
 
 interface Prefs { [event: string]: boolean }
 
-const EVENT_KEYS = [
-  { key: 'order_paid',      label: 'Siparişim ödendi',          icon: '💳' },
-  { key: 'order_shipped',   label: 'Siparişim kargoda',          icon: '📦' },
-  { key: 'order_completed', label: 'Siparişim tamamlandı',       icon: '✅' },
-  { key: 'order_cancelled', label: 'Siparişim iptal edildi',     icon: '❌' },
-  { key: 'withdrawal_approved', label: 'Çekim talebim onaylandı', icon: '✅' },
-  { key: 'withdrawal_rejected', label: 'Çekim talebim reddedildi', icon: '⚠️' }
-];
+const EVENT_KEYS = computed(() => [
+  { key: 'order_paid',      label: t('push.eventOrderPaid'),      icon: '💳' },
+  { key: 'order_shipped',   label: t('push.eventOrderShipped'),   icon: '📦' },
+  { key: 'order_completed', label: t('push.eventOrderCompleted'), icon: '✅' },
+  { key: 'order_cancelled', label: t('push.eventOrderCancelled'), icon: '❌' },
+  { key: 'withdrawal_approved', label: t('push.eventWithdrawalApproved'), icon: '✅' },
+  { key: 'withdrawal_rejected', label: t('push.eventWithdrawalRejected'), icon: '⚠️' }
+]);
 
 const prefs = ref<Prefs>({});
 const loading = ref(false);
 const info = ref('');
 
+const stateLabel = computed(() => {
+  switch (state.value) {
+    case 'unsupported': return t('push.stateUnsupported');
+    case 'denied':      return t('push.stateDenied');
+    case 'error':       return t('push.stateError');
+    case 'granted':     return t('push.stateGranted');
+    case 'prompt':      return t('push.statePrompt');
+    case 'idle':        return t('push.stateIdle');
+    default:            return state.value;
+  }
+});
+
 const stateMessage = computed(() => {
   switch (state.value) {
-    case 'unsupported': return 'Tarayıcınız Web Push desteklemiyor.';
-    case 'denied':      return 'Bildirim izni reddedildi. Tarayıcı ayarlarından açabilirsiniz.';
-    case 'error':       return error.value || 'Bilinmeyen bir hata oluştu.';
-    case 'granted':     return 'Bildirimler aktif.';
-    case 'prompt':      return 'Tarayıcı izin diyaloğu bekleniyor.';
+    case 'unsupported': return t('push.msgUnsupported');
+    case 'denied':      return t('push.msgDenied');
+    case 'error':       return error.value || t('push.msgErrorGeneric');
+    case 'granted':     return t('push.msgGranted');
+    case 'prompt':      return t('push.msgPrompt');
     default:            return '';
   }
 });
@@ -54,7 +68,7 @@ const loadPrefs = async () => {
     const res = await axios.get('/api/v1/push/preferences');
     prefs.value = res.data.preferences || {};
   } catch (e: any) {
-    info.value = 'Tercihler yüklenemedi.';
+    info.value = t('push.prefsLoadError');
   } finally {
     loading.value = false;
   }
@@ -70,11 +84,11 @@ const togglePref = async (key: string, value: boolean) => {
     else next[key] = false;
     await axios.put('/api/v1/push/preferences', next);
     prefs.value = next;
-    info.value = value ? '🔔 Açıldı' : '🔕 Kapatıldı';
+    info.value = value ? t('push.prefOn') : t('push.prefOff');
     setTimeout(() => { info.value = ''; }, 2000);
   } catch {
     prefs.value = { ...prefs.value, [key]: before }; // rollback
-    info.value = 'Tercih kaydedilemedi.';
+    info.value = t('push.prefsSaveError');
   }
 };
 
@@ -108,9 +122,9 @@ onUnmounted(() => { off?.(); });
 <template>
   <section class="ps-card">
     <header class="ps-head">
-      <h3>🔔 Anlık Bildirimler (Push)</h3>
+      <h3>🔔 {{ t('push.title') }}</h3>
       <span class="ps-state" :style="{ background: stateColor }">
-        {{ state }}
+        {{ stateLabel }}
       </span>
     </header>
 
@@ -124,15 +138,15 @@ onUnmounted(() => { off?.(); });
         @click="onEnable"
         :disabled="state === 'prompt'"
       >
-        🔔 Bildirimleri Aç
+        🔔 {{ t('push.enableBtn') }}
       </button>
       <p v-else class="ps-help">
-        Tarayıcı ayarlarından bu site için bildirim iznini açıp sayfayı yenileyin.
+        {{ t('push.deniedHelp') }}
       </p>
     </div>
 
     <div v-else class="ps-events">
-      <p class="ps-hint">Aşağıdaki olaylardan hangilerinde bildirim almak istiyorsunuz?</p>
+      <p class="ps-hint">{{ t('push.eventsHint') }}</p>
       <ul class="ps-list">
         <li v-for="ev in EVENT_KEYS" :key="ev.key" class="ps-row">
           <span class="ps-row-label">
@@ -150,7 +164,7 @@ onUnmounted(() => { off?.(); });
       </ul>
 
       <button class="ps-btn ps-btn--ghost" @click="onDisable">
-        Tüm bildirimleri kapat
+        {{ t('push.disableAll') }}
       </button>
     </div>
   </section>

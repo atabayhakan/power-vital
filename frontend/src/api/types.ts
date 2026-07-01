@@ -237,7 +237,43 @@ export interface paths {
                 };
             };
         };
-        put?: never;
+        /** @description Update the authenticated user's own profile (name, phone, address, city, birth date) */
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": components["schemas"]["ProfileUpdateRequest"];
+                };
+            };
+            responses: {
+                /** @description Profile updated */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Validation failed */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Not authenticated */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
         post?: never;
         delete?: never;
         options?: never;
@@ -4743,6 +4779,14 @@ export interface components {
         ChangePasswordRequest: {
             currentPassword: string;
             newPassword: string;
+        };
+        /** @description Authenticated user updates their own profile details (name, phone, address, city, birth date). Email/role/wallet are never editable here. */
+        ProfileUpdateRequest: {
+            name?: string;
+            phone?: string | "" | null;
+            address?: string | "" | null;
+            city?: string | "" | null;
+            birthDate?: string | "" | null;
         };
         /** @description Create a new product with a fixed KGS price. */
         ProductCreateRequest: {

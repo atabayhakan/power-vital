@@ -10,6 +10,10 @@ export interface UserProfile {
   name: string;
   email: string;
   role?: UserRole;
+  phone?: string | null;
+  address?: string | null;
+  city?: string | null;
+  birthDate?: string | null;
   walletBalanceUsd?: number;
   walletBalanceKgs?: number;
   cumulativeSpendKgs?: number;

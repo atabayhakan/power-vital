@@ -71,9 +71,9 @@ describe('AdminChartWidget — initial render', () => {
     api.apiGet.mockResolvedValue(typedResponse(buildTrendsResponse()));
     const w = mountWidget();
     await flushPromises();
-    // Revenue formatted as "20K ₽" (20000 → 20.0K)
+    // Revenue formatted as "20.0K KGS" (20000 → 20.0K)
     expect(w.text()).toContain('20');
-    expect(w.text()).toContain('₽');
+    expect(w.text()).toContain('KGS');
     expect(w.text()).toContain('59'); // orders
     expect(w.text()).toContain('23'); // newUsers
   });

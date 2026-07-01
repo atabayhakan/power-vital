@@ -7,7 +7,7 @@
 import { registry } from './registry';
 import { z } from 'zod';
 import {
-  RegisterSchema, LoginSchema, ChangePasswordSchema,
+  RegisterSchema, LoginSchema, ChangePasswordSchema, ProfileUpdateSchema,
   ProductCreateSchema, ProductUpdateSchema,
   CategoryCreateSchema, CategoryUpdateSchema,
   HeroSlideCreateSchema, HeroSlideUpdateSchema,
@@ -390,6 +390,14 @@ export const registerAuthRoutes = () => {
     security: [{ bearerAuth: [] }],
     request: { body: { content: { 'application/json': { schema: ChangePasswordSchema } } } },
     responses: { 200: { description: 'Password changed' }, 400: { description: 'Validation failed' }, 401: { description: 'Wrong current password' } }
+  });
+
+  registry.registerPath({
+    method: 'put', path: '/api/v1/auth/me',
+    tags: [tag.name], description: 'Update the authenticated user\'s own profile (name, phone, address, city, birth date)',
+    security: [{ bearerAuth: [] }],
+    request: { body: { content: { 'application/json': { schema: ProfileUpdateSchema } } } },
+    responses: { 200: { description: 'Profile updated' }, 400: { description: 'Validation failed' }, 401: { description: 'Not authenticated' } }
   });
 };
 
