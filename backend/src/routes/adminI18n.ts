@@ -73,7 +73,7 @@ router.get('/records', async (req: Request, res: Response) => {
     for (const f of schema.scalarFields) select[f] = true;
 
     const [rows, total] = await Promise.all([
-      delegate.findMany({ select, take: pageSize, skip, orderBy: { updatedAt: 'desc' } }),
+      delegate.findMany({ select, take: pageSize, skip, orderBy: { [schema.sortField || 'updatedAt']: 'desc' } }),
       delegate.count()
     ]);
 
@@ -505,7 +505,7 @@ router.get('/export/:model.csv', async (req: Request, res: Response) => {
     const select: any = { id: true, translations: true };
     for (const f of schema.scalarFields) select[f] = true;
     for (const arr of schema.arrayFields || []) select[arr.name] = true;
-    const rows = await delegate.findMany({ select, take: 2000, orderBy: { updatedAt: 'desc' } });
+    const rows = await delegate.findMany({ select, take: 2000, orderBy: { [schema.sortField || 'updatedAt']: 'desc' } });
 
     const esc = (s: any) => {
       if (s == null) return '';

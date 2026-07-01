@@ -486,7 +486,7 @@ export const sweepModel = async (
   for (const f of schema.scalarFields) select[f] = true;
   for (const arr of schema.arrayFields || []) select[arr.name] = true;
 
-  const rows = await delegate.findMany({ select, take: limit, orderBy: { updatedAt: 'desc' } });
+  const rows = await delegate.findMany({ select, take: limit, orderBy: { [schema.sortField || 'updatedAt']: 'desc' } });
   let filled = 0;
   for (const row of rows) {
     const base = ((): Record<string, any> => {

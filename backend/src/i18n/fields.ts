@@ -20,6 +20,14 @@ export interface ModelFieldSchema {
   scalarFields: string[];
   /** JSON path (relative to the translations root) where arrays of sub-objects live, e.g. "accordions" */
   arrayFields?: ArrayFieldSchema[];
+  /**
+   * Field to sort list/export queries by (always descending — newest or
+   * highest first). Defaults to 'updatedAt', which most models have, but
+   * Category has no timestamp fields at all and HeroSlide only has
+   * createdAt — sorting by a field the model doesn't have throws a Prisma
+   * "Unknown argument" error, so those two must override this.
+   */
+  sortField?: string;
 }
 
 export interface ArrayFieldSchema {
@@ -57,11 +65,13 @@ export const TRANSLATABLE_MODELS: Record<string, ModelFieldSchema> = {
   },
   Category: {
     model: 'Category',
-    scalarFields: ['name']
+    scalarFields: ['name'],
+    sortField: 'sortOrder'
   },
   HeroSlide: {
     model: 'HeroSlide',
-    scalarFields: ['title', 'subtitle', 'buttonText']
+    scalarFields: ['title', 'subtitle', 'buttonText'],
+    sortField: 'createdAt'
   },
   SiteSettings: {
     model: 'SiteSettings',
