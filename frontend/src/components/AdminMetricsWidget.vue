@@ -11,6 +11,9 @@
 import { ref, onMounted, onUnmounted, computed } from 'vue';
 import { apiGet } from '@/api/openapi-client';
 import { useAdminRealtime } from '../composables/useAdminRealtime';
+import { useTranslate } from '../composables/useTranslate';
+
+const { t } = useTranslate();
 
 interface MetricsSnapshot {
   timestamp: number;
@@ -55,7 +58,7 @@ const refresh = async () => {
     errorMsg.value = '';
     lastUpdated.value = new Date();
   } catch (e: any) {
-    errorMsg.value = e.response?.data?.error || 'Metrik alınamadı';
+    errorMsg.value = e.response?.data?.error || t('admin.metrics.fetchError');
   } finally {
     isLoading.value = false;
   }
@@ -166,9 +169,9 @@ onUnmounted(() => {
 <template>
   <div class="metrics-widget clay-surface">
     <header class="mw-head">
-      <h3 class="mw-title">📊 Canlı Metrikler</h3>
+      <h3 class="mw-title">📊 {{ t('admin.metrics.title') }}</h3>
       <span v-if="lastUpdated" class="mw-updated">
-        Son güncelleme: {{ lastUpdated.toLocaleTimeString() }}
+        {{ t('admin.metrics.lastUpdated', { time: lastUpdated.toLocaleTimeString() }) }}
         <span v-if="isLoading" class="mw-spinner">↻</span>
       </span>
     </header>
@@ -179,37 +182,37 @@ onUnmounted(() => {
       <!-- System card row -->
       <div class="mw-cards">
         <div class="mw-card">
-          <span class="mw-label">Uptime</span>
+          <span class="mw-label">{{ t('admin.metrics.uptime') }}</span>
           <span class="mw-value">{{ fmtUptime(metrics.uptimeSeconds) }}</span>
         </div>
         <div class="mw-card">
-          <span class="mw-label">Bellek (RSS)</span>
+          <span class="mw-label">{{ t('admin.metrics.memoryRss') }}</span>
           <span class="mw-value">{{ metrics.memoryMB.rss }} MB</span>
         </div>
         <div class="mw-card">
-          <span class="mw-label">Heap</span>
+          <span class="mw-label">{{ t('admin.metrics.heap') }}</span>
           <span class="mw-value">{{ metrics.memoryMB.heapUsed }} MB</span>
         </div>
         <div class="mw-card">
-          <span class="mw-label">Aktif SSE</span>
+          <span class="mw-label">{{ t('admin.metrics.activeSse') }}</span>
           <span class="mw-value">{{ metrics.sse.activeConnections }}</span>
         </div>
         <div class="mw-card mw-card--highlight">
-          <span class="mw-label">Toplam İstek</span>
+          <span class="mw-label">{{ t('admin.metrics.totalRequests') }}</span>
           <span class="mw-value">{{ totalRequests.toLocaleString() }}</span>
         </div>
         <div class="mw-card" :class="{ 'mw-card--bad': overallErrorRate > 0.05 }">
-          <span class="mw-label">Hata Oranı</span>
+          <span class="mw-label">{{ t('admin.metrics.errorRate') }}</span>
           <span class="mw-value">{{ fmtPct(overallErrorRate) }}</span>
         </div>
         <!-- Database query observability — see backend/utils/prismaQueryLogger.ts.
              Counts since process start; reset only via admin /reset hook. -->
         <div class="mw-card" :class="{ 'mw-card--bad': (metrics.db?.slowQueries ?? 0) > 0 }">
-          <span class="mw-label">Yavaş Sorgu</span>
+          <span class="mw-label">{{ t('admin.metrics.slowQuery') }}</span>
           <span class="mw-value">{{ metrics.db?.slowQueries ?? 0 }}</span>
         </div>
         <div class="mw-card" :class="{ 'mw-card--bad': (metrics.db?.n1Detections ?? 0) > 0 }">
-          <span class="mw-label">N+1 Tespiti</span>
+          <span class="mw-label">{{ t('admin.metrics.n1Detection') }}</span>
           <span class="mw-value">{{ metrics.db?.n1Detections ?? 0 }}</span>
         </div>
         <!-- Cache hit-rate — see backend/utils/cacheStats.ts.
@@ -217,22 +220,22 @@ onUnmounted(() => {
              handler is re-running on every request. -->
         <div class="mw-card"
              :class="{ 'mw-card--bad': (metrics.cache?.hitRatio ?? 0) < 0.5 && (metrics.cache?.total ?? 0) > 10 }">
-          <span class="mw-label">Cache Hit Ratio</span>
+          <span class="mw-label">{{ t('admin.metrics.cacheHitRatio') }}</span>
           <span class="mw-value">{{ fmtPct(metrics.cache?.hitRatio ?? 0) }}</span>
         </div>
       </div>
 
       <!-- Cache effectiveness per route (only shown when we have data) -->
       <template v-if="metrics.cache && metrics.cache.byRoute.length > 0">
-        <h4 class="mw-section">Cache Etkinliği (route bazında)</h4>
+        <h4 class="mw-section">{{ t('admin.metrics.cacheByRoute') }}</h4>
         <table class="mw-table">
           <thead>
             <tr>
-              <th>Route</th>
-              <th class="num">HIT</th>
-              <th class="num">MISS</th>
-              <th class="num">BYPASS</th>
-              <th class="num">Hit %</th>
+              <th>{{ t('admin.metrics.colRoute') }}</th>
+              <th class="num">{{ t('admin.metrics.colHit') }}</th>
+              <th class="num">{{ t('admin.metrics.colMiss') }}</th>
+              <th class="num">{{ t('admin.metrics.colBypass') }}</th>
+              <th class="num">{{ t('admin.metrics.colHitPct') }}</th>
             </tr>
           </thead>
           <tbody>
@@ -250,15 +253,15 @@ onUnmounted(() => {
       </template>
 
       <!-- Top endpoints table -->
-      <h4 class="mw-section">En Yoğun Endpoint'ler (P95 Latency)</h4>
+      <h4 class="mw-section">{{ t('admin.metrics.busiestEndpoints') }}</h4>
       <table class="mw-table">
         <thead>
           <tr>
-            <th>Method</th>
-            <th>Route</th>
-            <th class="num">İstek</th>
-            <th class="num">Hata</th>
-            <th class="num">P95</th>
+            <th>{{ t('admin.metrics.colMethod') }}</th>
+            <th>{{ t('admin.metrics.colRoute') }}</th>
+            <th class="num">{{ t('admin.metrics.colRequests') }}</th>
+            <th class="num">{{ t('admin.metrics.colErrors') }}</th>
+            <th class="num">{{ t('admin.metrics.colP95') }}</th>
           </tr>
         </thead>
         <tbody>
@@ -270,7 +273,7 @@ onUnmounted(() => {
             <td class="num" :class="{ 'mw-slow': r.p95 > 500 }">{{ r.p95 }}ms</td>
           </tr>
           <tr v-if="endpointRows.length === 0">
-            <td colspan="5" class="mw-empty">Henüz metrik verisi yok</td>
+            <td colspan="5" class="mw-empty">{{ t('admin.metrics.noData') }}</td>
           </tr>
         </tbody>
       </table>
@@ -278,25 +281,25 @@ onUnmounted(() => {
       <!-- Auth + notifications + search summary -->
       <div class="mw-bottom">
         <div class="mw-mini">
-          <span class="mw-label">Refresh token issued</span>
+          <span class="mw-label">{{ t('admin.metrics.refreshTokenIssued') }}</span>
           <span class="mw-value">
             {{ metrics.auth.refreshTokensIssued.reduce((s, r) => s + r.value, 0) }}
           </span>
         </div>
         <div class="mw-mini" :class="{ 'mw-card--bad': metrics.auth.refreshTokensReplayed.reduce((s, r) => s + r.value, 0) > 0 }">
-          <span class="mw-label">Replay tespit</span>
+          <span class="mw-label">{{ t('admin.metrics.replayDetected') }}</span>
           <span class="mw-value">
             {{ metrics.auth.refreshTokensReplayed.reduce((s, r) => s + r.value, 0) }}
           </span>
         </div>
         <div class="mw-mini">
-          <span class="mw-label">Email bildirim</span>
+          <span class="mw-label">{{ t('admin.metrics.emailNotification') }}</span>
           <span class="mw-value">
             {{ metrics.notifications.sent.reduce((s, r) => s + r.value, 0) }}
           </span>
         </div>
         <div class="mw-mini">
-          <span class="mw-label">Search (fulltext)</span>
+          <span class="mw-label">{{ t('admin.metrics.searchFulltext') }}</span>
           <span class="mw-value">
             {{ metrics.search.byStrategy.find(s => s.labels.strategy === 'fulltext')?.value ?? 0 }}
           </span>
