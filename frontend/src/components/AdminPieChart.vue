@@ -55,7 +55,7 @@ const props = withDefaults(defineProps<{
 // 8-colour palette. Tuned for a warm-light admin surface; works in
 // light + dark contexts.
 const PALETTE = [
-  '#b91c1c', // red
+  '#BC4A3C', // brand red (var(--pv-red) — matches buttons/active states elsewhere)
   '#1d4ed8', // blue
   '#047857', // green
   '#c2410c', // orange
@@ -90,10 +90,7 @@ const polarToCartesian = (cx: number, cy: number, r: number, angleDeg: number) =
   return { x: cx + r * Math.cos(rad), y: cy + r * Math.sin(rad) };
 };
 
-const arcPath = (startPct: number, endPct: number, rOuter: number, rInner: number) => {
-  if (endPct - startPct >= 1) return '';
-  const startAngle = startPct * 360;
-  const endAngle = endPct * 360;
+const ringSegment = (startAngle: number, endAngle: number, rOuter: number, rInner: number) => {
   const largeArc = endAngle - startAngle > 180 ? 1 : 0;
   const outerStart = polarToCartesian(CX, CY, rOuter, startAngle);
   const outerEnd = polarToCartesian(CX, CY, rOuter, endAngle);
@@ -106,6 +103,20 @@ const arcPath = (startPct: number, endPct: number, rOuter: number, rInner: numbe
     `A ${rInner} ${rInner} 0 ${largeArc} 0 ${innerStart.x} ${innerStart.y}`,
     'Z'
   ].join(' ');
+};
+
+const arcPath = (startPct: number, endPct: number, rOuter: number, rInner: number) => {
+  const startAngle = startPct * 360;
+  const endAngle = endPct * 360;
+  // A single category at (or effectively at) 100% share has no distinct
+  // start/end point for the SVG arc sweep to draw, so a plain arc command
+  // renders nothing. Split it into two half-turn segments to draw a full
+  // ring instead of silently skipping the slice.
+  if (endAngle - startAngle >= 359.999) {
+    const midAngle = startAngle + 180;
+    return ringSegment(startAngle, midAngle, rOuter, rInner) + ' ' + ringSegment(midAngle, endAngle, rOuter, rInner);
+  }
+  return ringSegment(startAngle, endAngle, rOuter, rInner);
 };
 
 const slices = computed(() => {

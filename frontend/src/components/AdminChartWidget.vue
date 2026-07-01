@@ -216,8 +216,8 @@ const daysLabel = computed(() => t('admin.chart.lastDays', { n: days.value }));
       >
         <defs>
           <linearGradient id="ac-revenue-gradient" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stop-color="#b91c1c" stop-opacity="0.7" />
-            <stop offset="100%" stop-color="#b91c1c" stop-opacity="0.05" />
+            <stop offset="0%" stop-color="#BC4A3C" stop-opacity="0.7" />
+            <stop offset="100%" stop-color="#BC4A3C" stop-opacity="0.05" />
           </linearGradient>
         </defs>
 
@@ -317,7 +317,7 @@ const daysLabel = computed(() => t('admin.chart.lastDays', { n: days.value }));
 }
 .ac-tab:hover { background: #f3f4f6; }
 .ac-tab--active {
-  background: #b91c1c; color: #fff; border-color: #b91c1c;
+  background: #BC4A3C; color: #fff; border-color: #BC4A3C;
 }
 .ac-tab:disabled { opacity: 0.6; cursor: not-allowed; }
 .ac-refresh {
@@ -344,7 +344,7 @@ const daysLabel = computed(() => t('admin.chart.lastDays', { n: days.value }));
   display: block; font-size: 1.4rem; font-weight: 800; color: #1a1a1a;
   margin-top: 0.2rem; line-height: 1.1;
 }
-.ac-kpi__value--revenue { color: #b91c1c; }
+.ac-kpi__value--revenue { color: #BC4A3C; }
 .ac-kpi__value--orders  { color: #1d4ed8; }
 .ac-kpi__value--users   { color: #047857; }
 .ac-kpi__sub {
@@ -354,7 +354,7 @@ const daysLabel = computed(() => t('admin.chart.lastDays', { n: days.value }));
 .ac-state {
   text-align: center; padding: 2.5rem 1rem; color: #6b7280; font-size: 0.9rem;
 }
-.ac-state--err { color: #b91c1c; }
+.ac-state--err { color: #BC4A3C; }
 
 .ac-chart-wrap {
   margin-top: 0.5rem;
@@ -370,11 +370,11 @@ const daysLabel = computed(() => t('admin.chart.lastDays', { n: days.value }));
 .ac-line {
   fill: none; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round;
 }
-.ac-line--revenue { stroke: #b91c1c; }
+.ac-line--revenue { stroke: #BC4A3C; }
 .ac-line--orders  { stroke: #1d4ed8; }
 .ac-line--users   { stroke: #047857; }
 .ac-area-revenue { fill: url(#ac-revenue-gradient); opacity: 0.18; }
-.ac-points circle { fill: #b91c1c; }
+.ac-points circle { fill: #BC4A3C; }
 
 .ac-legend {
   display: flex; gap: 1rem; justify-content: center; margin-top: 0.5rem;
@@ -384,7 +384,7 @@ const daysLabel = computed(() => t('admin.chart.lastDays', { n: days.value }));
 .ac-legend__swatch {
   display: inline-block; width: 14px; height: 3px; border-radius: 2px;
 }
-.ac-legend__swatch--revenue { background: #b91c1c; }
+.ac-legend__swatch--revenue { background: #BC4A3C; }
 .ac-legend__swatch--orders  { background: #1d4ed8; }
 .ac-legend__swatch--users   { background: #047857; }
 

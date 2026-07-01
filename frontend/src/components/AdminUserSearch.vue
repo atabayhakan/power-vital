@@ -139,8 +139,8 @@ const fmtKgs = (n: number) => n.toLocaleString('ru-RU');
   transition: border-color 0.15s, box-shadow 0.15s;
 }
 .aus-input-row:focus-within {
-  border-color: #b91c1c;
-  box-shadow: 0 0 0 3px rgba(185, 28, 28, 0.15);
+  border-color: #BC4A3C;
+  box-shadow: 0 0 0 3px rgba(188, 74, 60, 0.15);
 }
 .aus-icon { color: #6b7280; margin-right: 0.4rem; font-size: 0.95rem; }
 .aus-input {
@@ -163,7 +163,7 @@ const fmtKgs = (n: number) => n.toLocaleString('ru-RU');
   box-shadow: 0 4px 12px rgba(0,0,0,0.08);
   font-size: 0.85rem; color: #6b7280; z-index: 100;
 }
-.aus-state--err { color: #b91c1c; }
+.aus-state--err { color: #BC4A3C; }
 
 .aus-list {
   position: absolute; top: 100%; left: 0; right: 0;

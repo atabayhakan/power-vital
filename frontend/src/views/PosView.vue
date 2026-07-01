@@ -173,7 +173,7 @@ const fmtPrice = (n: number) => Math.round(n).toLocaleString('ru-RU') + ' сом
           <div v-if="userSearchResults.length > 0" style="margin-top: 8px; background: var(--bg-dark); border-radius: 4px; max-height: 120px; overflow-y: auto;">
             <div v-for="u in userSearchResults" :key="u.id" @click="selectUser(u)" style="padding: 8px; border-bottom: 1px solid rgba(255,255,255,0.05); cursor: pointer; display: flex; justify-content: space-between;">
               <span>{{ u.name }}</span>
-              <span style="color: var(--accent-blue); font-size: 0.8rem;">{{ u.role }}</span>
+              <span style="color: var(--accent-blue); font-size: 0.8rem;">{{ t('admin.role.' + u.role) }}</span>
             </div>
           </div>
         </div>

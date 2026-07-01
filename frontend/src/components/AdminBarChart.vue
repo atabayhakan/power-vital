@@ -67,8 +67,9 @@ const props = withDefaults(defineProps<{
   maxRows?: number;
 }>(), { unit: '', maxRows: 10 });
 
-// Default bar colour — red matches the dashboard accent.
-const DEFAULT_BAR = '#b91c1c';
+// Default bar colour — brand red (var(--pv-red)), matches buttons/active
+// states elsewhere instead of a generic off-brand red.
+const DEFAULT_BAR = '#BC4A3C';
 
 const sorted = computed(() =>
   [...props.data]

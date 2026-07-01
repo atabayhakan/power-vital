@@ -134,8 +134,8 @@ const fmtKgs = (n: number) => n.toLocaleString('ru-RU');
   padding: 0 0.5rem; transition: border-color 0.15s, box-shadow 0.15s;
 }
 .aps-input-row:focus-within {
-  border-color: #b91c1c;
-  box-shadow: 0 0 0 3px rgba(185, 28, 28, 0.15);
+  border-color: #BC4A3C;
+  box-shadow: 0 0 0 3px rgba(188, 74, 60, 0.15);
 }
 .aps-icon { color: #6b7280; margin-right: 0.4rem; font-size: 0.95rem; }
 .aps-input {
@@ -156,7 +156,7 @@ const fmtKgs = (n: number) => n.toLocaleString('ru-RU');
   box-shadow: 0 4px 12px rgba(0,0,0,0.08);
   font-size: 0.85rem; color: #6b7280; z-index: 100;
 }
-.aps-state--err { color: #b91c1c; }
+.aps-state--err { color: #BC4A3C; }
 
 .aps-list {
   position: absolute; top: 100%; left: 0; right: 0;
@@ -188,9 +188,9 @@ const fmtKgs = (n: number) => n.toLocaleString('ru-RU');
   font-size: 0.78rem;
 }
 .aps-cat { color: #6b7280; font-weight: 600; }
-.aps-price { color: #b91c1c; font-weight: 700; font-family: ui-monospace, monospace; }
+.aps-price { color: #BC4A3C; font-weight: 700; font-family: ui-monospace, monospace; }
 .aps-stock { color: #047857; font-weight: 600; }
-.aps-stock--low { color: #b91c1c; }
+.aps-stock--low { color: #BC4A3C; }
 .aps-low-badge {
   font-size: 0.7rem; font-weight: 700;
   padding: 0.1rem 0.4rem; border-radius: 999px;

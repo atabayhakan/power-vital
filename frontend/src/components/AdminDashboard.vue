@@ -41,7 +41,8 @@ const fetchAnalytics = async () => {
       name: c.categoryName, value: c.revenueKgs,
     }));
     topCustomers.value = ((resCust.data as unknown as TopCustomersResponse).customers || []).map((c) => ({
-      label: c.name, sublabel: c.email, value: c.totalKgs, badge: c.role,
+      label: c.name, sublabel: c.email, value: c.totalKgs,
+      badge: c.role ? t('admin.role.' + c.role) : undefined,
     }));
     topProducts.value = ((resProd.data as unknown as TopProductsResponse).products || []).map((p) => {
       const cat = p.categoryName ? ' · ' + p.categoryName : '';
