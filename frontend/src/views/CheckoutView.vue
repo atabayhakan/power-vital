@@ -18,7 +18,6 @@ const shippingCheckboxText = financeSettings.checkoutShippingCheckboxText || 'Si
 const freeShippingSuccessText = financeSettings.checkoutFreeShippingSuccessText || '🎉 Tebrikle, kargonuz ücretsizdir!';
 
 const shippingAccepted = ref(false);
-const discountRate = computed(() => currentUser.value?.dynamicDiscountRate ?? 0);
 const orderTotalKgs = computed(() => cartStore.cartTotalKgs);
 const isUnderThreshold = computed(() => orderTotalKgs.value > 0 && orderTotalKgs.value < thresholdKgs);
 const isFreeShipping = computed(() => orderTotalKgs.value >= thresholdKgs);
