@@ -968,17 +968,17 @@ export interface paths {
                         companyName?: string;
                         address?: string | null;
                         phone?: string | null;
-                        /** Format: email */
-                        email?: string | null;
+                        email?: string | "" | null;
                         mapIframeCode?: string | null;
-                        /** Format: uri */
-                        logoUrl?: string | null;
+                        logoUrl?: string | "" | null;
                         topbarShippingMsg?: string | null;
                         topbarPhone?: string | null;
                         copyrightText?: string | null;
                         trustBadges?: string | unknown[] | null;
                         partners?: string | unknown[] | null;
-                        footerLinks?: string | unknown[] | null;
+                        footerLinks?: string | unknown[] | {
+                            [key: string]: unknown;
+                        } | null;
                         homepageBlocks?: string | {
                             [key: string]: unknown;
                         } | null;

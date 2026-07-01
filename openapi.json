@@ -2237,11 +2237,21 @@
                     "maxLength": 50
                   },
                   "email": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "format": "email"
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "format": "email"
+                      },
+                      {
+                        "type": "string",
+                        "enum": [
+                          ""
+                        ]
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
                   },
                   "mapIframeCode": {
                     "type": [
@@ -2251,11 +2261,21 @@
                     "maxLength": 5000
                   },
                   "logoUrl": {
-                    "type": [
-                      "string",
-                      "null"
-                    ],
-                    "format": "uri"
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "format": "uri"
+                      },
+                      {
+                        "type": "string",
+                        "enum": [
+                          ""
+                        ]
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
                   },
                   "topbarShippingMsg": {
                     "type": [
@@ -2314,6 +2334,10 @@
                       {
                         "type": "array",
                         "items": {}
+                      },
+                      {
+                        "type": "object",
+                        "additionalProperties": {}
                       },
                       {
                         "type": "null"
