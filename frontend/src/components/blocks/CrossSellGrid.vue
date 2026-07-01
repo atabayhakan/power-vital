@@ -1,24 +1,56 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
+import axios from 'axios';
 import LazyImage from '../common/LazyImage.vue';
 import { useIntersectionObserver } from '../../composables/useIntersectionObserver';
+import { useCartStore } from '../../stores/useCartStore';
+import { useTranslation } from '../../composables/useTranslation';
+import { formatPrice } from '../../utils/PriceEngine';
 
-defineProps<{
+const props = defineProps<{
   title?: string;
+  limit?: string | number;
+  categoryId?: string;
 }>();
 
-// Lazy-mount the entire grid once the user scrolls within 200px of it
+const cartStore = useCartStore();
+const { tField } = useTranslation();
+
+// Lazy-mount the entire grid once the user scrolls within 200px of it —
+// also gates the product fetch so an admin-added-but-offscreen block
+// doesn't cost a request until it's actually about to be seen.
 const sectionRef = ref<HTMLElement | null>(null);
 const shouldRender = useIntersectionObserver(sectionRef, { rootMargin: '300px' });
 
-const crossSells = ref([
-  { id: '1', name: 'Power Vital Karadut Özü', price: 1200, rating: 48, img: 'https://cdn.myikas.com/images/c7afacdb-7cce-47a1-8553-35d2c163884c/abdf396c-433e-4dc4-ae67-5c43f805b42d/1080/karadut-01.webp' },
-  { id: '2', name: 'Power Vital Omega 3', price: 2500, rating: 124, img: 'https://cdn.myikas.com/images/c7afacdb-7cce-47a1-8553-35d2c163884c/33ad56e8-87bc-4af9-b202-1a893bdea410/1080/omega30.webp' },
-  { id: '3', name: 'Power Vital Magnezyum', price: 3200, rating: 89, img: 'https://cdn.myikas.com/images/c7afacdb-7cce-47a1-8553-35d2c163884c/b0668799-333b-4bd0-9c9b-508ed5ed5ff3/1080/magnezyum-calisma-yuzeyi-1.webp' },
-  { id: '4', name: 'Power Vital D3K2', price: 950, rating: 256, img: 'https://cdn.myikas.com/images/c7afacdb-7cce-47a1-8553-35d2c163884c/abdf396c-433e-4dc4-ae67-5c43f805b42d/1080/karadut-01.webp' }
-]);
+const crossSells = ref<any[]>([]);
+const justAdded = ref<Set<string>>(new Set());
 
-const formatPrice = (p: number) => p.toLocaleString('ru-RU') + ' KGS';
+const fetchProducts = async () => {
+  try {
+    const params: Record<string, string | number> = { limit: props.limit || 4 };
+    if (props.categoryId) params.categoryId = props.categoryId;
+    const res = await axios.get('/api/v1/products', { params });
+    crossSells.value = res.data || [];
+  } catch (e) {
+    console.error('Failed to load cross-sell products', e);
+  }
+};
+
+watch(shouldRender, (v) => { if (v && crossSells.value.length === 0) fetchProducts(); }, { immediate: true });
+
+const addToCart = (p: any) => {
+  cartStore.addToCart({
+    id: p.id,
+    name: tField(p, 'name') || p.name,
+    basePriceKgs: Number(p.basePriceKgs),
+    imageUrl: p.images?.[0]?.imageUrl || p.images?.[0] || ''
+  }, 1);
+  const next = new Set(justAdded.value).add(p.id);
+  justAdded.value = next;
+  setTimeout(() => {
+    const s = new Set(justAdded.value); s.delete(p.id); justAdded.value = s;
+  }, 1500);
+};
 </script>
 
 <template>
@@ -28,13 +60,15 @@ const formatPrice = (p: number) => p.toLocaleString('ru-RU') + ' KGS';
     <div v-if="shouldRender" class="xsell-grid">
       <article v-for="xs in crossSells" :key="xs.id" class="xsell-card clay-surface">
         <div class="xs-img-box clay-inset">
-          <LazyImage :src="xs.img" :alt="xs.name" width="1080" height="1080" class="xs-img" />
+          <LazyImage :src="xs.images?.[0]?.imageUrl || xs.images?.[0] || ''" :alt="tField(xs, 'name') || xs.name" width="1080" height="1080" class="xs-img" />
         </div>
         <div class="xs-info">
-          <h3 class="xs-title">{{ xs.name }}</h3>
-          <div class="xs-stars">★★★★★ <small>({{ xs.rating }})</small></div>
-          <div class="xs-price">{{ formatPrice(xs.price) }}</div>
-          <button class="xs-cta">SEPETE EKLE</button>
+          <h3 class="xs-title">{{ tField(xs, 'name') || xs.name }}</h3>
+          <div class="xs-stars">★★★★★</div>
+          <div class="xs-price">{{ formatPrice(Number(xs.basePriceKgs)) }} KGS</div>
+          <button class="xs-cta" :class="{ 'is-added': justAdded.has(xs.id) }" @click="addToCart(xs)">
+            {{ justAdded.has(xs.id) ? '✓ Eklendi' : 'SEPETE EKLE' }}
+          </button>
         </div>
       </article>
     </div>
@@ -59,6 +93,7 @@ const formatPrice = (p: number) => p.toLocaleString('ru-RU') + ' KGS';
 .xs-price { font-family: var(--font-display); font-size: 1.3rem; font-weight: 800; color: var(--text-primary); margin-bottom: var(--space-md); }
 .xs-cta { margin-top: auto; width: 100%; padding: var(--space-sm) var(--space-md); background: transparent; border: 2px solid var(--text-primary); border-radius: var(--radius-sm); font-family: var(--font-display); font-weight: 700; color: var(--text-primary); cursor: pointer; transition: all var(--duration-normal) var(--ease-smooth); }
 .xs-cta:hover { background: var(--text-primary); color: var(--surface-white); }
+.xs-cta.is-added { background: var(--pv-green, #2e7d32); border-color: var(--pv-green, #2e7d32); color: #fff; }
 
 @media (max-width: 640px) {
   .xsell-grid { grid-template-columns: 1fr; }

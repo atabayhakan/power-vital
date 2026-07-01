@@ -73,7 +73,7 @@ export const BLOCK_CATALOG: BlockDef[] = [
     description: 'Tek ürünü görsel + metinle öne çıkaran bölüm',
     icon: ['M3 3h18v18H3z', 'M3 9h18', 'M9 21V9'],
     pages: ['storefront', 'product'],
-    defaultData: {},
+    defaultData: { productId: '', productName: '' },
   },
   {
     type: 'crosssellgrid',
@@ -81,7 +81,7 @@ export const BLOCK_CATALOG: BlockDef[] = [
     description: 'Birlikte alınan / önerilen ürünler şeridi',
     icon: ['M16 3h5v5', 'M4 20 21 3', 'M21 16v5h-5', 'M15 15l6 6', 'M4 4l5 5'],
     pages: ['storefront', 'product'],
-    defaultData: {},
+    defaultData: { title: 'Çok Satanlar', limit: '4', categoryId: '' },
   },
   {
     type: 'reviewsection',
@@ -112,6 +112,19 @@ export const BLOCK_CATALOG: BlockDef[] = [
     pages: ['storefront'],
     defaultData: {},
   },
+  {
+    type: 'cart_settings',
+    name: 'Sepet Ayarları (Öneri Ürünü)',
+    description: 'Yan sepette gösterilecek önerilen ürünü seç',
+    icon: [
+      'M9 22a1 1 0 1 0 0-2 1 1 0 0 0 0 2z',
+      'M20 22a1 1 0 1 0 0-2 1 1 0 0 0 0 2z',
+      'M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6',
+    ],
+    pages: ['cart'],
+    defaultData: { upsellProductId: '', upsellProductName: '', upsellProductPrice: '', upsellProductImage: '' },
+    singleton: true,
+  },
 ];
 
 // Normalize any stored type alias (kebab/snake/legacy) to its catalog entry.
@@ -127,6 +140,9 @@ const ALIASES: Record<string, string> = {
   certificates: 'certificatesblock',
   sertifikalar: 'certificatesblock',
   partners: 'partnersblock',
+  cartsettings: 'cart_settings',
+  sidecart: 'cart_settings',
+  side_cart: 'cart_settings',
 };
 
 export const canonicalType = (type: string): string => {

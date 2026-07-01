@@ -44,9 +44,24 @@ const TRANSITION_MS = 1200;
 
 const isTextLayered = (s: Slide) => (s.displayMode || 'IMAGE_ONLY') === 'WITH_TEXT';
 
+// Only shown when the live /api/v1/slides call fails or returns nothing —
+// still needs real translations (rendered via tField, same as live data)
+// so an RU/KG visitor doesn't see Turkish text during a backend outage.
 const fallbackSlides: Slide[] = [
-  { id: '1', displayMode: 'WITH_TEXT', title: 'Hücresel Devrim Başladı', subtitle: 'Power Vital ile enerjini %100\'e çıkar.', buttonText: 'Şimdi İncele', buttonLink: '/kategori/vitaminler', imageUrl: 'https://cdn.myikas.com/images/c7afacdb-7cce-47a1-8553-35d2c163884c/abdf396c-433e-4dc4-ae67-5c43f805b42d/1080/karadut-01.webp', mobileImageUrl: null, overlayOpacity: 55, isActive: true },
-  { id: '2', displayMode: 'IMAGE_ONLY', title: 'Lipozomal Teknoloji', subtitle: null, buttonText: null, buttonLink: '/urun/omega3', imageUrl: 'https://cdn.myikas.com/images/c7afacdb-7cce-47a1-8553-35d2c163884c/33ad56e8-87bc-4af9-b202-1a893bdea410/1080/omega30.webp', mobileImageUrl: null, overlayOpacity: 0, isActive: true }
+  {
+    id: '1', displayMode: 'WITH_TEXT', title: 'Hücresel Devrim Başladı', subtitle: 'Power Vital ile enerjini %100\'e çıkar.', buttonText: 'Şimdi İncele', buttonLink: '/kategori/vitaminler', imageUrl: 'https://cdn.myikas.com/images/c7afacdb-7cce-47a1-8553-35d2c163884c/abdf396c-433e-4dc4-ae67-5c43f805b42d/1080/karadut-01.webp', mobileImageUrl: null, overlayOpacity: 55, isActive: true,
+    translations: {
+      ru: { title: 'Клеточная революция началась', subtitle: 'С Power Vital подними свою энергию на 100%.', buttonText: 'Смотреть сейчас' },
+      kg: { title: 'Клеткалык революция башталды', subtitle: 'Power Vital менен энергияңды 100%га көтөр.', buttonText: 'Азыр карап чык' }
+    }
+  } as unknown as Slide,
+  {
+    id: '2', displayMode: 'IMAGE_ONLY', title: 'Lipozomal Teknoloji', subtitle: null, buttonText: null, buttonLink: '/urun/omega3', imageUrl: 'https://cdn.myikas.com/images/c7afacdb-7cce-47a1-8553-35d2c163884c/33ad56e8-87bc-4af9-b202-1a893bdea410/1080/omega30.webp', mobileImageUrl: null, overlayOpacity: 0, isActive: true,
+    translations: {
+      ru: { title: 'Липосомальная технология' },
+      kg: { title: 'Липосомалык технология' }
+    }
+  } as unknown as Slide
 ];
 
 const displaySlides = computed(() => {

@@ -20,19 +20,6 @@ const safeAsync = (loader: () => Promise<any>, blockType: string) => defineAsync
   suspensible: false
 });
 
-// CartSettings alias'ı için placeholder bileşen (Sepet ayarları CMS paneli)
-// Gerçek SideCart settings buraya bağlanabilir; MVP için bilgilendirme kartı gösterir
-const CartSettingsBlock = {
-  name: 'CartSettingsBlock',
-  render: () => h('div', {
-    class: 'cart-settings-placeholder clay-surface',
-    style: 'padding:32px; text-align:center;'
-  }, [
-    h('h3', { style: 'margin:0 0 8px 0; color:#BC4A3C;' }, '🛒 Sepet (SideCart) Ayarları'),
-    h('p', { style: 'color:#52525b; margin:0; font-size:14px;' }, 'Bu blok aktif. Yan panelden ayarları düzenleyin (free shipping limit, upsell önerisi vb.)')
-  ])
-};
-
 export const componentRegistry: Record<string, Component> = {
   'hero_slider': safeAsync(() => import('../components/blocks/HeroSliderBlock.vue'), 'hero_slider'),
   'hero_slider_block': safeAsync(() => import('../components/blocks/HeroSliderBlock.vue'), 'hero_slider_block'),
@@ -57,13 +44,6 @@ export const componentRegistry: Record<string, Component> = {
 
   'partners': safeAsync(() => import('../components/blocks/PartnersBlock.vue'), 'partners'),
   'partnersblock': safeAsync(() => import('../components/blocks/PartnersBlock.vue'), 'partnersblock'),
-
-  // 🛒 CART_SETTINGS FIX — PascalCase + kebab-case + snake-case alias'lar
-  'CartSettings': CartSettingsBlock,
-  'cart_settings': CartSettingsBlock,
-  'cartsettings': CartSettingsBlock,
-  'sidecart': CartSettingsBlock,
-  'side_cart': CartSettingsBlock
 };
 
 const _warnedIds = new Set<string>();

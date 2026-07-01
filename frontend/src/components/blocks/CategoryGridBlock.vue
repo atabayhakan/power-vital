@@ -25,11 +25,15 @@ interface Category {
 
 const loading = ref(true);
 
+// Only shown when the live /api/v1/categories call fails or returns no
+// active rows — still needs real translations (rendered via tField, same
+// as live category data) so an RU/KG visitor doesn't see Turkish names
+// during a backend outage.
 const fallbackCategories: Category[] = [
-  { id: '1', name: 'Vitamin & Mineraller', slug: 'vitaminler', iconEmoji: '💊', imageUrl: null, isActive: true },
-  { id: '2', name: 'Kolajen Ürünleri', slug: 'kolajen', iconEmoji: '✨', imageUrl: null, isActive: true },
-  { id: '3', name: 'Bağışıklık', slug: 'bagisiklik', iconEmoji: '🛡️', imageUrl: null, isActive: true },
-  { id: '4', name: 'Enerji & Odaklanma', slug: 'enerji', iconEmoji: '⚡', imageUrl: null, isActive: true }
+  { id: '1', name: 'Vitamin & Mineraller', slug: 'vitaminler', iconEmoji: '💊', imageUrl: null, isActive: true, translations: { ru: { name: 'Витамины и минералы' }, kg: { name: 'Витаминдер жана минералдар' } } } as unknown as Category,
+  { id: '2', name: 'Kolajen Ürünleri', slug: 'kolajen', iconEmoji: '✨', imageUrl: null, isActive: true, translations: { ru: { name: 'Коллагеновые продукты' }, kg: { name: 'Коллаген азыктары' } } } as unknown as Category,
+  { id: '3', name: 'Bağışıklık', slug: 'bagisiklik', iconEmoji: '🛡️', imageUrl: null, isActive: true, translations: { ru: { name: 'Иммунитет' }, kg: { name: 'Иммунитет' } } } as unknown as Category,
+  { id: '4', name: 'Enerji & Odaklanma', slug: 'enerji', iconEmoji: '⚡', imageUrl: null, isActive: true, translations: { ru: { name: 'Энергия и концентрация' }, kg: { name: 'Энергия жана топтолуу' } } } as unknown as Category
 ];
 
 const displayCategories = shallowRef<Category[]>([]);

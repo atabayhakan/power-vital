@@ -1,27 +1,48 @@
 <script setup lang="ts">
-import { ref, watch, computed } from 'vue';
+import { ref, watch, computed, onMounted } from 'vue';
+import axios from 'axios';
 import LazyImage from '../common/LazyImage.vue';
+import { useCartStore } from '../../stores/useCartStore';
+import { useTranslation } from '../../composables/useTranslation';
 
+// `productId` comes from the Page Builder's product-picker (see
+// PageBuilderView's handleProductPicked, type 'productshowcase'). `product`
+// stays supported for any caller that already has the full object in hand
+// (e.g. a future product-detail-page embed) so a network round-trip isn't
+// forced when the data is already available.
 const props = defineProps<{
   product?: any;
+  productId?: string;
   defaultGallery?: string[];
 }>();
 
-const emit = defineEmits(['add-to-cart']);
+const cartStore = useCartStore();
+const { tField } = useTranslation();
 
 const quantity = ref(1);
 const mainImage = ref('');
 const thumbnails = ref<string[]>([]);
+const fetchedProduct = ref<any>(null);
 
-const resolvedProduct = computed(() => {
-  return props.product || {
-    id: 'demo',
-    name: 'Örnek Premium Ürün',
-    basePriceKgs: 4500,
-    oldPriceKgs: 5500,
-    stockQuantity: 100,
-    images: [{ imageUrl: 'https://cdn.myikas.com/images/c7afacdb-7cce-47a1-8553-35d2c163884c/b0668799-333b-4bd0-9c9b-508ed5ed5ff3/1080/magnezyum-calisma-yuzeyi-1.webp' }]
-  };
+const DEMO_PRODUCT = {
+  id: 'demo',
+  name: 'Örnek Premium Ürün',
+  basePriceKgs: 4500,
+  oldPriceKgs: 5500,
+  stockQuantity: 100,
+  images: [{ imageUrl: 'https://cdn.myikas.com/images/c7afacdb-7cce-47a1-8553-35d2c163884c/b0668799-333b-4bd0-9c9b-508ed5ed5ff3/1080/magnezyum-calisma-yuzeyi-1.webp' }]
+};
+
+const resolvedProduct = computed(() => props.product || fetchedProduct.value || DEMO_PRODUCT);
+
+onMounted(async () => {
+  if (props.product || !props.productId) return;
+  try {
+    const res = await axios.get(`/api/v1/products/${props.productId}`);
+    fetchedProduct.value = res.data;
+  } catch (e) {
+    console.error('Failed to load showcase product', e);
+  }
 });
 
 watch(() => resolvedProduct.value, (newVal) => {
@@ -57,7 +78,14 @@ const toggleAccordion = (index: number) => {
 };
 
 const triggerAddToCart = () => {
-  emit('add-to-cart', quantity.value);
+  const p = resolvedProduct.value;
+  if (!p) return;
+  cartStore.addToCart({
+    id: p.id,
+    name: tField(p, 'name') || p.name,
+    basePriceKgs: Number(p.basePriceKgs),
+    imageUrl: p.images?.[0]?.imageUrl || p.images?.[0] || ''
+  }, quantity.value);
 };
 </script>
 
@@ -79,13 +107,13 @@ const triggerAddToCart = () => {
         <button class="thumb-arrow">▼</button>
       </div>
       <div class="str-main-img clay-surface">
-        <LazyImage :src="mainImage" :alt="resolvedProduct?.name || 'Ürün Görseli'" :eager="true" width="800" height="800" sizes="(max-width: 1024px) 100vw, 50vw" class="str-main__img" />
+        <LazyImage :src="mainImage" :alt="(resolvedProduct && tField(resolvedProduct, 'name')) || 'Ürün Görseli'" :eager="true" width="800" height="800" sizes="(max-width: 1024px) 100vw, 50vw" class="str-main__img" />
       </div>
     </div>
 
     <!-- RIGHT: Buy Box -->
     <div class="str-info-col" v-if="resolvedProduct">
-      <h1 class="str-title">{{ resolvedProduct.name }}</h1>
+      <h1 class="str-title">{{ tField(resolvedProduct, 'name') || resolvedProduct.name }}</h1>
       
       <div class="str-rating-row">
         <div class="str-stars">★★★★★</div>

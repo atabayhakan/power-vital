@@ -181,6 +181,36 @@ export const HeroSlideUpdateSchema = HeroSlideCreateSchema.partial().strict();
 // ────────────────────────────────────────────────────────────────────────────
 // Settings (site-wide)
 // ────────────────────────────────────────────────────────────────────────────
+
+// Page Builder block shape — mirrors frontend/src/stores/usePageBuilderStore.ts's
+// PageBlock interface. Only the outer structure is validated (id/type/position/
+// visible present with the right primitive types, data is a plain object); the
+// contents of `data` stay loosely typed since they vary per block type and are
+// owned by the frontend's block catalog, not duplicated here. This is enough to
+// stop a malformed payload (missing id, non-boolean visible, etc.) from being
+// persisted and breaking the storefront's :key/v-if/component-type bindings.
+const PageBlockSchema = z.object({
+  id: z.string().min(1).max(200),
+  type: z.string().min(1).max(100),
+  position: z.number().int(),
+  visible: z.boolean(),
+  data: z.record(z.string(), z.unknown())
+});
+const HomepageBlocksShapeSchema = z.object({
+  storefront: z.array(PageBlockSchema).max(100).optional(),
+  product: z.array(PageBlockSchema).max(100).optional(),
+  cart: z.array(PageBlockSchema).max(100).optional()
+});
+// homepageBlocks can arrive pre-stringified (legacy callers) or as a plain
+// object (the normal case, from usePageBuilderStore's PUT) — parse strings
+// to JSON before validating the shape either way.
+const HomepageBlocksSchema = z.preprocess((val) => {
+  if (typeof val === 'string') {
+    try { return JSON.parse(val); } catch { return val; }
+  }
+  return val;
+}, HomepageBlocksShapeSchema);
+
 export const SettingsUpdateSchema = z.object({
   companyName: z.string().max(200).optional(),
   address: z.string().max(500).optional().nullable(),
@@ -194,7 +224,7 @@ export const SettingsUpdateSchema = z.object({
   trustBadges: z.union([z.string(), z.array(z.any())]).optional().nullable(),
   partners: z.union([z.string(), z.array(z.any())]).optional().nullable(),
   footerLinks: z.union([z.string(), z.array(z.any()), z.record(z.string(), z.any())]).optional().nullable(),
-  homepageBlocks: z.union([z.string(), z.record(z.string(), z.any())]).optional().nullable(),
+  homepageBlocks: HomepageBlocksSchema.optional().nullable(),
   financeSettings: z.union([z.string(), z.record(z.string(), z.any())]).optional().nullable(),
   faqItems: z.union([z.string(), z.array(z.any())]).optional().nullable(),
   // Hero campaign banner — admin schedules a countdown that

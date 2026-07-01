@@ -36,6 +36,16 @@ const PRICE_FIELDS = new Set([
   'countdownHours'
 ]);
 
+// ─── Optimistic locking for homepageBlocks ─────────────────────────────
+// The Page Builder autosaves ~1s after every edit. If two admins have it
+// open at once, each PUT overwrites the WHOLE homepageBlocks column —
+// there's no per-block merge — so the second save silently discards the
+// first admin's edits. hashOf() lets the client prove it last saw the
+// version it's about to overwrite; a mismatch means someone else saved
+// in between and this write must be rejected instead of clobbering it.
+const hashOf = (value: any): string =>
+  crypto.createHash('sha1').update(JSON.stringify(value ?? null)).digest('hex');
+
 const coercePriceFields = (blocks: any): any => {
   if (!blocks || typeof blocks !== 'object') return blocks;
   for (const key of Object.keys(blocks)) {
@@ -107,6 +117,12 @@ router.get('/', async (req: Request, res: Response) => {
       }
     }
 
+    // Exposed separately from the response ETag (which covers the whole
+    // settings object and churns on unrelated field edits). This one is
+    // scoped to just homepageBlocks so Page Builder can detect a real
+    // conflict without false positives from e.g. a company-name edit.
+    parsed._blocksVersion = hashOf(parsed.homepageBlocks ?? null);
+
     // ETag = SHA-1 of the canonical JSON. Stable for an unchanged payload.
     const etag = '"' + crypto.createHash('sha1').update(JSON.stringify(parsed)).digest('hex') + '"';
     await setCache(SETTINGS_CACHE_KEY, { payload: parsed, etag }, SETTINGS_CACHE_TTL);
@@ -151,6 +167,30 @@ router.put('/', authenticateJWT, requireRole('admin'), validate({ body: Settings
     } = req.body;
 
     let settings = await prisma.siteSettings.findFirst();
+
+    // Reject the write if the client's edit was based on a stale copy of
+    // homepageBlocks — see hashOf() comment above. Scalar/other JSON
+    // fields aren't covered: those save via independent Prisma columns,
+    // so two admins editing e.g. companyName and homepageBlocks at the
+    // same time don't actually clobber each other.
+    if (homepageBlocks !== undefined) {
+      const baseVersion = req.header('x-blocks-base-version');
+      if (baseVersion) {
+        let currentBlocksParsed: any = null;
+        if (settings?.homepageBlocks) {
+          try { currentBlocksParsed = JSON.parse(settings.homepageBlocks); } catch { /* treat as null */ }
+        }
+        const currentVersion = hashOf(currentBlocksParsed);
+        if (baseVersion !== currentVersion) {
+          res.status(409).json({
+            error: 'conflict',
+            message: 'Bu bölümler başka bir yönetici tarafından güncellendi. Değişikliklerinizi kaybetmemek için sayfayı yeniden yükleyin.',
+            currentBlocksVersion: currentVersion
+          });
+          return;
+        }
+      }
+    }
 
     const dataToSave: any = {};
     if (companyName !== undefined) dataToSave.companyName = companyName;
@@ -214,7 +254,11 @@ router.put('/', authenticateJWT, requireRole('admin'), validate({ body: Settings
     // topbarShippingMsg, copyrightText) into RU/KG — fire-and-forget.
     translateOnSave('SiteSettings', settings.id);
 
-    res.json(settings);
+    let savedBlocksParsed: any = null;
+    if (settings.homepageBlocks) {
+      try { savedBlocksParsed = JSON.parse(settings.homepageBlocks); } catch { /* keep null */ }
+    }
+    res.json({ ...settings, _blocksVersion: hashOf(savedBlocksParsed) });
   } catch (error: any) {
     logger.error({ err: error }, 'Update Settings Error:');
     res.status(500).json({ error: 'Failed to update settings: ' + (error.message || 'unknown') });

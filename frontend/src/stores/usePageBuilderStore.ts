@@ -19,11 +19,107 @@ export const usePageBuilderStore = defineStore('pageBuilder', () => {
   const productBlocks = shallowRef<PageBlock[]>([]);
   const cartBlocks = shallowRef<PageBlock[]>([]);
   const isPageBuilderLoading = shallowRef<boolean>(false);
+  // Server-computed hash of the homepageBlocks column at last fetch/save.
+  // Sent back on the next save as x-blocks-base-version so the backend can
+  // detect another admin having saved in between (see settings.ts).
+  const blocksVersion = shallowRef<string | null>(null);
+
+  // --- Undo / Redo (session-only, not persisted) ---
+  // Snapshots cover all three pages together so undo is a single
+  // chronological timeline regardless of which tab is active when it's
+  // triggered — matches how most editors treat undo history.
+  interface BlocksSnapshot {
+    storefront: PageBlock[];
+    product: PageBlock[];
+    cart: PageBlock[];
+  }
+  const MAX_HISTORY = 50;
+  // Rapid edits to the SAME field (every keystroke calls updateBlockData)
+  // are coalesced into one undo step instead of one per character —
+  // matches the 800ms autosave debounce in PageBuilderView with margin.
+  const COALESCE_WINDOW_MS = 1500;
+  const undoStack: BlocksSnapshot[] = [];
+  const redoStack: BlocksSnapshot[] = [];
+  let lastActionKey: string | null = null;
+  let lastActionTime = 0;
+  const canUndo = shallowRef(false);
+  const canRedo = shallowRef(false);
+
+  const snapshot = (): BlocksSnapshot => ({
+    storefront: JSON.parse(JSON.stringify(storefrontBlocks.value)),
+    product: JSON.parse(JSON.stringify(productBlocks.value)),
+    cart: JSON.parse(JSON.stringify(cartBlocks.value))
+  });
+
+  const syncHistoryFlags = () => {
+    canUndo.value = undoStack.length > 0;
+    canRedo.value = redoStack.length > 0;
+  };
+
+  /** Call BEFORE a discrete, deliberate mutation (add/remove/reorder/toggle). */
+  const pushHistory = () => {
+    undoStack.push(snapshot());
+    if (undoStack.length > MAX_HISTORY) undoStack.shift();
+    redoStack.length = 0; // a new action invalidates any redo timeline
+    lastActionKey = null;
+    syncHistoryFlags();
+  };
+
+  /** Call before a coalescing mutation (continuous field edits). */
+  const pushHistoryCoalesced = (actionKey: string) => {
+    const now = Date.now();
+    if (actionKey === lastActionKey && now - lastActionTime < COALESCE_WINDOW_MS) {
+      lastActionTime = now;
+      return;
+    }
+    undoStack.push(snapshot());
+    if (undoStack.length > MAX_HISTORY) undoStack.shift();
+    redoStack.length = 0;
+    lastActionKey = actionKey;
+    lastActionTime = now;
+    syncHistoryFlags();
+  };
+
+  const restore = (snap: BlocksSnapshot) => {
+    storefrontBlocks.value = snap.storefront;
+    productBlocks.value = snap.product;
+    cartBlocks.value = snap.cart;
+    if (typeof broadcastSync !== 'undefined') broadcastSync();
+  };
+
+  const undo = (): boolean => {
+    const snap = undoStack.pop();
+    if (!snap) return false;
+    redoStack.push(snapshot());
+    restore(snap);
+    lastActionKey = null;
+    syncHistoryFlags();
+    return true;
+  };
+
+  const redo = (): boolean => {
+    const snap = redoStack.pop();
+    if (!snap) return false;
+    undoStack.push(snapshot());
+    restore(snap);
+    lastActionKey = null;
+    syncHistoryFlags();
+    return true;
+  };
 
   const fetchBlocks = async () => {
     isPageBuilderLoading.value = true;
+    // A fresh sync from the server invalidates any local undo history —
+    // it no longer corresponds to a state the server can round-trip to.
+    undoStack.length = 0;
+    redoStack.length = 0;
+    lastActionKey = null;
+    syncHistoryFlags();
     try {
       const res = await axios.get('/api/v1/settings');
+      if (res.data && typeof res.data._blocksVersion === 'string') {
+        blocksVersion.value = res.data._blocksVersion;
+      }
       if (res.data && res.data.homepageBlocks) {
         let blocks = res.data.homepageBlocks;
         if (typeof blocks === 'string') {
@@ -76,16 +172,23 @@ export const usePageBuilderStore = defineStore('pageBuilder', () => {
   };
 
   const saveBlocks = async () => {
-    try {
-      await axios.put('/api/v1/settings', {
-        homepageBlocks: {
-          storefront: storefrontBlocks.value,
-          product: productBlocks.value,
-          cart: cartBlocks.value
-        }
-      }, { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
-    } catch (e) {
-      console.error('Failed to save blocks:', e);
+    // Rethrows on failure (including 409 conflicts) — callers such as
+    // PageBuilderView's flushSave() need to see this to surface a
+    // save-error / conflict state instead of silently doing nothing.
+    const res = await axios.put('/api/v1/settings', {
+      homepageBlocks: {
+        storefront: storefrontBlocks.value,
+        product: productBlocks.value,
+        cart: cartBlocks.value
+      }
+    }, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('token')}`,
+        ...(blocksVersion.value ? { 'x-blocks-base-version': blocksVersion.value } : {})
+      }
+    });
+    if (res.data && typeof res.data._blocksVersion === 'string') {
+      blocksVersion.value = res.data._blocksVersion;
     }
   };
 
@@ -130,6 +233,7 @@ export const usePageBuilderStore = defineStore('pageBuilder', () => {
   };
 
   const reorderBlocks = (page: 'storefront' | 'product' | 'cart', startIndex: number, endIndex: number) => {
+    pushHistory();
     const target = getTargetArray(page);
     const result = Array.from(target.value);
     const [removed] = result.splice(startIndex, 1);
@@ -148,6 +252,7 @@ export const usePageBuilderStore = defineStore('pageBuilder', () => {
     const target = getTargetArray(page);
     const block = target.value.find(b => b.id === blockId);
     if (block) {
+      pushHistory();
       block.visible = !block.visible;
       target.value = [...target.value]; // Trigger shallowRef reactivity
       if (typeof broadcastSync !== 'undefined') broadcastSync();
@@ -158,6 +263,7 @@ export const usePageBuilderStore = defineStore('pageBuilder', () => {
     const target = getTargetArray(page);
     const block = target.value.find(b => b.id === blockId);
     if (block) {
+      pushHistoryCoalesced('updateBlockData:' + page + ':' + blockId);
       block.data = { ...block.data, ...newData };
       target.value = [...target.value]; // Trigger shallowRef reactivity
       if (typeof broadcastSync !== 'undefined') broadcastSync();
@@ -170,6 +276,7 @@ export const usePageBuilderStore = defineStore('pageBuilder', () => {
 
   /** Append a fresh block of the given type with its default data. Returns the new id. */
   const addBlock = (page: 'storefront' | 'product' | 'cart', type: string, defaultData: Record<string, any> = {}): string => {
+    pushHistory();
     const target = getTargetArray(page);
     const id = genId();
     const result = [...target.value, {
@@ -187,6 +294,7 @@ export const usePageBuilderStore = defineStore('pageBuilder', () => {
 
   /** Remove a block by id. */
   const removeBlock = (page: 'storefront' | 'product' | 'cart', blockId: string) => {
+    pushHistory();
     const target = getTargetArray(page);
     const result = target.value.filter(b => b.id !== blockId);
     renumber(result);
@@ -199,6 +307,7 @@ export const usePageBuilderStore = defineStore('pageBuilder', () => {
     const target = getTargetArray(page);
     const idx = target.value.findIndex(b => b.id === blockId);
     if (idx === -1) return null;
+    pushHistory();
     const src = target.value[idx];
     const id = genId();
     const copy = { id, type: src.type, position: 0, visible: src.visible, data: JSON.parse(JSON.stringify(src.data || {})) };
@@ -225,6 +334,7 @@ export const usePageBuilderStore = defineStore('pageBuilder', () => {
     productBlocks,
     cartBlocks,
     isPageBuilderLoading,
+    blocksVersion,
     fetchBlocks,
     saveBlocks,
     reorderBlocks,
@@ -233,6 +343,10 @@ export const usePageBuilderStore = defineStore('pageBuilder', () => {
     addBlock,
     removeBlock,
     duplicateBlock,
-    moveBlock
+    moveBlock,
+    undo,
+    redo,
+    canUndo,
+    canRedo
   };
 });

@@ -124,12 +124,18 @@ onMounted(async () => {
     const res = await axios.get(`/api/v1/products?limit=${queryLimit}${catQuery}`);
     products.value = res.data;
   } catch (err) {
-    // Fallback if no backend
+    // Fallback if no backend — still needs real translations (rendered via
+    // tField, same as live product data) so an RU/KG visitor doesn't see
+    // Turkish names during a backend outage.
     products.value = [
       {
         id: '1',
         name: 'Power Vital Karadut Özü',
         basePriceKgs: 1300,
+        translations: {
+          ru: { name: 'Power Vital Экстракт чёрной шелковицы' },
+          kg: { name: 'Power Vital Кара тут экстракты' }
+        },
         images: [
           { imageUrl: 'https://cdn.myikas.com/images/c7afacdb-7cce-47a1-8553-35d2c163884c/abdf396c-433e-4dc4-ae67-5c43f805b42d/1080/karadut-01.webp' },
           { imageUrl: 'https://cdn.myikas.com/images/c7afacdb-7cce-47a1-8553-35d2c163884c/abdf396c-433e-4dc4-ae67-5c43f805b42d/1080/karadut-01.webp' }
@@ -139,6 +145,10 @@ onMounted(async () => {
         id: '2',
         name: 'Power Vital Omega 3',
         basePriceKgs: 1800,
+        translations: {
+          ru: { name: 'Power Vital Омега 3' },
+          kg: { name: 'Power Vital Омега 3' }
+        },
         images: [
           { imageUrl: 'https://cdn.myikas.com/images/c7afacdb-7cce-47a1-8553-35d2c163884c/33ad56e8-87bc-4af9-b202-1a893bdea410/1080/omega30.webp' }
         ]
@@ -147,6 +157,10 @@ onMounted(async () => {
         id: '3',
         name: 'Power Vital Magnezyum',
         basePriceKgs: 2200,
+        translations: {
+          ru: { name: 'Power Vital Магний' },
+          kg: { name: 'Power Vital Магний' }
+        },
         images: [
           { imageUrl: 'https://cdn.myikas.com/images/c7afacdb-7cce-47a1-8553-35d2c163884c/b0668799-333b-4bd0-9c9b-508ed5ed5ff3/1080/magnezyum-calisma-yuzeyi-1.webp' }
         ]

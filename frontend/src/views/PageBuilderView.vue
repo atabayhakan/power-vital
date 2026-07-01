@@ -7,13 +7,15 @@ import draggable from 'vuedraggable';
 import { resolveComponent } from '../utils/componentRegistry';
 import { calculatePrice } from '../utils/PriceEngine';
 import ProductPickerModal from '../components/ProductPickerModal.vue';
-import { blocksForPage, getBlockDef, getBlockName, getBlockIcon, type BuilderPage } from '../utils/blockCatalog';
+import { blocksForPage, getBlockDef, getBlockName, getBlockIcon, canonicalType, type BuilderPage } from '../utils/blockCatalog';
+import { useTranslate } from '../composables/useTranslate';
 
 // 🛡️ CSS Bleed Fix: Storefront bileşenleri --clay-shadow, --glass-bg vb.
 // design token'lara ihtiyaç duyar. Bu import olmadan canvas bembeyaz kalıyor.
 import '../style.css';
 
 const store = usePageBuilderStore();
+const { t } = useTranslate();
 
 type PageType = 'storefront' | 'product' | 'cart';
 const selectedPage = ref<PageType>('storefront');
@@ -32,7 +34,7 @@ const activeBlocks = computed({
 });
 
 // --- SAVE STATE (UI feedback) ---
-const saveStatus = ref<'idle' | 'pending' | 'saving' | 'saved' | 'error'>('idle');
+const saveStatus = ref<'idle' | 'pending' | 'saving' | 'saved' | 'error' | 'conflict'>('idle');
 const lastSavedAt = ref<Date | null>(null);
 
 // Drag and Drop State with Vue Draggable
@@ -120,10 +122,55 @@ const blockToDelete = ref<string | null>(null);
 const confirmDelete = (id: string) => { blockToDelete.value = id; };
 const cancelDelete = () => { blockToDelete.value = null; };
 
+// After undo/redo, drop the selection if it pointed at a block that no
+// longer exists in the restored state (e.g. undoing past its creation).
+const dropStaleSelection = () => {
+  if (selectedBlockId.value && !activeBlocks.value.find(b => b.id === selectedBlockId.value)) {
+    selectedBlockId.value = null;
+  }
+};
+const handleUndo = () => {
+  if (store.undo()) {
+    dropStaleSelection();
+    // The selected block's `data` may have just changed underneath the
+    // locally-edited `draft` copy (undo doesn't go through the draft →
+    // store watcher), so the settings-panel inputs need an explicit
+    // resync or they'd keep showing the pre-undo values.
+    syncDraftFromBlock();
+    triggerDebouncedSave();
+  }
+};
+const handleRedo = () => {
+  if (store.redo()) {
+    dropStaleSelection();
+    syncDraftFromBlock();
+    triggerDebouncedSave();
+  }
+};
+
+const isTypingTarget = (el: EventTarget | null): boolean => {
+  if (!(el instanceof HTMLElement)) return false;
+  return el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.isContentEditable;
+};
+
 const onModalKeydown = (e: KeyboardEvent) => {
-  if (e.key !== 'Escape') return;
-  if (libraryOpen.value) libraryOpen.value = false;
-  else if (blockToDelete.value) cancelDelete();
+  if (e.key === 'Escape') {
+    if (libraryOpen.value) libraryOpen.value = false;
+    else if (blockToDelete.value) cancelDelete();
+    return;
+  }
+  // Ctrl/Cmd+Z and Ctrl/Cmd+Shift+Z (or +Y) drive the block history — but
+  // only when focus isn't in a text field, so native browser undo keeps
+  // working for in-progress typing.
+  if ((e.ctrlKey || e.metaKey) && !isTypingTarget(e.target)) {
+    if (e.key.toLowerCase() === 'z' && !e.shiftKey) {
+      e.preventDefault();
+      handleUndo();
+    } else if ((e.key.toLowerCase() === 'z' && e.shiftKey) || e.key.toLowerCase() === 'y') {
+      e.preventDefault();
+      handleRedo();
+    }
+  }
 };
 onMounted(() => window.addEventListener('keydown', onModalKeydown));
 onBeforeUnmount(() => window.removeEventListener('keydown', onModalKeydown));
@@ -140,25 +187,41 @@ const blockIndex = (id: string) => activeBlocks.value.findIndex(b => b.id === id
 // ═══ Product Picker (Günün Fırsatı) ═══
 const pickerOpen = ref(false);
 
+const PICKER_BLOCK_TYPES = new Set(['promobanner', 'deal_of_the_day', 'cart_settings', 'productshowcase']);
 const openProductPicker = () => {
-  if (selectedBlock.value?.type !== 'promobanner' && selectedBlock.value?.type !== 'deal_of_the_day') return;
+  if (!selectedBlock.value || !PICKER_BLOCK_TYPES.has(canonicalType(selectedBlock.value.type))) return;
   pickerOpen.value = true;
 };
 
 const handleProductPicked = (product: any) => {
-  if (!selectedBlockId.value) return;
+  if (!selectedBlockId.value || !selectedBlock.value) return;
   const priceKgs = Number(product.basePriceKgs || 0);
   const kgs = priceKgs > 0 ? Math.round(calculatePrice(priceKgs)) : 0;
-  const oldKgs = kgs > 0 ? Math.round((kgs * 1.30) / 10) * 10 : '';
   const thumb = product.images?.[0]?.imageUrl || '';
+  const type = canonicalType(selectedBlock.value.type);
 
-  store.updateBlockData(selectedPage.value, selectedBlockId.value, {
-    productName: product.name,
-    imageUrl: thumb,
-    newPrice: kgs > 0 ? String(kgs) : '',
-    oldPrice: oldKgs ? String(oldKgs) : '',
-    productId: product.id
-  });
+  if (type === 'cart_settings') {
+    store.updateBlockData(selectedPage.value, selectedBlockId.value, {
+      upsellProductName: product.name,
+      upsellProductImage: thumb,
+      upsellProductPrice: kgs > 0 ? String(kgs) : '',
+      upsellProductId: product.id
+    });
+  } else if (type === 'productshowcase') {
+    store.updateBlockData(selectedPage.value, selectedBlockId.value, {
+      productName: product.name,
+      productId: product.id
+    });
+  } else {
+    const oldKgs = kgs > 0 ? Math.round((kgs * 1.30) / 10) * 10 : '';
+    store.updateBlockData(selectedPage.value, selectedBlockId.value, {
+      productName: product.name,
+      imageUrl: thumb,
+      newPrice: kgs > 0 ? String(kgs) : '',
+      oldPrice: oldKgs ? String(oldKgs) : '',
+      productId: product.id
+    });
+  }
   syncDraftFromBlock(); // reflect picked product in the editable inputs
   triggerDebouncedSave();
   pickerOpen.value = false;
@@ -181,6 +244,11 @@ const flushSave = async () => {
     needsResave = true;
     return;
   }
+  // A conflict means the server rejected our last save because another
+  // admin's edit landed first. Retrying with the same stale base version
+  // would just 409 again — stop autosaving until the admin reloads via
+  // resolveConflict() and picks the fix up from a known-good state.
+  if (saveStatus.value === 'conflict') return;
   inFlight = true;
   saveStatus.value = 'saving';
   try {
@@ -188,16 +256,18 @@ const flushSave = async () => {
     lastSavedAt.value = new Date();
     saveStatus.value = 'saved';
     console.warn('[API] Blocks saved at', lastSavedAt.value.toLocaleTimeString());
-  } catch (e) {
+  } catch (e: any) {
     console.error('[API] Save failed', e);
-    saveStatus.value = 'error';
+    saveStatus.value = e?.response?.status === 409 ? 'conflict' : 'error';
   } finally {
     inFlight = false;
-    if (needsResave) {
+    if (needsResave && saveStatus.value !== 'conflict') {
       needsResave = false;
       saveStatus.value = 'pending';
       if (saveTimeout) clearTimeout(saveTimeout);
       saveTimeout = setTimeout(flushSave, 200);
+    } else {
+      needsResave = false;
     }
   }
 };
@@ -207,22 +277,47 @@ const manualSave = async () => {
   await flushSave();
 };
 
+// Discards local edits and reloads the latest blocks from the server so
+// the admin starts from a known-good state after a conflicting save.
+const resolveConflict = async () => {
+  if (saveTimeout) { clearTimeout(saveTimeout); saveTimeout = null; }
+  await store.fetchBlocks();
+  selectedBlockId.value = null;
+  saveStatus.value = 'idle';
+  lastSavedAt.value = new Date();
+};
+
 const onBeforeUnloadHandler = (e: BeforeUnloadEvent) => {
   if (saveStatus.value === 'pending' || saveStatus.value === 'saving') {
     try {
       const token = localStorage.getItem('token');
-      const payload = JSON.stringify({
-        homepageBlocks: {
-          storefront: store.storefrontBlocks,
-          product: store.productBlocks,
-          cart: store.cartBlocks
-        }
-      });
-      if (navigator.sendBeacon && token) {
-        const blob = new Blob([payload], { type: 'application/json' });
-        navigator.sendBeacon('/api/v1/settings?beacon=1&token=' + encodeURIComponent(token), blob);
+      // navigator.sendBeacon can't set an Authorization header (or any
+      // custom header), so the endpoint's authenticateJWT middleware would
+      // 401 every single beacon — this used to smuggle the token in the
+      // query string instead, which never worked (still 401s) and would
+      // have leaked the token into server access logs if it had. fetch()
+      // with keepalive:true is the modern replacement: it survives page
+      // unload like sendBeacon but is a normal request, so the real auth
+      // header just works.
+      if (token) {
+        fetch('/api/v1/settings', {
+          method: 'PUT',
+          keepalive: true,
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+            ...(store.blocksVersion ? { 'x-blocks-base-version': store.blocksVersion } : {})
+          },
+          body: JSON.stringify({
+            homepageBlocks: {
+              storefront: store.storefrontBlocks,
+              product: store.productBlocks,
+              cart: store.cartBlocks
+            }
+          })
+        }).catch(() => { /* best-effort — page is already unloading */ });
       }
-    } catch { /* beacon best-effort */ }
+    } catch { /* best-effort */ }
     e.preventDefault();
     e.returnValue = '';
   }
@@ -249,42 +344,22 @@ onBeforeUnmount(() => {
 });
 
 // UI Mapping Helpers
-const getFieldLabel = (key: string) => {
-  const map: Record<string, string> = {
-    text: 'Kayan Yazı Metni',
-    speed: 'Hız',
-    bgColor: 'Arka Plan Rengi',
-    textColor: 'Yazı Rengi',
-    title: 'Başlık',
-    columns: 'Sütun Sayısı (Izgara)',
-    showPrice: 'Fiyatı Göster',
-    autoplay: 'Otomatik Oynat',
-    interval: 'Süre (ms)',
-    showArrows: 'Okları Göster',
-    zoomEnabled: 'Yakınlaştırma Aktif',
-    showThumbnails: 'Küçük Resimleri Göster',
-    allowNew: 'Yorum Eklemeye İzin Ver',
-    showRatings: 'Puanları Göster',
-    productName: 'Ürün Adı',
-    description: 'Açıklama / Metin',
-    buttonText: 'Buton Metni',
-    limit: 'Ürün Gösterim Limiti',
-    categoryId: 'Kategori ID (Filtrelemek için)',
-    oldPrice: 'Eski Fiyat (Üstü Çizili)',
-    newPrice: 'Yeni Fiyat (İndirimli)',
-    imageUrl: 'Görsel URL Adresi',
-    countdownHours: 'Geri Sayım (Saat)',
-    freeShippingThreshold: 'Ücretsiz Kargo Limiti (KGS)',
-    upsellProductName: 'Önerilen Ürün Adı (Upsell)',
-    upsellProductPrice: 'Önerilen Ürün Fiyatı',
-    upsellProductImage: 'Önerilen Ürün Görseli',
-    showCategoryText: 'Kategori İsimlerini Göster'
-  };
-  return map[key] || key;
-};
+// Field labels are admin-editable UI strings (admin.pbFields.*), not
+// storefront content — they switch with the admin panel's own language
+// toggle (KG/RU/TR sidebar buttons), independent of block data locale.
+const KNOWN_FIELD_KEYS = new Set([
+  'text', 'speed', 'bgColor', 'textColor', 'title', 'columns', 'showPrice',
+  'autoplay', 'interval', 'showArrows', 'zoomEnabled', 'showThumbnails',
+  'allowNew', 'showRatings', 'productName', 'description', 'buttonText',
+  'limit', 'categoryId', 'oldPrice', 'newPrice', 'imageUrl', 'countdownHours',
+  'freeShippingThreshold', 'upsellProductName', 'upsellProductPrice',
+  'upsellProductImage', 'showCategoryText'
+]);
+const getFieldLabel = (key: string) =>
+  KNOWN_FIELD_KEYS.has(key) ? t('admin.pbFields.' + key) : key;
 
 // Internal keys we never expose as editable fields
-const HIDDEN_FIELD_KEYS = new Set(['productId']);
+const HIDDEN_FIELD_KEYS = new Set(['productId', 'upsellProductId']);
 const fieldKeys = computed(() => {
   if (!selectedBlock.value?.data) return [] as string[];
   return Object.keys(selectedBlock.value.data).filter(k => !HIDDEN_FIELD_KEYS.has(k));
@@ -298,29 +373,58 @@ const isTextareaKey = (k: string) => {
   const lk = k.toLowerCase();
   return TEXTAREA_FIELD_KEYS.has(lk) || lk.includes('description') || lk.includes('content') || lk.includes('paragraph');
 };
-const fieldType = (key: string): 'color' | 'boolean' | 'speed' | 'columns' | 'picker' | 'textarea' | 'text' => {
+const fieldType = (key: string): 'color' | 'boolean' | 'speed' | 'columns' | 'picker' | 'textarea' | 'image' | 'text' => {
   const lk = key.toLowerCase();
   if (lk.includes('color')) return 'color';
   if (key === 'speed') return 'speed';
   if (key === 'columns') return 'columns';
   const v = draft[key];
   if (v === true || v === false || v === 'true' || v === 'false') return 'boolean';
-  if (key === 'productName' && (selectedBlock.value?.type === 'promobanner' || selectedBlock.value?.type === 'deal_of_the_day')) return 'picker';
+  if (key === 'productName' && ['promobanner', 'deal_of_the_day', 'productshowcase'].includes(canonicalType(selectedBlock.value?.type || ''))) return 'picker';
+  if (key === 'upsellProductName' && canonicalType(selectedBlock.value?.type || '') === 'cart_settings') return 'picker';
+  // Free-typed image URL fields (not the ones auto-filled read-only by a
+  // product picker) get a live thumbnail so a bad/typo'd URL is obvious
+  // immediately instead of only showing up as a broken image on the
+  // real storefront after saving.
+  if (lk.includes('image') || lk === 'imageurl') return 'image';
   if (isTextareaKey(key)) return 'textarea';
   return 'text';
 };
 const isWide = (key: string) => {
   const t = fieldType(key);
-  return t === 'textarea' || t === 'picker';
+  return t === 'textarea' || t === 'picker' || t === 'image';
 };
 
 const getDisplayName = (type: string) => getBlockName(type);
+
+// Certificates/Partners have no per-block settings because their actual
+// content (trust badges / partner logos) is a single site-wide list edited
+// in Site Settings, not something duplicated per Page Builder instance —
+// this points the admin there instead of implying nothing can be changed.
+const CONTENT_ELSEWHERE_HINT: Record<string, string> = {
+  certificatesblock: 'Bu bölümün içeriği (rozetler) Dükkan Ayarları → Genel İletişim Ayarları sayfasında düzenlenir.',
+  partnersblock: 'Bu bölümün içeriği (ortak logoları) Dükkan Ayarları → Genel İletişim Ayarları sayfasında düzenlenir.'
+};
+const contentElsewhereHint = computed(() => {
+  if (!selectedBlock.value) return null;
+  return CONTENT_ELSEWHERE_HINT[canonicalType(selectedBlock.value.type)] || null;
+});
 
 const dispatchCartEvent = () => {
   if (typeof window !== 'undefined') {
     window.dispatchEvent(new CustomEvent('open-cart'));
   }
 };
+
+const cartUpsellSummary = computed(() => {
+  const block = store.cartBlocks.find(b => canonicalType(b.type) === 'cart_settings');
+  if (!block?.data?.upsellProductId || !block.data.upsellProductName) return null;
+  return {
+    name: block.data.upsellProductName,
+    price: block.data.upsellProductPrice || '0',
+    imageUrl: block.data.upsellProductImage || ''
+  };
+});
 
 // Responsive Preview State
 const previewMode = ref<'desktop' | 'mobile'>('desktop');
@@ -342,6 +446,15 @@ const previewMode = ref<'desktop' | 'mobile'>('desktop');
           <button class="pb-tab" :class="{ active: selectedPage === 'cart' }" @click="selectedPage = 'cart'; selectedBlockId = null">Sepet</button>
         </div>
 
+        <div class="pb-undo-group">
+          <button class="pb-icon-btn" :disabled="!store.canUndo" @click="handleUndo" title="Geri al (Ctrl+Z)">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg>
+          </button>
+          <button class="pb-icon-btn" :disabled="!store.canRedo" @click="handleRedo" title="Yinele (Ctrl+Shift+Z)">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 14 5-5-5-5"/><path d="M20 9H9.5a5.5 5.5 0 0 0 0 11H13"/></svg>
+          </button>
+        </div>
+
         <!-- Save status bar -->
         <div class="pb-save" :class="`is-${saveStatus}`">
           <div class="pb-save__status">
@@ -355,9 +468,13 @@ const previewMode = ref<'desktop' | 'mobile'>('desktop');
                 <span v-if="lastSavedAt" class="pb-save__time">{{ lastSavedAt.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' }) }}</span>
               </template>
               <template v-else-if="saveStatus === 'error'">Kayıt başarısız — tekrar deneyin</template>
+              <template v-else-if="saveStatus === 'conflict'">Bu bölümler başka bir yönetici tarafından güncellendi</template>
             </span>
           </div>
-          <button class="pb-save__btn" :disabled="saveStatus === 'saving'" @click="manualSave" title="Tüm değişiklikleri şimdi kaydet">
+          <button v-if="saveStatus === 'conflict'" class="pb-save__btn pb-save__btn--warn" @click="resolveConflict" title="Değişikliklerinizi kaybedip en güncel sürümü yükleyin">
+            Yeniden Yükle
+          </button>
+          <button v-else class="pb-save__btn" :disabled="saveStatus === 'saving'" @click="manualSave" title="Tüm değişiklikleri şimdi kaydet">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/>
             </svg>
@@ -383,6 +500,10 @@ const previewMode = ref<'desktop' | 'mobile'>('desktop');
           handle=".pb-card__grip"
           :delay="120"
           :delayOnTouchOnly="true"
+          :animation="180"
+          ghost-class="pb-card--ghost"
+          chosen-class="pb-card--chosen"
+          drag-class="pb-card--drag"
           class="pb-layers"
         >
           <template #item="{ element: block, index }">
@@ -463,7 +584,15 @@ const previewMode = ref<'desktop' | 'mobile'>('desktop');
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
                 Ürün Seç
               </button>
-              <span v-if="selectedBlock?.data?.productId" class="pb-pick-badge">✓ Seçili</span>
+              <span v-if="selectedBlock?.data?.productId || selectedBlock?.data?.upsellProductId" class="pb-pick-badge">✓ Seçili</span>
+            </div>
+
+            <div v-else-if="fieldType(key) === 'image'" class="pb-image-field">
+              <input type="text" class="pb-input" v-model="draft[key]" placeholder="https://…" />
+              <div class="pb-image-preview">
+                <img v-if="draft[key]" :src="draft[key]" alt="Önizleme" />
+                <span v-else class="pb-image-preview__empty">Görsel yok</span>
+              </div>
             </div>
 
             <textarea
@@ -474,7 +603,11 @@ const previewMode = ref<'desktop' | 'mobile'>('desktop');
             <input v-else type="text" class="pb-input" v-model="draft[key]" />
           </div>
 
-          <p v-if="fieldKeys.length === 0" class="pb-empty">Bu blok için düzenlenebilir ayar yok.</p>
+          <div v-if="fieldKeys.length === 0 && contentElsewhereHint" class="pb-elsewhere-hint">
+            <p>{{ contentElsewhereHint }}</p>
+            <router-link to="/site-settings" class="pb-elsewhere-hint__link">Dükkan Ayarları'na git →</router-link>
+          </div>
+          <p v-else-if="fieldKeys.length === 0" class="pb-empty">Bu blok için düzenlenebilir ayar yok.</p>
         </div>
         <div v-else class="pb-empty">
           Ayarları görmek için bir bölüm seçin — sol listeden veya sağdaki önizlemeden tıklayın.
@@ -557,6 +690,14 @@ const previewMode = ref<'desktop' | 'mobile'>('desktop');
               <div class="pb-cart-preview">
                 <h3>Sepet Ayarları Önizlemesi</h3>
                 <p>Düzenlediğiniz ayarlar anında yan sepete (Side Cart) yansır. Test için sepeti açın.</p>
+                <div v-if="cartUpsellSummary" class="pb-cart-upsell-summary">
+                  <img v-if="cartUpsellSummary.imageUrl" :src="cartUpsellSummary.imageUrl" alt="" />
+                  <div>
+                    <strong>{{ cartUpsellSummary.name }}</strong>
+                    <span>{{ cartUpsellSummary.price }} KGS</span>
+                  </div>
+                </div>
+                <p v-else class="pb-cart-upsell-empty">Henüz bir öneri ürünü seçilmedi.</p>
                 <button class="pb-add-btn" @click="dispatchCartEvent">Sepeti Aç / Test Et</button>
               </div>
             </div>
@@ -663,12 +804,14 @@ const previewMode = ref<'desktop' | 'mobile'>('desktop');
 .pb-save.is-saving { border-color: #93c5fd; background: #eff6ff; }
 .pb-save.is-saved { border-color: #86efac; background: #f0fdf4; }
 .pb-save.is-error { border-color: #fca5a5; background: #fef2f2; color: #b91c1c; }
+.pb-save.is-conflict { border-color: #fca5a5; background: #fef2f2; color: #b91c1c; }
 .pb-save__status { display: flex; align-items: center; gap: 8px; min-width: 0; }
 .pb-save__dot { width: 8px; height: 8px; border-radius: 50%; background: #9ca3af; flex-shrink: 0; }
 .pb-save.is-pending .pb-save__dot { background: #f59e0b; }
 .pb-save.is-saving .pb-save__dot { background: #3b82f6; animation: pb-pulse 1s ease-in-out infinite; }
 .pb-save.is-saved .pb-save__dot { background: #10b981; }
 .pb-save.is-error .pb-save__dot { background: #ef4444; }
+.pb-save.is-conflict .pb-save__dot { background: #ef4444; }
 @keyframes pb-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
 .pb-save__label { font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .pb-save__time { color: #9ca3af; font-weight: 400; margin-left: 4px; }
@@ -676,6 +819,7 @@ const previewMode = ref<'desktop' | 'mobile'>('desktop');
 .pb-save__btn:hover:not(:disabled) { filter: brightness(1.07); }
 .pb-save__btn:active:not(:disabled) { transform: scale(0.97); }
 .pb-save__btn:disabled { opacity: 0.55; cursor: not-allowed; }
+.pb-save__btn--warn { background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%); box-shadow: 0 2px 8px rgba(185, 28, 28, 0.3); }
 
 /* Sections */
 .pb-section { background: #fff; border: 1px solid #e5e7eb; border-radius: 14px; padding: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
@@ -696,6 +840,13 @@ const previewMode = ref<'desktop' | 'mobile'>('desktop');
 .pb-card.is-selected { border-color: #BC4A3C; background: #fdf4f2; box-shadow: 0 0 0 1px #BC4A3C; }
 .pb-card.is-hidden { opacity: 0.55; }
 .pb-card.is-hidden .pb-card__name { text-decoration: line-through; }
+/* Sortable.js drag states — ghost is the drop-placeholder left in the
+   list, chosen/drag style the element actually following the cursor. */
+.pb-card--ghost { opacity: 0.5; background: #fdf4f2; border: 2px dashed #BC4A3C; }
+.pb-card--ghost * { opacity: 0; }
+.pb-card--chosen { box-shadow: 0 10px 28px rgba(0,0,0,0.16); cursor: grabbing; }
+.pb-card--drag { opacity: 0.92; background: #fff; }
+.pb-card__grip:active { cursor: grabbing; }
 .pb-card__grip { display: flex; align-items: center; justify-content: center; color: #b0b4ba; cursor: grab; flex-shrink: 0; }
 .pb-card__grip:active { cursor: grabbing; }
 .pb-card__icon { display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 9px; background: #f3f4f6; color: #BC4A3C; flex-shrink: 0; }
@@ -708,6 +859,9 @@ const previewMode = ref<'desktop' | 'mobile'>('desktop');
 .pb-icon-btn { display: flex; align-items: center; justify-content: center; width: 28px; height: 28px; border: none; background: transparent; color: #6b7280; border-radius: 7px; cursor: pointer; transition: background 0.15s, color 0.15s; }
 .pb-icon-btn:hover { background: #f3f4f6; color: #111827; }
 .pb-icon-btn--danger:hover { background: #fef2f2; color: #dc2626; }
+.pb-icon-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+.pb-icon-btn:disabled:hover { background: transparent; color: #6b7280; }
+.pb-undo-group { display: flex; align-items: center; gap: 2px; padding: 3px; background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; }
 
 .pb-empty-layers { text-align: center; padding: 20px 12px; color: #9ca3af; font-size: 13px; display: flex; flex-direction: column; gap: 12px; align-items: center; }
 .pb-empty-layers p { margin: 0; }
@@ -725,6 +879,10 @@ const previewMode = ref<'desktop' | 'mobile'>('desktop');
 .pb-range { flex: 1; accent-color: #BC4A3C; }
 .pb-range-val { background: #f3f4f6; padding: 4px 10px; border-radius: 6px; font-size: 12px; color: #111827; font-weight: 700; }
 .pb-empty { font-size: 13px; color: #9ca3af; padding: 14px 0; line-height: 1.5; }
+.pb-elsewhere-hint { padding: 14px; background: #f9fafb; border: 1px dashed #d1d5db; border-radius: 10px; }
+.pb-elsewhere-hint p { margin: 0 0 8px; font-size: 13px; color: #6b7280; line-height: 1.5; }
+.pb-elsewhere-hint__link { font-size: 13px; font-weight: 700; color: #BC4A3C; text-decoration: none; }
+.pb-elsewhere-hint__link:hover { text-decoration: underline; }
 
 /* Picker row */
 .pb-picker-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
@@ -732,6 +890,11 @@ const previewMode = ref<'desktop' | 'mobile'>('desktop');
 .pb-pick-btn { display: inline-flex; align-items: center; gap: 6px; padding: 0 13px; min-height: 40px; background: #BC4A3C; color: #fff; font-family: 'Outfit', sans-serif; font-size: 12px; font-weight: 800; border: none; border-radius: 9px; cursor: pointer; white-space: nowrap; transition: filter 0.15s; }
 .pb-pick-btn:hover { filter: brightness(1.08); }
 .pb-pick-badge { display: inline-flex; align-items: center; padding: 4px 10px; background: #f0fdf4; border: 1px solid #86efac; border-radius: 100px; font-size: 11px; font-weight: 700; color: #16a34a; }
+.pb-image-field { display: flex; align-items: center; gap: 10px; }
+.pb-image-field .pb-input { flex: 1; }
+.pb-image-preview { flex-shrink: 0; width: 44px; height: 44px; border-radius: 8px; border: 1px solid #e5e7eb; background: #f9fafb; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+.pb-image-preview img { width: 100%; height: 100%; object-fit: cover; }
+.pb-image-preview__empty { font-size: 9px; color: #9ca3af; text-align: center; line-height: 1.2; padding: 2px; }
 
 /* ════════ CANVAS ════════ */
 .pb-canvas { display: flex; flex-direction: column; background: #fff; border: 1px solid #e5e7eb; border-radius: 16px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
@@ -773,6 +936,12 @@ const previewMode = ref<'desktop' | 'mobile'>('desktop');
 .pb-cart-preview { padding: 60px 40px; text-align: center; }
 .pb-cart-preview h3 { font-family: 'Outfit', sans-serif; font-size: 1.3rem; color: #111827; margin: 0 0 10px; }
 .pb-cart-preview p { color: #6b7280; margin: 0 0 22px; max-width: 460px; margin-inline: auto; line-height: 1.6; }
+.pb-cart-upsell-summary { display: flex; align-items: center; gap: 12px; max-width: 340px; margin: 0 auto 22px; padding: 10px 14px; background: #fff; border: 1px solid #e5e7eb; border-radius: 10px; text-align: left; }
+.pb-cart-upsell-summary img { width: 44px; height: 44px; border-radius: 8px; object-fit: cover; flex-shrink: 0; background: #f3f4f6; }
+.pb-cart-upsell-summary div { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.pb-cart-upsell-summary strong { font-size: 13.5px; color: #111827; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pb-cart-upsell-summary span { font-size: 12.5px; color: #BC4A3C; font-weight: 600; }
+.pb-cart-upsell-empty { color: #9ca3af; font-size: 13px; margin: 0 0 22px; }
 
 /* ════════ MODAL / LIBRARY ════════ */
 .pb-modal-overlay { position: fixed; inset: 0; z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 24px; background: rgba(17, 24, 39, 0.5); backdrop-filter: blur(4px); }

@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import { useCartStore } from '../stores/useCartStore';
+import { usePageBuilderStore } from '../stores/usePageBuilderStore';
+import { canonicalType } from '../utils/blockCatalog';
 import { useRouter } from 'vue-router';
 import { computed, ref, onMounted, onUnmounted } from 'vue';
 import api from '../utils/api';
@@ -9,6 +11,7 @@ import { useTranslation } from '../composables/useTranslation';
 import { useTranslate } from '../composables/useTranslate';
 
 const cartStore = useCartStore();
+const pageBuilderStore = usePageBuilderStore();
 const { getDiscountedKgs } = useGamification();
 const { tField } = useTranslation();
 const { t } = useTranslate();
@@ -34,6 +37,31 @@ const upsellProduct = ref<any>(null);
 const upsellAdding = ref(false);
 
 onMounted(async () => {
+  // Page Builder's "Sepet" tab lets an admin pin a specific upsell product
+  // (see PageBuilderView's cart_settings block). Prefer that over the
+  // auto-pick fallback below. SlideOutCart is mounted globally regardless
+  // of route, so the store may not have loaded blocks yet — fetch if empty.
+  try {
+    if (pageBuilderStore.cartBlocks.length === 0) {
+      await pageBuilderStore.fetchBlocks();
+    }
+    const cartSettings = pageBuilderStore.cartBlocks.find(
+      (b) => canonicalType(b.type) === 'cart_settings' && b.visible
+    );
+    if (cartSettings?.data?.upsellProductId && cartSettings.data.upsellProductName) {
+      upsellProduct.value = {
+        id: cartSettings.data.upsellProductId,
+        name: cartSettings.data.upsellProductName,
+        basePriceKgs: Number(cartSettings.data.upsellProductPrice) || 0,
+        images: [{ imageUrl: cartSettings.data.upsellProductImage || '' }]
+      };
+      return;
+    }
+  } catch (e) {
+    console.error('Failed to load admin-configured upsell product', e);
+  }
+
+  // Fallback: no admin-configured upsell — auto-pick a cheap product.
   try {
     const res = await api.get('/products?limit=5');
     if (res.data && res.data.length > 0) {
