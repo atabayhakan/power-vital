@@ -37,11 +37,15 @@ const activeBlocks = computed({
 const saveStatus = ref<'idle' | 'pending' | 'saving' | 'saved' | 'error' | 'conflict'>('idle');
 const lastSavedAt = ref<Date | null>(null);
 
-// Drag and Drop State with Vue Draggable
-const onDragEnd = (e: any) => {
-  if (e.oldIndex !== undefined && e.newIndex !== undefined && e.oldIndex !== e.newIndex) {
-    store.reorderBlocks(selectedPage.value, e.oldIndex, e.newIndex);
-    triggerDebouncedSave();
+// Drag and Drop — vuedraggable emits reorder info on `change` as
+// `{ moved: { oldIndex, newIndex } }`, NOT on `update:model-value` (that
+// event just carries the already-spliced array). Binding this to
+// update:model-value meant oldIndex/newIndex were always undefined, so
+// the guard below never ran and dragging silently did nothing.
+const onDragChange = (e: any) => {
+  if (e.moved && e.moved.oldIndex !== e.moved.newIndex) {
+    store.reorderBlocks(selectedPage.value, e.moved.oldIndex, e.moved.newIndex);
+    markDirty();
   }
 };
 
@@ -57,7 +61,7 @@ const selectBlock = (id: string) => {
 
 const toggleVisibility = (id: string) => {
   store.toggleVisibility(selectedPage.value, id);
-  triggerDebouncedSave();
+  markDirty();
 };
 
 // ═══ Editable draft (caret-safe + IME-safe field editing) ═══
@@ -88,7 +92,7 @@ watch(draft, () => {
   }
   if (!changed) return;
   store.updateBlockData(selectedPage.value, selectedBlockId.value, { ...draft });
-  triggerDebouncedSave();
+  markDirty();
 }, { deep: true });
 
 // ═══ Block Library (add new blocks) ═══
@@ -104,18 +108,18 @@ const addNewBlock = (type: string) => {
   const id = store.addBlock(selectedPage.value, type, def.defaultData);
   selectedBlockId.value = id;
   libraryOpen.value = false;
-  triggerDebouncedSave();
+  markDirty();
 };
 
 const duplicateBlockById = (id: string) => {
   const newId = store.duplicateBlock(selectedPage.value, id);
   if (newId) selectedBlockId.value = newId;
-  triggerDebouncedSave();
+  markDirty();
 };
 
 const moveBlockBy = (id: string, dir: -1 | 1) => {
   store.moveBlock(selectedPage.value, id, dir);
-  triggerDebouncedSave();
+  markDirty();
 };
 
 const blockToDelete = ref<string | null>(null);
@@ -137,14 +141,14 @@ const handleUndo = () => {
     // store watcher), so the settings-panel inputs need an explicit
     // resync or they'd keep showing the pre-undo values.
     syncDraftFromBlock();
-    triggerDebouncedSave();
+    markDirty();
   }
 };
 const handleRedo = () => {
   if (store.redo()) {
     dropStaleSelection();
     syncDraftFromBlock();
-    triggerDebouncedSave();
+    markDirty();
   }
 };
 
@@ -179,7 +183,7 @@ const performDelete = () => {
   if (selectedBlockId.value === blockToDelete.value) selectedBlockId.value = null;
   store.removeBlock(selectedPage.value, blockToDelete.value);
   blockToDelete.value = null;
-  triggerDebouncedSave();
+  markDirty();
 };
 
 const blockIndex = (id: string) => activeBlocks.value.findIndex(b => b.id === id);
@@ -223,31 +227,25 @@ const handleProductPicked = (product: any) => {
     });
   }
   syncDraftFromBlock(); // reflect picked product in the editable inputs
-  triggerDebouncedSave();
+  markDirty();
   pickerOpen.value = false;
 };
 
-// --- DEBOUNCED API SAVE with status tracking ---
-let saveTimeout: any = null;
-const triggerDebouncedSave = () => {
-  saveStatus.value = 'pending';
-  if (saveTimeout) clearTimeout(saveTimeout);
-  saveTimeout = setTimeout(async () => {
-    await flushSave();
-  }, 800);
+// --- MANUAL SAVE ONLY — no autosave ---
+// Every mutation just marks the draft dirty; nothing reaches the network
+// until the admin explicitly clicks "Kaydet". (Previously every edit
+// scheduled an 800ms-debounced save, which pushed half-finished edits
+// live without the admin choosing to.)
+const markDirty = () => {
+  if (saveStatus.value !== 'conflict') saveStatus.value = 'pending';
 };
 
 let inFlight = false;
-let needsResave = false;
-const flushSave = async () => {
-  if (inFlight) {
-    needsResave = true;
-    return;
-  }
-  // A conflict means the server rejected our last save because another
-  // admin's edit landed first. Retrying with the same stale base version
-  // would just 409 again — stop autosaving until the admin reloads via
-  // resolveConflict() and picks the fix up from a known-good state.
+const manualSave = async () => {
+  if (inFlight) return;
+  // A conflict means the server rejected the last save because another
+  // admin's edit landed first — saving again with the same stale base
+  // version would just 409 again. Resolve it via resolveConflict() first.
   if (saveStatus.value === 'conflict') return;
   inFlight = true;
   saveStatus.value = 'saving';
@@ -255,32 +253,17 @@ const flushSave = async () => {
     await store.saveBlocks();
     lastSavedAt.value = new Date();
     saveStatus.value = 'saved';
-    console.warn('[API] Blocks saved at', lastSavedAt.value.toLocaleTimeString());
   } catch (e: any) {
     console.error('[API] Save failed', e);
     saveStatus.value = e?.response?.status === 409 ? 'conflict' : 'error';
   } finally {
     inFlight = false;
-    if (needsResave && saveStatus.value !== 'conflict') {
-      needsResave = false;
-      saveStatus.value = 'pending';
-      if (saveTimeout) clearTimeout(saveTimeout);
-      saveTimeout = setTimeout(flushSave, 200);
-    } else {
-      needsResave = false;
-    }
   }
-};
-
-const manualSave = async () => {
-  if (saveTimeout) { clearTimeout(saveTimeout); saveTimeout = null; }
-  await flushSave();
 };
 
 // Discards local edits and reloads the latest blocks from the server so
 // the admin starts from a known-good state after a conflicting save.
 const resolveConflict = async () => {
-  if (saveTimeout) { clearTimeout(saveTimeout); saveTimeout = null; }
   await store.fetchBlocks();
   selectedBlockId.value = null;
   saveStatus.value = 'idle';
@@ -333,11 +316,6 @@ onMounted(async () => {
 });
 
 onBeforeUnmount(() => {
-  if (saveTimeout) {
-    clearTimeout(saveTimeout);
-    saveTimeout = null;
-    flushSave();
-  }
   if (typeof window !== 'undefined') {
     window.removeEventListener('beforeunload', onBeforeUnloadHandler);
   }
@@ -461,7 +439,7 @@ const previewMode = ref<'desktop' | 'mobile'>('desktop');
             <span class="pb-save__dot"/>
             <span class="pb-save__label">
               <template v-if="saveStatus === 'idle'">Hazır</template>
-              <template v-else-if="saveStatus === 'pending'">Değişiklik var — otomatik kaydedilecek…</template>
+              <template v-else-if="saveStatus === 'pending'">Kaydedilmemiş değişiklikler var</template>
               <template v-else-if="saveStatus === 'saving'">Kaydediliyor…</template>
               <template v-else-if="saveStatus === 'saved'">
                 Kaydedildi
@@ -495,7 +473,7 @@ const previewMode = ref<'desktop' | 'mobile'>('desktop');
 
         <draggable
           :model-value="activeBlocks"
-          @update:model-value="onDragEnd"
+          @change="onDragChange"
           item-key="id"
           handle=".pb-card__grip"
           :delay="120"
