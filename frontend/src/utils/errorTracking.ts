@@ -1,6 +1,6 @@
 // Error tracking — wires the front-end error boundary + global handlers
 // to BOTH:
-//   1. The backend's /api/v1/errors/report endpoint (system of record,
+//   1. The backend's /api/v1/client-logs/report endpoint (system of record,
 //      admin dashboard, MySQL persistence).
 //   2. Sentry (lazy-loaded via utils/sentry.ts), when configured.
 //
@@ -47,7 +47,7 @@ interface ReportPayload {
  *
  * In dev (import.meta.env.PROD === false) we just log — keeps the
  * network clean and lets devs see exactly what would be sent.
- * In production we POST to /api/v1/errors/report.
+ * In production we POST to /api/v1/client-logs/report.
  *
  * If Sentry is enabled (DSN configured), we ALSO forward the error
  * there for stack-trace grouping and alert webhooks. Both calls are
@@ -97,7 +97,13 @@ export const reportError = (error: Error, context: ErrorContext = {}): void => {
   // Fire-and-forget. We deliberately do NOT await — the caller is
   // usually inside a catch block and we don't want to mask the
   // original error with a secondary one from this helper.
-  apiPost('/api/v1/errors/report', payload).catch((err) => {
+  // "/client-logs/" instead of "/errors/": the old path matched
+  // error-telemetry patterns in ad-block filter lists, so reports (and the
+  // admin resolve action) were silently blocked in-browser for users with
+  // an ad blocker or strict tracking protection. The backend keeps
+  // /api/v1/errors mounted as a legacy alias. Cast: the generated OpenAPI
+  // path types don't know the alias mount.
+  (apiPost as any)('/api/v1/client-logs/report', payload).catch((err: unknown) => {
     // eslint-disable-next-line no-console
     console.error('[errorTracking] failed to send report', err);
   });

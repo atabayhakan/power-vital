@@ -1,7 +1,7 @@
 <script setup lang="ts">
 // AdminErrorsView — admin-only error feed.
 //
-// Pulls from /api/v1/errors/recent and lets the admin mark each
+// Pulls from /api/v1/client-logs/recent and lets the admin mark each
 // error as resolved with an optional note. Uses ErrorBoundary so a
 // broken card doesn't take down the whole page.
 import { ref, reactive, onMounted } from 'vue';
@@ -36,7 +36,12 @@ const load = async () => {
   try {
     const query: Record<string, string | number> = { limit: 200 };
     if (includeResolved.value) query.resolved = 'true';
-    const { data } = await apiGet('/api/v1/errors/recent', { query });
+    // "/client-logs/" not "/errors/": the old segment matched ad-block
+    // filter-list telemetry patterns, which silently blocked these calls
+    // in-browser for admins running an ad blocker (request never left the
+    // machine — nothing in nginx, no visible error). Cast: the generated
+    // OpenAPI path types only know the legacy /errors mount.
+    const { data } = await (apiGet as any)('/api/v1/client-logs/recent', { query });
     errors.value = (data as { errors: ClientErrorRow[] }).errors;
   } catch (e: any) {
     errorMsg.value = e.response?.data?.error || 'Hata kayıtları alınamadı';
@@ -60,7 +65,7 @@ const resolve = async (id: string) => {
     // openapi-client can't see this specific value. We cast to `any`
     // only at the call site to keep the rest of the function strict.
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    await (apiPost as any)(`/api/v1/errors/${id}/resolve`, { resolvedNote: resolveNotes[id] || undefined });
+    await (apiPost as any)(`/api/v1/client-logs/${id}/resolve`, { resolvedNote: resolveNotes[id] || undefined });
     delete resolveNotes[id];
     await load();
     successMsg.value = 'Çözüldü olarak işaretlendi.';

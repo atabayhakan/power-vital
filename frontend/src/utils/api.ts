@@ -1,10 +1,19 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: '/api/v1'
+  baseURL: '/api/v1',
   // Intentionally no default Content-Type: axios sets multipart/form-data
   // with the right boundary for FormData, and application/json for plain
   // objects. Hard-coding application/json here would break file uploads.
+  //
+  // 304 must count as success: the ETag layer below sends If-None-Match
+  // for the cacheable GETs, and the whole point is hydrating the 304 from
+  // sessionStorage in the response interceptor. Axios's default
+  // validateStatus (2xx only) sent every 304 down the ERROR path instead,
+  // so the interceptor never ran and callers saw "AxiosError: Request
+  // failed with status code 304" — the cache layer was rejecting the very
+  // responses it asked the server to produce.
+  validateStatus: (status) => (status >= 200 && status < 300) || status === 304
 });
 
 // ─── Cache layer (stale-while-revalidate via If-None-Match) ──────────────

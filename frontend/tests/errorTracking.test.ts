@@ -57,7 +57,9 @@ describe('utils/errorTracking.ts', () => {
 
     expect(mockApiPost).toHaveBeenCalledTimes(1);
     const [url, payload] = mockApiPost.mock.calls[0];
-    expect(url).toBe('/api/v1/errors/report');
+    // /client-logs, NOT /errors — "/errors/" matches ad-block telemetry
+    // filter patterns and gets silently blocked in-browser.
+    expect(url).toBe('/api/v1/client-logs/report');
     expect(payload.message).toBe('prod-boom');
     expect(payload.source).toBe('CheckoutView');
     expect(payload.phase).toBe('mount');

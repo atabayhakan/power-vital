@@ -236,7 +236,16 @@ app.use('/api/v1/inventory', inventoryRoutes);
 // the public /report endpoint doesn't get shadowed. Rate limiting for
 // the public /report route is applied inside errors.ts itself, scoped
 // to just that route (not the admin-only /recent and /:id/resolve).
+//
+// Two mounts, same router:
+//   /client-logs — canonical. "/errors/" URL segments match the
+//     error-telemetry patterns in ad-block/tracking-protection filter
+//     lists (EasyPrivacy etc.), which silently killed the admin's
+//     resolve clicks inside the browser before any request was sent.
+//   /errors — legacy alias, kept so tabs still running an older bundle
+//     (and anything external that learned the old path) keep working.
 import errorsRoutes from './routes/errors';
+app.use('/api/v1/client-logs', errorsRoutes);
 app.use('/api/v1/errors', errorsRoutes);
 
 // Serve uploaded files
