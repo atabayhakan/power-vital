@@ -14,7 +14,6 @@
  * the caller decides how to handle that (mark order pending, etc.).
  */
 export const recognizeReceiptText = async (imagePath: string): Promise<string> => {
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
   const Tesseract = require('tesseract.js');
   const result = await Tesseract.recognize(imagePath, 'rus+kir+eng', {
     logger: () => { /* silent */ }
