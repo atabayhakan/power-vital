@@ -1,6 +1,7 @@
 import { Router, Request, Response } from 'express';
 import { authenticateJWT, requireRole } from '../middleware/auth';
 import prisma from '../lib/prisma';
+import { recognizeReceiptText } from '../lib/ocr';
 import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
@@ -315,15 +316,11 @@ router.post('/:orderId/verify', limit(RATE_LIMITS.ocr.verify), validate({ params
       : path.join(__dirname, '../..', 'uploads');
     const imagePath = path.join(uploadBase, order.receiptImageUrl.replace(/^\/?uploads\/?/, ''));
 
-    // OCR with Tesseract.js
+    // OCR with Tesseract.js (via a mockable seam — see lib/ocr.ts)
     let ocrText = '';
     let ocrError: string | null = null;
     try {
-      const Tesseract = require('tesseract.js');
-      const result = await Tesseract.recognize(imagePath, 'rus+kir+eng', {
-        logger: (m: any) => {} // silent
-      });
-      ocrText = result.data.text;
+      ocrText = await recognizeReceiptText(imagePath);
     } catch (err: any) {
       console.error('OCR Error:', err?.message || err);
       ocrError = err?.message || 'OCR engine unavailable';

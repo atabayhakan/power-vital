@@ -39,8 +39,14 @@ describe('POST /api/v1/auth/register', () => {
       .post('/api/v1/auth/register')
       .send({ email: 'alice@test.com' });
 
+    // validate() returns the standard envelope: { error: 'Validation
+    // failed', issues: [{ path, message, code }] } — the per-field detail
+    // lives in `issues`, not the top-level `error`.
     expect(res.status).toBe(400);
-    expect(res.body.error).toMatch(/required/i);
+    expect(res.body.error).toBe('Validation failed');
+    const missingPaths = res.body.issues.map((i: { path: string }) => i.path);
+    expect(missingPaths).toContain('name');
+    expect(missingPaths).toContain('password');
   });
 
   it('rejects duplicate email', async () => {

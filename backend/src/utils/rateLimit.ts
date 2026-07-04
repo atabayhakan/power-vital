@@ -88,6 +88,13 @@ export const limit = (spec: LimitSpec): RateLimitRequestHandler => {
     skip: (req: Request) => {
       // Never rate-limit health checks
       if (req.path === '/health' || req.path === '/health/ready') return true;
+      // Functional integration tests (auth, checkout, ...) hit these routes
+      // far more than the production limits allow (repeated register/login
+      // in beforeEach), which tripped a shared in-memory bucket and made
+      // unrelated assertions fail with 429/401. Skip in the test env — but
+      // rateLimit.test.ts, which exists to verify the limiter, opts back in
+      // by setting RL_ENFORCE=1.
+      if (process.env.NODE_ENV === 'test' && process.env.RL_ENFORCE !== '1') return true;
       return false;
     }
   });

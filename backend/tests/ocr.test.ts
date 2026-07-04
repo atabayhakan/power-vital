@@ -6,16 +6,15 @@ import checkoutRouter from '../src/routes/checkout';
 import prisma from '../src/lib/prisma';
 import { buildTestApp, cleanDatabase, closePrisma } from './testHelpers';
 
-// Stub tesseract.js so the test doesn't need a real image + binary.
-// Each test sets a different return value via the mock implementation.
-vi.mock('tesseract.js', () => ({
-  default: {
-    recognize: vi.fn()
-  }
+// Stub the OCR seam (lib/ocr.ts) so the test never touches a real image
+// or the Tesseract binary. The route calls recognizeReceiptText(imagePath)
+// and we drive its resolved text / rejection per test. `.mockResolvedValue`
+// here returns the raw text directly (the route no longer unwraps a
+// `{ data: { text } }` object — that lives inside lib/ocr now).
+const { recognizeText } = vi.hoisted(() => ({ recognizeText: vi.fn() }));
+vi.mock('../src/lib/ocr', () => ({
+  recognizeReceiptText: recognizeText
 }));
-
-import Tesseract from 'tesseract.js';
-const recognizeMock = Tesseract.recognize as unknown as ReturnType<typeof vi.fn>;
 
 const app = buildTestApp({ path: '/api/v1/checkout', router: checkoutRouter });
 
@@ -26,6 +25,17 @@ afterAll(async () => {
 });
 
 const makeOrderWithReceipt = async (totalKgs = 1000) => {
+  // OrderItem.productId is a real FK — a hardcoded fake UUID violated the
+  // constraint and threw before the test even ran. Seed an actual product
+  // (unique barcode per call so parallel/repeated seeds don't collide).
+  const product = await prisma.product.create({
+    data: {
+      barcode: 'OCR-' + Math.random().toString(36).slice(2, 9),
+      name: 'OCR Test Product',
+      basePriceKgs: totalKgs,
+      stockQuantity: 100
+    }
+  });
   const order = await prisma.order.create({
     data: {
       status: 'pending',
@@ -36,7 +46,7 @@ const makeOrderWithReceipt = async (totalKgs = 1000) => {
       receiptImageUrl: '/uploads/receipts/test-receipt.jpg',
       items: {
         create: [{
-          productId: '00000000-0000-0000-0000-000000000001',
+          productId: product.id,
           quantity: 1,
           unitPriceKgs: totalKgs,
           totalPriceKgs: totalKgs
@@ -51,7 +61,7 @@ describe('POST /api/v1/checkout/:orderId/verify (OCR strict mode)', () => {
   beforeEach(async () => {
     await prisma.orderItem.deleteMany();
     await prisma.order.deleteMany();
-    recognizeMock.mockReset();
+    recognizeText.mockReset();
   });
 
   it('is idempotent on already-paid orders (no re-processing)', async () => {
@@ -64,7 +74,7 @@ describe('POST /api/v1/checkout/:orderId/verify (OCR strict mode)', () => {
     expect(res.body.verified).toBe(true);
     expect(res.body.method).toBe('already-verified');
     // Tesseract must NOT be called for already-paid orders
-    expect(recognizeMock).not.toHaveBeenCalled();
+    expect(recognizeText).not.toHaveBeenCalled();
   });
 
   it('returns 404 for unknown order', async () => {
@@ -89,9 +99,7 @@ describe('POST /api/v1/checkout/:orderId/verify (OCR strict mode)', () => {
 
   it('marks order as PAID when OCR amount matches within 5% tolerance', async () => {
     const order = await makeOrderWithReceipt(1000);
-    recognizeMock.mockResolvedValue({
-      data: { text: 'Получатель: PV\nСумма: 1000 KGS\nНазначение: заказ' }
-    });
+    recognizeText.mockResolvedValue('Получатель: PV\nСумма: 1000 KGS\nНазначение: заказ');
 
     const res = await request(app).post(`/api/v1/checkout/${order.id}/verify`);
 
@@ -108,9 +116,7 @@ describe('POST /api/v1/checkout/:orderId/verify (OCR strict mode)', () => {
   it('keeps order PENDING on amount mismatch (NEVER auto-approves)', async () => {
     const order = await makeOrderWithReceipt(1000);
     // OCR shows 500 KGS — too low
-    recognizeMock.mockResolvedValue({
-      data: { text: 'Сумма: 500 сом' }
-    });
+    recognizeText.mockResolvedValue('Сумма: 500 сом');
 
     const res = await request(app).post(`/api/v1/checkout/${order.id}/verify`);
 
@@ -126,9 +132,7 @@ describe('POST /api/v1/checkout/:orderId/verify (OCR strict mode)', () => {
 
   it('keeps order PENDING when amount cannot be parsed (no number found)', async () => {
     const order = await makeOrderWithReceipt(1000);
-    recognizeMock.mockResolvedValue({
-      data: { text: 'Dekont içeriği okunamadı' }
-    });
+    recognizeText.mockResolvedValue('Dekont içeriği okunamadı');
 
     const res = await request(app).post(`/api/v1/checkout/${order.id}/verify`);
 
@@ -142,7 +146,7 @@ describe('POST /api/v1/checkout/:orderId/verify (OCR strict mode)', () => {
 
   it('keeps order PENDING when OCR engine itself throws (mark for manual review)', async () => {
     const order = await makeOrderWithReceipt(1000);
-    recognizeMock.mockRejectedValue(new Error('Tesseract binary not found'));
+    recognizeText.mockRejectedValue(new Error('Tesseract binary not found'));
 
     const res = await request(app).post(`/api/v1/checkout/${order.id}/verify`);
 
@@ -158,9 +162,7 @@ describe('POST /api/v1/checkout/:orderId/verify (OCR strict mode)', () => {
 
   it('accepts amount within 5% tolerance', async () => {
     const order = await makeOrderWithReceipt(1000);
-    recognizeMock.mockResolvedValue({
-      data: { text: 'Сумма: 1030 KGS' } // +3%, within 5%
-    });
+    recognizeText.mockResolvedValue('Сумма: 1030 KGS'); // +3%, within 5%
 
     const res = await request(app).post(`/api/v1/checkout/${order.id}/verify`);
     expect(res.body.verified).toBe(true);

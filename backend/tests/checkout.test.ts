@@ -54,7 +54,7 @@ describe('POST /api/v1/checkout', () => {
   it('rejects empty cart with 400', async () => {
     const res = await request(app)
       .post('/api/v1/checkout')
-      .send({ cart: [], customerName: 'X', customerPhone: '+996' });
+      .send({ cart: [], customerName: 'X', customerPhone: '+996555000000' });
     expect(res.status).toBe(400);
   });
 
@@ -74,7 +74,7 @@ describe('POST /api/v1/checkout', () => {
       .send({
         cart: [{ productId: product.id, quantity: 5 }],
         customerName: 'X',
-        customerPhone: '+996'
+        customerPhone: '+996555000000'
       });
 
     expect(res.status).toBe(400);
@@ -93,7 +93,7 @@ describe('POST /api/v1/checkout', () => {
       .send({
         cart: [{ productId: product.id, quantity: 3 }],
         customerName: 'X',
-        customerPhone: '+996'
+        customerPhone: '+996555000000'
       });
 
     expect(res.status).toBe(201);
@@ -111,7 +111,7 @@ describe('POST /api/v1/checkout', () => {
           { productId: product.id, quantity: 1 }
         ],
         customerName: 'X',
-        customerPhone: '+996'
+        customerPhone: '+996555000000'
       });
 
     expect(res.status).toBe(201);
@@ -129,7 +129,7 @@ describe('POST /api/v1/checkout', () => {
       .send({
         cart: [{ productId: 'non-existent', quantity: 1 }],
         customerName: 'X',
-        customerPhone: '+996'
+        customerPhone: '+996555000000'
       });
     expect(res.status).toBe(400);
     expect(res.body.error).toMatch(/no valid products/i);
@@ -150,7 +150,7 @@ describe('GET /api/v1/checkout/:orderId', () => {
       .send({
         cart: [{ productId: product.id, quantity: 1 }],
         customerName: 'X',
-        customerPhone: '+996'
+        customerPhone: '+996555000000'
       });
 
     const res = await request(app).get(`/api/v1/checkout/${created.body.orderId}`);

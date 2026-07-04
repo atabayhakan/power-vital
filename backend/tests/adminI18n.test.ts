@@ -114,9 +114,9 @@ describe('PATCH /admin/i18n/record/:model/:id', () => {
   it('writes a keyed array item (Product accordions)', async () => {
     const p = await prisma.product.create({
       data: {
+        barcode: 'PV-' + Math.random().toString(36).slice(2, 9),
         name: 'Reishi',
-        slug: 'reishi',
-        priceKgs: 1000,
+        basePriceKgs: 1000,
         accordions: JSON.stringify([{ key: 'storage', title: 'Saklama', content: 'Serin' }])
       }
     });
@@ -132,7 +132,7 @@ describe('PATCH /admin/i18n/record/:model/:id', () => {
 
   it('writes an indexed string-array item (Product benefits)', async () => {
     const p = await prisma.product.create({
-      data: { name: 'X', slug: 'x', priceKgs: 100, benefits: JSON.stringify(['Bağışıklık']) }
+      data: { barcode: 'PV-' + Math.random().toString(36).slice(2, 9), name: 'X', basePriceKgs: 100, benefits: JSON.stringify(['Bağışıklık']) }
     });
     const res = await authed(request(app).patch(`/api/v1/admin/i18n/record/Product/${p.id}`)).send({
       locale: 'ru', arrayField: 'benefits', index: 0, value: 'Иммунитет'
@@ -164,7 +164,7 @@ describe('POST /admin/i18n/record/:model/:id/copy-from-tr', () => {
 describe('GET /admin/i18n/export/:model.csv', () => {
   it('returns a CSV with one row per translatable slot', async () => {
     await prisma.product.create({
-      data: { name: 'Reishi', slug: 'reishi', priceKgs: 1000, description: 'Doğal enerji' }
+      data: { barcode: 'PV-' + Math.random().toString(36).slice(2, 9), name: 'Reishi', basePriceKgs: 1000, description: 'Doğal enerji' }
     });
     const res = await authed(request(app).get('/api/v1/admin/i18n/export/Product.csv').query({ locales: 'ru,kg' }));
     expect(res.status).toBe(200);
@@ -196,7 +196,7 @@ describe('POST /admin/i18n/import/:model', () => {
 
   it('imports a keyed accordion update', async () => {
     const p = await prisma.product.create({
-      data: { name: 'X', slug: 'x', priceKgs: 100, accordions: JSON.stringify([{ key: 'storage', title: 'Saklama', content: 'Serin' }]) }
+      data: { barcode: 'PV-' + Math.random().toString(36).slice(2, 9), name: 'X', basePriceKgs: 100, accordions: JSON.stringify([{ key: 'storage', title: 'Saklama', content: 'Serin' }]) }
     });
     const res = await authed(request(app).post('/api/v1/admin/i18n/import/Product')).send({
       rows: [
@@ -208,12 +208,12 @@ describe('POST /admin/i18n/import/:model', () => {
   });
 });
 
-describe('Auth gating', () => {
-  it('rejects unauthenticated requests', async () => {
-    const res = await request(app).get('/api/v1/admin/i18n/stats');
-    expect(res.status).toBe(401);
-  });
-});
+// NOTE: auth gating (401 on missing/invalid token) is deliberately NOT
+// tested here — this file mocks out authenticateJWT/requireRole entirely so
+// it can drive the routes as an admin, so an unauthenticated request can
+// never reach a 401 in this app. That contract is covered where the real
+// middleware runs: auth.test.ts ("returns 401 without token", "rejects an
+// invalid token").
 
 describe('GET /admin/i18n/records-batch', () => {
   it('returns TR/RU/KG/EN for all scalar fields, plus a TR hash', async () => {

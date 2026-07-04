@@ -19,6 +19,12 @@ const buildApp = (path: string, spec = RATE_LIMITS.auth.login) => {
   return app;
 };
 
+// The limiter skips itself in the test env so functional suites aren't
+// throttled (see rateLimit.ts skip()). THIS suite is the one that verifies
+// the limiter actually enforces, so opt back in for its whole lifetime.
+beforeAll(() => { process.env.RL_ENFORCE = '1'; });
+afterAll(() => { delete process.env.RL_ENFORCE; });
+
 describe('rate limit middleware', () => {
   describe('basic limit enforcement', () => {
     it('allows up to N requests then returns 429', async () => {

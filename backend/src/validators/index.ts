@@ -379,7 +379,10 @@ export const I18nImportRowSchema = z.object({
 }).strict();
 
 export const I18nImportSchema = z.object({
-  model: z.string().min(1),
+  // `model` is optional: the route reads it from the URL path
+  // (/import/:model), so requiring it in the body rejected valid imports
+  // that only send { rows }. Accepted-but-ignored when a caller includes it.
+  model: z.string().min(1).optional(),
   rows: z.array(I18nImportRowSchema).min(1).max(5000)
 }).strict();
 
