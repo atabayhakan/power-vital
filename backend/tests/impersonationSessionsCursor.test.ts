@@ -78,7 +78,11 @@ const buildApp = async () => {
   const app = express();
   app.use(express.json());
   const routes = (await import('../src/routes/adminImpersonation')).default;
-  app.use('/api/v1/admin', routes);
+  // Mirror the production mount (src/index.ts): the router's own paths are
+  // /sessions, /status, ... — mounting at /api/v1/admin (as this test
+  // originally did) made every request 404 because the /impersonation
+  // segment lives in the mount point, not inside the router.
+  app.use('/api/v1/admin/impersonation', routes);
   return app;
 };
 

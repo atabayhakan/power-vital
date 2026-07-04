@@ -183,7 +183,9 @@ const main = async () => {
   const html = await fetchUrl('/');
   check('GET / returns 200', html.status === 200, `status=${html.status}`);
   check('Content-Type is text/html', /text\/html/.test(html.headers['content-type'] || ''), html.headers['content-type'] || '');
-  check('<html lang="ru"> present', /<html\s+lang="ru"/i.test(html.body), 'lang attribute');
+  // "kg" is the app-wide default locale (useTranslate's readLocale, the
+  // axios Accept-Language interceptor, and index.html all default to it).
+  check('<html lang="kg"> present', /<html\s+lang="kg"/i.test(html.body), 'lang attribute');
   check('index.html includes <div id="app">', /<div\s+id="app">/.test(html.body), 'SPA root mounted');
   // Production build replaces the dev entry with a hashed asset
   check('index.html has a hashed /assets/*.js script',
