@@ -6,7 +6,7 @@ import router from './router'
 import axios from 'axios'
 import i18n from './i18n'
 import { applyUiOverrides } from './utils/uiOverrides'
-import { reportError } from './utils/errorTracking'
+import { reportError, STALE_CHUNK_PATTERN } from './utils/errorTracking'
 import { initSentry } from './utils/sentry'
 // Quill CSS is now lazy-injected by PageManageView on mount so the
 // public bundle (~30 KB) skips it entirely. See views/PageManageView.vue.
@@ -69,7 +69,7 @@ window.addEventListener('unhandledrejection', (event) => {
   const reason = event.reason instanceof Error
     ? event.reason
     : new Error(typeof event.reason === 'string' ? event.reason : JSON.stringify(event.reason));
-  if (/Failed to fetch dynamically imported module|Unable to preload CSS/.test(reason.message)) {
+  if (STALE_CHUNK_PATTERN.test(reason.message)) {
     recoverFromStaleChunk();
     return;
   }

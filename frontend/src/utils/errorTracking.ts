@@ -54,7 +54,23 @@ interface ReportPayload {
  * fire-and-forget — they do not block, and they swallow their own
  * errors so they can't mask the original.
  */
+// Stale-deployment chunk failures: every deploy renames the content-hashed
+// asset files, so tabs opened before the deploy fail to lazy-load the old
+// names. main.ts detects exactly these and force-reloads the page onto the
+// new bundle — the user recovers on their own, and there is nothing for an
+// admin to fix. Reporting them only floods the İstemci Hataları feed with
+// a burst of noise after every deploy, burying real errors.
+// The alternates cover each browser engine's own wording for the same
+// failure: Chrome, Vite's preload helper, Firefox, and Safari in order.
+export const STALE_CHUNK_PATTERN = /Failed to fetch dynamically imported module|Unable to preload CSS|error loading dynamically imported module|Importing a module script failed/i;
+
 export const reportError = (error: Error, context: ErrorContext = {}): void => {
+  if (STALE_CHUNK_PATTERN.test(error.message)) {
+    // eslint-disable-next-line no-console
+    console.warn('[errorTracking] stale-chunk error suppressed (auto-reload will recover):', error.message);
+    return;
+  }
+
   const payload: ReportPayload = {
     message: error.message.slice(0, 500),
     stack: error.stack?.slice(0, 32768),

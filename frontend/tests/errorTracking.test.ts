@@ -139,4 +139,28 @@ describe('utils/errorTracking.ts', () => {
 
     expect(mockApiPost.mock.calls[0][1].source).toBe('unknown');
   });
+
+  it('suppresses stale-deployment chunk errors entirely (no backend, no Sentry)', () => {
+    vi.stubEnv('PROD', true);
+    mockIsEnabled.mockReturnValue(true);
+
+    // Every browser engine words this failure differently — all of them
+    // self-heal via main.ts's auto-reload, so none should be reported.
+    const staleMessages = [
+      'Failed to fetch dynamically imported module: https://powervital.kg/assets/CertificatesBlock-BqYooOx-.js',
+      'Unable to preload CSS for /assets/ReviewSection-BPufNEBM.css',
+      'error loading dynamically imported module: https://powervital.kg/assets/x.js',
+      'Importing a module script failed.'
+    ];
+    for (const msg of staleMessages) {
+      reportError(new Error(msg), { tags: { component: 'ErrorBoundary' } });
+    }
+
+    expect(mockApiPost).not.toHaveBeenCalled();
+    expect(mockCapture).not.toHaveBeenCalled();
+
+    // A real error still goes through — the filter must not overmatch.
+    reportError(new Error('TypeError: x is not a function'), { tags: { component: 'ErrorBoundary' } });
+    expect(mockApiPost).toHaveBeenCalledTimes(1);
+  });
 });
