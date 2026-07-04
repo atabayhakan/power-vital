@@ -187,9 +187,9 @@ const revertOrder = async (order: any) => {
   const shortId = String(order.id).slice(0, 8).toUpperCase();
   const ok = (globalThis as any).confirm?.(
     `#${shortId} siparişi GERİ ALINACAK:\n` +
-    `• Durum "Bekliyor"a dönecek\n` +
-    `• Bu siparişten dağıtılan tüm bonus/prim ilgili cüzdanlardan geri alınacak (bakiye eksiye düşebilir)\n` +
-    `• Alıcının kariyer/seviye/indirimi yeniden hesaplanacak\n\nDevam edilsin mi?`
+    '• Durum "Bekliyor"a dönecek\n' +
+    '• Bu siparişten dağıtılan tüm bonus/prim ilgili cüzdanlardan geri alınacak (bakiye eksiye düşebilir)\n' +
+    '• Alıcının kariyer/seviye/indirimi yeniden hesaplanacak\n\nDevam edilsin mi?'
   );
   if (!ok) return;
   try {

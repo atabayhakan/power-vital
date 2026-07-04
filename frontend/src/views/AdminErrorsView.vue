@@ -64,7 +64,7 @@ const resolve = async (id: string) => {
     // The id is dynamic (route param), so the literal-path typing in
     // openapi-client can't see this specific value. We cast to `any`
     // only at the call site to keep the rest of the function strict.
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+     
     await (apiPost as any)(`/api/v1/client-logs/${id}/resolve`, { resolvedNote: resolveNotes[id] || undefined });
     delete resolveNotes[id];
     await load();

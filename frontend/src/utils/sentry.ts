@@ -125,7 +125,7 @@ export const initSentry = async (
     api.initialized = true;
     return true;
   } catch (err) {
-    // eslint-disable-next-line no-console
+     
     console.warn('[sentry] init failed, continuing without it:', err);
     return false;
   }

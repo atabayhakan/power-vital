@@ -66,7 +66,7 @@ export const STALE_CHUNK_PATTERN = /Failed to fetch dynamically imported module|
 
 export const reportError = (error: Error, context: ErrorContext = {}): void => {
   if (STALE_CHUNK_PATTERN.test(error.message)) {
-    // eslint-disable-next-line no-console
+     
     console.warn('[errorTracking] stale-chunk error suppressed (auto-reload will recover):', error.message);
     return;
   }
@@ -83,7 +83,7 @@ export const reportError = (error: Error, context: ErrorContext = {}): void => {
   };
 
   if (!import.meta.env.PROD) {
-    // eslint-disable-next-line no-console
+     
     console.warn('[errorTracking:dev]', payload);
     return;
   }
@@ -104,7 +104,7 @@ export const reportError = (error: Error, context: ErrorContext = {}): void => {
   // /api/v1/errors mounted as a legacy alias. Cast: the generated OpenAPI
   // path types don't know the alias mount.
   (apiPost as any)('/api/v1/client-logs/report', payload).catch((err: unknown) => {
-    // eslint-disable-next-line no-console
+     
     console.error('[errorTracking] failed to send report', err);
   });
 };
