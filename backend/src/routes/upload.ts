@@ -28,8 +28,8 @@ const upload = multer({
   limits: { fileSize: 25 * 1024 * 1024, files: 20 } // 25MB per file, max 20 files
 });
 
-// GET /api/v1/upload/folders — List all folders
-router.get('/folders', async (req: Request, res: Response) => {
+// GET /api/v1/upload/folders — List all folders (admin media library only)
+router.get('/folders', authenticateJWT, requireRole('admin'), async (req: Request, res: Response) => {
   try {
     const folders = await prisma.mediaFolder.findMany({
       orderBy: { createdAt: 'desc' }
@@ -234,8 +234,8 @@ router.post('/hires', authenticateJWT, requireRole('admin'), upload.array('files
   }
 });
 
-// GET /api/v1/upload — List all media
-router.get('/', async (req: Request, res: Response) => {
+// GET /api/v1/upload — List all media (admin media library only)
+router.get('/', authenticateJWT, requireRole('admin'), async (req: Request, res: Response) => {
   try {
     const media = await prisma.media.findMany({
       orderBy: { createdAt: 'desc' }

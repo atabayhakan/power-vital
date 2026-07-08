@@ -31,6 +31,16 @@ export const authenticateJWT = (req: AuthRequest, res: Response, next: NextFunct
       if (err) {
         return res.status(401).json({ error: 'Token is invalid or expired' });
       }
+      // 🛡️ Token-type confusion guard. Refresh tokens are signed with the
+      // same secret when REFRESH_TOKEN_SECRET is unset (see tokenService),
+      // so a stolen refresh JWT would otherwise verify here and act as a
+      // 7-day Bearer credential that survives family revocation. Access
+      // tokens carry `type: 'access'`; reject anything that declares a
+      // different type. Tokens with no type claim are treated as legacy
+      // access tokens and still accepted (access TTL is 15m).
+      if (user?.type && user.type !== 'access') {
+        return res.status(401).json({ error: 'Token is invalid or expired' });
+      }
       // Normalise the decoded payload — tokenService signs with `{id, role}`
       // but legacy middleware/helpers expect `userId`. Provide both so
       // every callsite works without touching the sign side.

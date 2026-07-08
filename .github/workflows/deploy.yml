@@ -128,7 +128,7 @@ jobs:
           chmod 600 ~/.ssh/deploy_key
           ssh-keyscan -H "$HOST" >> ~/.ssh/known_hosts 2>/dev/null
           rsync -avz --delete \
-            -e "ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no" \
+            -e "ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=accept-new" \
             pv-release-${{ github.event.inputs.tag }}.tar.gz \
             "$HOST:$PATH/releases/"
 
@@ -139,7 +139,7 @@ jobs:
           PATH: ${{ secrets.PRODUCTION_PATH }}
           TAG: ${{ github.event.inputs.tag }}
         run: |
-          ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no "$HOST" << EOF
+          ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=accept-new "$HOST" << EOF
             set -e
             cd $PATH
             # Stash the previous release so we can roll back fast

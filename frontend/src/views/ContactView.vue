@@ -2,6 +2,7 @@
 import { ref, computed, onMounted } from 'vue';
 import axios from 'axios';
 import { useTranslate } from '../composables/useTranslate';
+import { buildSafeMapIframe } from '../utils/safeMapEmbed';
 
 const { t } = useTranslate();
 
@@ -38,15 +39,10 @@ onMounted(async () => {
   }
 });
 
-// Sanitize map iframe to prevent XSS — only allow <iframe> from trusted sources
-const sanitizedMap = computed(() => {
-  const raw = settings.value.mapIframeCode;
-  if (!raw) return '';
-  // Only allow iframe tags with src from google.com/maps or yandex
-  const iframeMatch = raw.match(/<iframe[^>]*src=["'](https:\/\/(www\.)?(google\.com\/maps|maps\.google\.|yandex\.[a-z]+\/map)[^"']*)["'][^>]*><\/iframe>/i);
-  if (iframeMatch) return iframeMatch[0];
-  return ''; // Strip everything that isn't a trusted iframe
-});
+// Sanitize map iframe to prevent XSS. We do NOT echo the admin's markup —
+// buildSafeMapIframe extracts only the src URL, validates the host, and
+// rebuilds a clean <iframe> from scratch. See utils/safeMapEmbed.
+const sanitizedMap = computed(() => buildSafeMapIframe(settings.value.mapIframeCode));
 
 const submitForm = async () => {
   isSending.value = true;

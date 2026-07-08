@@ -3,6 +3,7 @@ import { ref, computed, onMounted } from 'vue';
 import axios from 'axios';
 import MediaSelectorModal from '../components/MediaSelectorModal.vue';
 import CountdownPreview from '../components/admin/CountdownPreview.vue';
+import { buildSafeMapIframe } from '../utils/safeMapEmbed';
 
 const activeTab = ref('general');
 const isMediaModalOpen = ref(false);
@@ -42,12 +43,9 @@ const settings = ref({
 const loading = ref(false);
 const saved = ref(false);
 
-const sanitizedMapPreview = computed(() => {
-  const raw = settings.value.mapIframeCode;
-  if (!raw) return '';
-  const m = raw.match(/<iframe[^>]*src=["'][^"']*["'][^>]*><\/iframe>/i);
-  return m ? m[0] : '';
-});
+// Admin-side preview of the embed. Uses the same safe builder as the public
+// storefront so what the admin previews is exactly what visitors get.
+const sanitizedMapPreview = computed(() => buildSafeMapIframe(settings.value.mapIframeCode));
 
 const token = () => localStorage.getItem('token') || '';
 const headers = () => ({ Authorization: `Bearer ${token()}` });

@@ -17,6 +17,12 @@ import { setRefreshCookie, clearRefreshCookie, REFRESH_COOKIE_NAME } from '../ut
 
 const router = Router();
 
+// bcrypt work factor. 12 (~250ms/hash on modern hardware) is the current
+// OWASP-recommended floor. Existing cost-10 hashes still verify fine —
+// bcrypt encodes the cost in the hash, so bcrypt.compare is agnostic; only
+// newly created hashes use the higher factor.
+const BCRYPT_ROUNDS = 12;
+
 // /api/v1/auth/register — 3/hour per IP
 router.post('/register', limit(RATE_LIMITS.auth.register), validate({ body: RegisterSchema }), async (req: Request, res: Response) => {
   try {
@@ -29,7 +35,7 @@ router.post('/register', limit(RATE_LIMITS.auth.register), validate({ body: Regi
       return res.status(400).json({ error: 'Email already in use' });
     }
 
-    const passwordHash = await bcrypt.hash(password, 10);
+    const passwordHash = await bcrypt.hash(password, BCRYPT_ROUNDS);
     const role = 'customer'; // Gamified Ascension: All new users start as customers
 
     const user = await prisma.user.create({
@@ -323,7 +329,7 @@ router.put('/change-password', authenticateJWT, limit(RATE_LIMITS.auth.changePwd
       return res.status(401).json({ error: 'Current password is incorrect' });
     }
 
-    const newHash = await bcrypt.hash(newPassword, 10);
+    const newHash = await bcrypt.hash(newPassword, BCRYPT_ROUNDS);
     await prisma.user.update({
       where: { id: userId },
       data: { passwordHash: newHash }
