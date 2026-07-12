@@ -31,10 +31,15 @@ const isTrustedMapUrl = (rawUrl: string): boolean => {
   }
   if (url.protocol !== 'https:') return false;
   const host = url.hostname.toLowerCase();
-  // Exact host match, or a *.yandex.* / *.google.* map subdomain.
+  // Exact host match from the explicit allowlist.
   if (ALLOWED_HOSTS.includes(host)) {
     // Google embeds live under /maps; Yandex under /map-widget or /maps.
-    if (host.endsWith('google.com') || host === 'www.google.com.tr') {
+    if (
+      host === 'google.com' ||
+      host === 'www.google.com' ||
+      host === 'maps.google.com' ||
+      host === 'www.google.com.tr'
+    ) {
       return url.pathname.startsWith('/maps');
     }
     return true;
