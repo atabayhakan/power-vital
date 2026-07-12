@@ -70,6 +70,7 @@ const resolve = async (id: string) => {
     await load();
     successMsg.value = 'Çözüldü olarak işaretlendi.';
   } catch (e: any) {
+    console.error('[AdminErrorsView] Resolve failed:', e);
     errorMsg.value = e.response?.data?.error || 'Çözüldü olarak işaretlenemedi';
   } finally {
     resolvingId.value = null;
