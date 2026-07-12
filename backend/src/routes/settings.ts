@@ -160,7 +160,7 @@ router.get('/ui-i18n', async (_req: Request, res: Response) => {
 router.put('/', authenticateJWT, requireRole('admin'), validate({ body: SettingsUpdateSchema }), async (req: Request, res: Response) => {
   try {
     const {
-      companyName, address, phone, email, mapIframeCode, logoUrl,
+      companyName, address, phone, email, mapIframeCode, logoUrl, logoScale,
       topbarShippingMsg, topbarPhone, trustBadges, partners, footerLinks, copyrightText,
       homepageBlocks, financeSettings, translations, faqItems,
       campaignEnabled, campaignEndsAt, campaignTitle, campaignCta, campaignLink
@@ -199,6 +199,7 @@ router.put('/', authenticateJWT, requireRole('admin'), validate({ body: Settings
     if (email !== undefined) dataToSave.email = email;
     if (mapIframeCode !== undefined) dataToSave.mapIframeCode = mapIframeCode;
     if (logoUrl !== undefined) dataToSave.logoUrl = logoUrl;
+    if (logoScale !== undefined) dataToSave.logoScale = logoScale === null ? 1 : logoScale;
     if (topbarShippingMsg !== undefined) dataToSave.topbarShippingMsg = topbarShippingMsg;
     if (topbarPhone !== undefined) dataToSave.topbarPhone = topbarPhone;
     if (copyrightText !== undefined) dataToSave.copyrightText = copyrightText;

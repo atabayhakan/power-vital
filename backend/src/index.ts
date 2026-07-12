@@ -270,12 +270,21 @@ logger.info({ uploadDir: staticUploadDir }, '/uploads static serving');
 //   • http://localhost:3000/api/docs.json  — raw OpenAPI 3.1 spec
 registerAllRoutes();
 const openapiDocument = buildOpenApiDocument();
-app.get('/api/docs.json', (_req, res) => res.json(openapiDocument));
-app.use('/api/docs', swaggerUi.serve as any, swaggerUi.setup(openapiDocument, {
-  customSiteTitle: 'Power Vital API Docs',
-  customCss: '.swagger-ui .topbar { display: none }'
-}) as any);
-logger.info('OpenAPI docs at /api/docs');
+// The API docs describe every endpoint, shape, and auth requirement — useful
+// in dev/staging but an information-disclosure surface if left open on the
+// public production host. Expose them only outside production, or when an
+// operator explicitly opts in via ENABLE_API_DOCS=true.
+const docsEnabled = process.env.NODE_ENV !== 'production' || process.env.ENABLE_API_DOCS === 'true';
+if (docsEnabled) {
+  app.get('/api/docs.json', (_req, res) => res.json(openapiDocument));
+  app.use('/api/docs', swaggerUi.serve as any, swaggerUi.setup(openapiDocument, {
+    customSiteTitle: 'Power Vital API Docs',
+    customCss: '.swagger-ui .topbar { display: none }'
+  }) as any);
+  logger.info('OpenAPI docs at /api/docs');
+} else {
+  logger.info('OpenAPI docs disabled in production (set ENABLE_API_DOCS=true to enable)');
+}
 
 // Cache observability middleware — must come AFTER all routes so the
 // `finish` listener catches the final X-Cache header set by handlers.

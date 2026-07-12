@@ -3,6 +3,7 @@ import { ref, computed, onMounted } from 'vue';
 import axios from 'axios';
 import MediaSelectorModal from '../components/MediaSelectorModal.vue';
 import CountdownPreview from '../components/admin/CountdownPreview.vue';
+import { buildSafeMapIframe } from '../utils/safeMapEmbed';
 
 const activeTab = ref('general');
 const isMediaModalOpen = ref(false);
@@ -10,6 +11,7 @@ const activeTargetField = ref<{ type: string, index?: number } | null>(null);
 
 const settings = ref({
   companyName: '', address: '', phone: '', email: '', mapIframeCode: '', logoUrl: '',
+  logoScale: 1,
   topbarShippingMsg: '', topbarPhone: '',
   trustBadges: [] as any[],
   partners: [] as any[],
@@ -42,12 +44,9 @@ const settings = ref({
 const loading = ref(false);
 const saved = ref(false);
 
-const sanitizedMapPreview = computed(() => {
-  const raw = settings.value.mapIframeCode;
-  if (!raw) return '';
-  const m = raw.match(/<iframe[^>]*src=["'][^"']*["'][^>]*><\/iframe>/i);
-  return m ? m[0] : '';
-});
+// Admin-side preview of the embed. Uses the same safe builder as the public
+// storefront so what the admin previews is exactly what visitors get.
+const sanitizedMapPreview = computed(() => buildSafeMapIframe(settings.value.mapIframeCode));
 
 const token = () => localStorage.getItem('token') || '';
 const headers = () => ({ Authorization: `Bearer ${token()}` });
@@ -62,6 +61,7 @@ const fetchSettings = async () => {
       email: res.data.email || '',
       mapIframeCode: res.data.mapIframeCode || '',
       logoUrl: res.data.logoUrl || '',
+      logoScale: typeof res.data.logoScale === 'number' ? res.data.logoScale : 1,
       topbarShippingMsg: res.data.topbarShippingMsg || '',
       topbarPhone: res.data.topbarPhone || '',
       trustBadges: res.data.trustBadges || [],
@@ -237,12 +237,31 @@ onMounted(fetchSettings);
             <h3>🖼️ Site Logosu</h3>
             <p class="help-text">Logo yüklediğinizde navbar ve footer'da otomatik görüntülenir.</p>
             <div class="logo-row">
-              <div class="logo-preview" v-if="settings.logoUrl"><img :src="settings.logoUrl" alt="Logo" /></div>
+              <div class="logo-preview" v-if="settings.logoUrl">
+                <img :src="settings.logoUrl" alt="Logo" :style="{ maxHeight: (44 * settings.logoScale) + 'px' }" />
+              </div>
               <div class="logo-placeholder" v-else>Logo yüklenmemiş</div>
               <div class="logo-actions">
                 <button type="button" class="upload-btn" @click="openMediaSelector('logo')">🖼️ Medya Kütüphanesinden Seç</button>
                 <button type="button" v-if="settings.logoUrl" class="clear-btn" @click="settings.logoUrl = ''">✕ Kaldır</button>
               </div>
+            </div>
+
+            <!-- Logo boyutu (ölçek) — sadece bir logo yüklüyken göster -->
+            <div class="logo-scale-row" v-if="settings.logoUrl">
+              <label class="logo-scale-label">
+                Logo Boyutu
+                <span class="logo-scale-value">{{ Math.round(settings.logoScale * 100) }}%</span>
+              </label>
+              <div class="logo-scale-controls">
+                <input
+                  type="range" min="0.5" max="2" step="0.05"
+                  v-model.number="settings.logoScale"
+                  class="logo-scale-slider"
+                />
+                <button type="button" class="logo-scale-reset" @click="settings.logoScale = 1" title="Varsayılana dön">↺ %100</button>
+              </div>
+              <p class="help-text">Navbar ve footer'daki logo boyutunu ölçekler (%50–%200). Değişiklik kaydettikten sonra sitede uygulanır.</p>
             </div>
           </div>
 
@@ -544,7 +563,16 @@ textarea { width: 100%; padding: 12px; background: rgba(255,255,255,.05); border
 
 /* Logo */
 .logo-row { display: flex; align-items: center; gap: 20px; }
-.logo-preview img { height: 50px; border-radius: 6px; background: rgba(255,255,255,.1); padding: 6px; }
+.logo-preview img { height: auto; max-height: 50px; width: auto; border-radius: 6px; background: rgba(0,0,0,.03); padding: 6px; transition: max-height .15s ease; }
+
+/* Logo boyutu (ölçek) kontrolü */
+.logo-scale-row { margin-top: 18px; padding-top: 16px; border-top: 1px solid rgba(0,0,0,0.06); max-width: 460px; }
+.logo-scale-label { display: flex; align-items: center; justify-content: space-between; font-size: 13px; font-weight: 600; color: var(--color-text-primary); margin-bottom: 8px; }
+.logo-scale-value { font-variant-numeric: tabular-nums; color: var(--color-primary); font-weight: 700; }
+.logo-scale-controls { display: flex; align-items: center; gap: 12px; }
+.logo-scale-slider { flex: 1; accent-color: var(--color-primary); height: 4px; cursor: pointer; }
+.logo-scale-reset { flex-shrink: 0; padding: 6px 10px; font-size: 12px; font-weight: 600; color: var(--color-text-secondary); background: var(--surface-inset); border: 1px solid rgba(0,0,0,0.08); border-radius: 6px; cursor: pointer; }
+.logo-scale-reset:hover { color: var(--color-primary); }
 .logo-placeholder { padding: 16px 24px; background: rgba(255,255,255,.03); border: 1px dashed rgba(255,255,255,.15); border-radius: 8px; font-size: 13px; color: var(--color-text-muted); }
 .logo-actions { display: flex; gap: 10px; align-items: center; }
 .upload-btn { padding: 8px 18px; background: linear-gradient(135deg, var(--color-primary), var(--color-secondary)); color: #fff; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 600; }

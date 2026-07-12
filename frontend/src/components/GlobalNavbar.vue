@@ -25,6 +25,7 @@ const openShareDialog = () => {
 
 const logoUrl = ref('');
 const companyName = ref('Power Vital');
+const logoScale = ref(1);
 
 const openAuthModal = () => {
   window.dispatchEvent(new CustomEvent('open-auth-modal'));
@@ -47,6 +48,7 @@ const fetchSettings = async () => {
     if (res.data) {
       logoUrl.value = res.data.logoUrl || '';
       companyName.value = res.data.companyName || 'Power Vital';
+      logoScale.value = typeof res.data.logoScale === 'number' ? res.data.logoScale : 1;
     }
   } catch (e) {
     // console.error('Failed to load settings', _e);
@@ -69,7 +71,7 @@ onUnmounted(() => {
     <div class="nav-container">
       <!-- Logo -->
       <router-link to="/" class="nav-brand" :class="{ 'has-img': logoUrl }">
-        <img v-if="logoUrl" :src="logoUrl" :alt="companyName" class="nav-logo-img" />
+        <img v-if="logoUrl" :src="logoUrl" :alt="companyName" class="nav-logo-img" :style="{ '--logo-scale': logoScale }" />
         <template v-else>Power<span class="brand-accent">Vital</span></template>
       </router-link>
 
@@ -200,16 +202,17 @@ onUnmounted(() => {
   color: transparent;
 }
 .nav-logo-img {
-  max-width: 260px;
+  --logo-scale: 1;
+  max-width: calc(260px * var(--logo-scale));
   height: auto;
-  max-height: 70px;
+  max-height: calc(70px * var(--logo-scale));
   object-fit: contain;
   transition: max-height var(--duration-normal);
   filter: brightness(1.1) contrast(1.2);
   mix-blend-mode: multiply;
 }
 .is-scrolled .nav-logo-img {
-  max-height: 50px;
+  max-height: calc(50px * var(--logo-scale));
 }
 
 .nav-links { display: flex; gap: 32px; }
@@ -431,8 +434,8 @@ onUnmounted(() => {
   .nav-container { padding: 0 16px; height: 64px; }
   .is-scrolled .nav-container { height: 56px; }
   .nav-brand { font-size: 1.4rem; }
-  .nav-logo-img { max-width: 180px; max-height: 44px; }
-  .is-scrolled .nav-logo-img { max-height: 36px; }
+  .nav-logo-img { max-width: calc(180px * var(--logo-scale)); max-height: calc(44px * var(--logo-scale)); }
+  .is-scrolled .nav-logo-img { max-height: calc(36px * var(--logo-scale)); }
   .desktop-only { display: none !important; }
   .cart-btn { width: 44px; height: 44px; }
 }

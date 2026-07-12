@@ -217,7 +217,16 @@ export const SettingsUpdateSchema = z.object({
   phone: z.string().max(50).optional().nullable(),
   email: z.string().email().optional().nullable().or(z.literal('').transform(() => undefined)),
   mapIframeCode: z.string().max(5000).optional().nullable(),
-  logoUrl: z.string().url().optional().nullable().or(z.literal('').transform(() => undefined)),
+  // Media library returns root-relative paths (e.g. "/uploads/logo.webp"),
+  // not absolute URLs — so accept either "/…" or a full http(s) URL. An
+  // empty string clears the logo.
+  logoUrl: z.string().max(2000)
+    .refine((v) => v.startsWith('/') || /^https?:\/\//i.test(v),
+      'logoUrl must be a root-relative path (/…) or an absolute http(s) URL')
+    .optional().nullable().or(z.literal('').transform(() => undefined)),
+  // Logo size multiplier set by the admin slider (0.5–2.0 in the UI; we
+  // accept a slightly wider band defensively). 1 = default sizing.
+  logoScale: z.number().min(0.3).max(3).optional().nullable(),
   topbarShippingMsg: z.string().max(500).optional().nullable(),
   topbarPhone: z.string().max(50).optional().nullable(),
   copyrightText: z.string().max(500).optional().nullable(),

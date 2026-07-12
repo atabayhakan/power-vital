@@ -1,23 +1,41 @@
 // OpenAPI doc tests — verify the generated /api/docs.json covers every
 // admin endpoint we shipped in this sprint.
 //
-// Why a real fetch instead of inspecting the registry directly?
+// Why serve it from a local Express app instead of inspecting the
+// registry directly?
 //   • Catches drift between the route file and the generated spec —
 //     if a developer adds an endpoint but forgets to call
 //     registry.registerPath, this test fires.
 //   • Catches zod schema mismatch (a schema that doesn't .openapi()-
 //     register produces a $ref to a non-existent schema in the output).
+//
+// This used to fetch the live https://powervital.kg/api/docs.json —
+// a DB-free unit test has no business depending on network access or a
+// production deployment being up. It also broke outright once docs were
+// gated behind NODE_ENV !== 'production' for security (info-disclosure
+// hardening), since prod now 404s on that route by design. Instead we
+// build the same document the real server builds (registerAllRoutes +
+// buildOpenApiDocument, exactly as src/index.ts does) and serve it from
+// an in-process Express app.
 
 import { describe, it, expect } from 'vitest';
+import express from 'express';
+import request from 'supertest';
+import { buildOpenApiDocument } from '../src/openapi/registry';
+import { registerAllRoutes } from '../src/openapi/routes';
 
-const SPEC_URL = 'https://powervital.kg/api/docs.json';
+registerAllRoutes();
+const openapiDocument = buildOpenApiDocument();
+
+const app = express();
+app.get('/api/docs.json', (_req, res) => res.json(openapiDocument));
 
 let cached: any = null;
 async function loadSpec() {
   if (cached) return cached;
-  const res = await fetch(SPEC_URL);
+  const res = await request(app).get('/api/docs.json');
   expect(res.status).toBe(200);
-  cached = await res.json();
+  cached = res.body;
   return cached;
 }
 

@@ -13,6 +13,12 @@ jobs:
     name: Audit new/changed dependencies
     runs-on: ubuntu-latest
     timeout-minutes: 5
+    # Non-blocking until the repo's "Dependency graph" setting (Settings →
+    # Security → Code security and analysis) is enabled — the action hard
+    # errors with "Dependency review is not supported on this repository"
+    # when it's off, which would otherwise block every PR indefinitely.
+    # Remove this once the setting is turned on.
+    continue-on-error: true
 
     steps:
       - uses: actions/checkout@v4
@@ -24,7 +30,7 @@ jobs:
           # of severity moderate or higher.
           fail-on-severity: moderate
           # Show the reviewer a summary comment on the PR.
-          comment-summary-options: "--licenses"
+          comment-summary-in-pr: always
           # Skip license checks entirely — we don't have a license policy
           # yet and false-positives are noisy.
-          licenses: skip
+          license-check: false

@@ -69,6 +69,7 @@ const writeCache = (key: string, entry: CacheEntry) => {
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token');
+    config.headers = config.headers || {};
     if (token) {
       config.headers['Authorization'] = `Bearer ${token}`;
     }

@@ -16,6 +16,7 @@ interface ClientErrorRow {
   locale: string | null;
   userId: string | null;
   resolved: boolean;
+  resolvedAt?: string | null;
   createdAt: string;
 }
 
@@ -64,12 +65,26 @@ const resolve = async (id: string) => {
     // The id is dynamic (route param), so the literal-path typing in
     // openapi-client can't see this specific value. We cast to `any`
     // only at the call site to keep the rest of the function strict.
-     
-    await (apiPost as any)(`/api/v1/client-logs/${id}/resolve`, { resolvedNote: resolveNotes[id] || undefined });
+
+    const { data } = await (apiPost as any)(`/api/v1/client-logs/${id}/resolve`, { resolvedNote: resolveNotes[id] || undefined });
     delete resolveNotes[id];
-    await load();
+    // Update local state instead of re-fetching the whole list: a full
+    // reload here toggled the unrelated "Yenile" button through its
+    // loading text AND re-rendered the entire list in several separate
+    // passes, so every resolve visibly jolted the whole page (rows
+    // jumping up/down) instead of just removing the one row.
+    if (includeResolved.value) {
+      const row = errors.value.find(r => r.id === id);
+      if (row) {
+        row.resolved = true;
+        if (data?.resolvedAt) row.resolvedAt = data.resolvedAt;
+      }
+    } else {
+      errors.value = errors.value.filter(r => r.id !== id);
+    }
     successMsg.value = 'Çözüldü olarak işaretlendi.';
   } catch (e: any) {
+    console.error('[AdminErrorsView] Resolve failed:', e);
     errorMsg.value = e.response?.data?.error || 'Çözüldü olarak işaretlenemedi';
   } finally {
     resolvingId.value = null;

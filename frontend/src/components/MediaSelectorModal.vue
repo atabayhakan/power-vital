@@ -236,56 +236,58 @@ watch(() => props.isOpen, (newVal) => {
 <style scoped>
 .modal-overlay {
   position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-  background: rgba(0,0,0,0.7); backdrop-filter: blur(8px);
+  background: rgba(26, 22, 18, 0.45); backdrop-filter: blur(8px);
   z-index: 1000; display: flex; align-items: center; justify-content: center;
 }
 
 .modal-content {
   width: 90vw; max-width: 1000px; height: 80vh;
-  background: #18181b; border: 1px solid rgba(255,255,255,0.1); border-radius: 20px;
+  background: var(--surface-card); border: 1px solid rgba(0,0,0,0.06); border-radius: 20px;
+  box-shadow: 0 24px 60px rgba(26, 22, 18, 0.25);
   display: flex; flex-direction: column; overflow: hidden;
 }
 
 .modal-header {
   display: flex; justify-content: space-between; align-items: center;
-  padding: 16px 24px; border-bottom: 1px solid rgba(255,255,255,0.05);
+  padding: 16px 24px; border-bottom: 1px solid rgba(0,0,0,0.06);
 }
-.modal-header h2 { margin: 0; font-size: 20px; color: #fff; font-family: 'Outfit', sans-serif; }
-.close-btn { background: transparent; border: none; color: #fff; font-size: 20px; cursor: pointer; }
+.modal-header h2 { margin: 0; font-size: 20px; color: var(--text-primary); font-family: 'Outfit', sans-serif; }
+.close-btn { background: transparent; border: none; color: var(--text-secondary); font-size: 20px; cursor: pointer; }
+.close-btn:hover { color: var(--text-primary); }
 
 .library-layout { display: flex; flex: 1; overflow: hidden; }
 
 /* SIDEBAR */
 .folders-sidebar {
-  width: 220px; background: rgba(0,0,0,0.2); border-right: 1px solid rgba(255,255,255,0.05);
+  width: 220px; background: var(--surface-inset); border-right: 1px solid rgba(0,0,0,0.06);
   padding: 16px; overflow-y: auto;
 }
-.folders-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; color: #fff; }
+.folders-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; color: var(--text-primary); }
 .folders-header h3 { margin: 0; font-size: 14px; }
 .btn-new-folder { background: var(--color-primary); color: white; border: none; border-radius: 6px; width: 24px; height: 24px; cursor: pointer; }
 
 .new-folder-form { display: flex; gap: 8px; margin-bottom: 16px; }
-.new-folder-form input { flex: 1; padding: 6px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #fff; border-radius: 4px; font-size: 12px; }
+.new-folder-form input { flex: 1; padding: 6px; background: var(--surface-white); border: 1px solid rgba(0,0,0,0.12); color: var(--text-primary); border-radius: 4px; font-size: 12px; }
 .btn-create { background: #10b981; border: none; color: #fff; border-radius: 4px; padding: 0 8px; cursor: pointer; }
 
 .folder-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 4px; }
-.folder-list li { padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 13px; color: #a1a1aa; display: flex; justify-content: space-between; align-items: center; }
-.folder-list li:hover { background: rgba(255,255,255,0.05); color: #fff; }
-.folder-list li.active { background: rgba(188,74,60, 0.2); color: #fff; font-weight: bold; }
+.folder-list li { padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 13px; color: var(--text-secondary); display: flex; justify-content: space-between; align-items: center; }
+.folder-list li:hover { background: rgba(0,0,0,0.04); color: var(--text-primary); }
+.folder-list li.active { background: rgba(188,74,60, 0.12); color: var(--color-primary); font-weight: bold; }
 .btn-del-folder { background: transparent; border: none; opacity: 0; cursor: pointer; }
 .folder-list li:hover .btn-del-folder { opacity: 1; }
 
 /* MAIN */
 .library-main { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; }
-.upload-zone { border: 2px dashed rgba(255,255,255,0.2); border-radius: 12px; padding: 20px; text-align: center; color: #a1a1aa; cursor: pointer; margin-bottom: 20px; transition: 0.2s; }
+.upload-zone { border: 2px dashed rgba(0,0,0,0.18); border-radius: 12px; padding: 20px; text-align: center; color: var(--text-secondary); cursor: pointer; margin-bottom: 20px; transition: 0.2s; }
 .upload-zone:hover { border-color: var(--color-primary); background: rgba(188,74,60,0.05); }
 
 .media-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 16px; }
-.media-card { background: #27272a; border-radius: 12px; overflow: hidden; height: 140px; position: relative; }
+.media-card { background: var(--surface-inset); border: 1px solid rgba(0,0,0,0.06); border-radius: 12px; overflow: hidden; height: 140px; position: relative; }
 .media-preview { width: 100%; height: 100%; background-size: cover; background-position: center; }
 
 .media-actions {
-  position: absolute; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(2px);
+  position: absolute; inset: 0; background: rgba(26, 22, 18, 0.55); backdrop-filter: blur(2px);
   display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 10px; opacity: 0; transition: 0.2s;
 }
 .media-card:hover .media-actions { opacity: 1; }
@@ -294,7 +296,7 @@ watch(() => props.isOpen, (newVal) => {
 .select-btn { background: var(--color-primary); color: #fff; }
 .delete-btn { background: #ef4444; color: #fff; }
 
-.empty-state { grid-column: 1 / -1; text-align: center; color: #71717a; padding: 40px; }
+.empty-state { grid-column: 1 / -1; text-align: center; color: var(--text-muted); padding: 40px; }
 .upload-error { color: #ef4444; font-size: 12px; margin-top: 8px; }
 .upload-zone.is-uploading { border-color: var(--color-primary); background: rgba(188,74,60,0.05); }
 </style>
