@@ -16,6 +16,7 @@ interface ClientErrorRow {
   locale: string | null;
   userId: string | null;
   resolved: boolean;
+  resolvedAt?: string | null;
   createdAt: string;
 }
 
