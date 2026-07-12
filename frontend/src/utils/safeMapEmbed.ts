@@ -62,7 +62,7 @@ export const buildSafeMapIframe = (raw: string | null | undefined): string => {
   // already been confirmed to contain no quote characters by the match above.
   return (
     `<iframe src="${src}" width="100%" height="100%" style="border:0" ` +
-    `loading="lazy" referrerpolicy="no-referrer-when-downgrade" ` +
-    `allowfullscreen></iframe>`
+    'loading="lazy" referrerpolicy="no-referrer-when-downgrade" ' +
+    'allowfullscreen></iframe>'
   );
 };

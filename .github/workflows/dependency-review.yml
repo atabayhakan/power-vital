@@ -24,7 +24,7 @@ jobs:
           # of severity moderate or higher.
           fail-on-severity: moderate
           # Show the reviewer a summary comment on the PR.
-          comment-summary-options: "--licenses"
+          comment-summary-in-pr: always
           # Skip license checks entirely — we don't have a license policy
           # yet and false-positives are noisy.
-          licenses: skip
+          license-check: false
