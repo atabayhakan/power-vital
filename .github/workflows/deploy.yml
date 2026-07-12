@@ -138,6 +138,14 @@ jobs:
           HOST: ${{ secrets.PRODUCTION_HOST }}
           PATH: ${{ secrets.PRODUCTION_PATH }}
           TAG: ${{ github.event.inputs.tag }}
+          # Was previously referenced below as $DB_PASSWORD without ever
+          # being defined — the runner's shell expanded it to an empty
+          # string, so `mysql -p$DB_PASSWORD` became bare `-p`, which
+          # makes the client prompt interactively for a password instead
+          # of using one. In a non-interactive SSH heredoc that just
+          # fails (or hangs), so the FULLTEXT migration line never
+          # actually ran automatically; `|| true` silently swallowed it.
+          DB_PASSWORD: ${{ secrets.PRODUCTION_DB_PASSWORD }}
         run: |
           ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=accept-new "$HOST" << EOF
             set -e
@@ -148,8 +156,10 @@ jobs:
             tar -xzf releases/pv-release-$TAG.tar.gz -C releases/$TAG --strip-components=1
             rm -rf current
             ln -s releases/$TAG current
-            # Run the FULLTEXT migration (idempotent)
-            mysql -h 127.0.0.1 -u pv_user -p$DB_PASSWORD pv_production < current/prisma/migrations/add_fulltext_search.sql || true
+            # Run the additive migrations (each is idempotent — safe to
+            # re-run on every deploy even if already applied).
+            mysql -h 127.0.0.1 -u pv_user -p'$DB_PASSWORD' pv_production < current/prisma/migrations/add_fulltext_search.sql || true
+            mysql -h 127.0.0.1 -u pv_user -p'$DB_PASSWORD' pv_production < current/prisma/migrations/add_logo_scale.sql || true
             # Restart via PM2 (assumes app is named "pv-backend")
             pm2 restart pv-backend
             pm2 save
