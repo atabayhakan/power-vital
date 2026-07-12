@@ -10,6 +10,7 @@ const { t } = useTranslate();
 const settings = ref({
   companyName: 'Power Vital',
   logoUrl: '',
+  logoScale: 1,
   address: 'İstanbul, Türkiye',
   phone: '+90 850 123 45 67',
   email: 'info@powervital.com',
@@ -67,6 +68,7 @@ onMounted(async () => {
     if (res.data) {
       settings.value.companyName = res.data.companyName || settings.value.companyName;
       settings.value.logoUrl = res.data.logoUrl || '';
+      settings.value.logoScale = typeof res.data.logoScale === 'number' ? res.data.logoScale : 1;
       settings.value.address = res.data.address || settings.value.address;
       settings.value.phone = res.data.phone || settings.value.phone;
       settings.value.email = res.data.email || settings.value.email;
@@ -147,7 +149,7 @@ const paymentProviders = [
       <div class="footer-grid">
         <!-- Col 1: Brand -->
         <div class="footer-brand">
-          <img v-if="settings.logoUrl" :src="settings.logoUrl" :alt="settings.companyName" class="footer-logo-img" />
+          <img v-if="settings.logoUrl" :src="settings.logoUrl" :alt="settings.companyName" class="footer-logo-img" :style="{ '--logo-scale': settings.logoScale }" />
           <h2 v-else class="footer-logo">Power<span class="footer-logo__accent">Vital</span></h2>
           <p class="footer-desc">{{ settings.footerLinks.description }}</p>
 
@@ -454,9 +456,10 @@ const paymentProviders = [
 }
 .footer-logo__accent { color: var(--pv-red, #BC4A3C); }
 .footer-logo-img {
-  max-width: 280px;
+  --logo-scale: 1;
+  max-width: calc(280px * var(--logo-scale));
   height: auto;
-  max-height: 80px;
+  max-height: calc(80px * var(--logo-scale));
   object-fit: contain;
   filter: brightness(1.1) contrast(1.2);
   mix-blend-mode: multiply;
