@@ -537,6 +537,79 @@
           "createdAt"
         ]
       },
+      "PaginationEnvelope<FinanceWithdrawal>": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FinanceWithdrawal"
+            }
+          },
+          "total": {
+            "type": "integer",
+            "description": "Total rows matching the query"
+          },
+          "page": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "hasMore": {
+            "type": "boolean",
+            "description": "True if there is at least one more page"
+          }
+        },
+        "required": [
+          "items",
+          "total",
+          "page",
+          "limit",
+          "hasMore"
+        ]
+      },
+      "FinanceWithdrawal": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "amount": {
+            "type": "number"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "description": "pending | approved | rejected"
+          },
+          "bankInfo": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "createdAt": {
+            "type": "string"
+          },
+          "updatedAt": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "amount",
+          "currency",
+          "status",
+          "createdAt",
+          "updatedAt"
+        ],
+        "description": "FinanceWithdrawal"
+      },
       "PaginationEnvelope<T>": {
         "type": "object",
         "properties": {
@@ -3196,6 +3269,57 @@
         "responses": {
           "201": {
             "description": "Withdrawal request created"
+          }
+        }
+      }
+    },
+    "/api/v1/finance/withdrawals": {
+      "get": {
+        "tags": [
+          "Finance"
+        ],
+        "description": "List the authenticated user's own withdrawal requests (paginated, newest first)",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1
+            },
+            "required": false,
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 200,
+              "default": 50
+            },
+            "required": false,
+            "name": "limit",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Paginated envelope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginationEnvelope<FinanceWithdrawal>"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated"
           }
         }
       }

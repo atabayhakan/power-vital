@@ -1669,6 +1669,52 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/finance/withdrawals": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description List the authenticated user's own withdrawal requests (paginated, newest first) */
+        get: {
+            parameters: {
+                query?: {
+                    page?: number;
+                    limit?: number;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Paginated envelope */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["PaginationEnvelope<FinanceWithdrawal>"];
+                    };
+                };
+                /** @description Not authenticated */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/finance/transactions": {
         parameters: {
             query?: never;
@@ -4853,6 +4899,26 @@ export interface components {
             address: string | null;
             receiptImageUrl: string | null;
             createdAt: string;
+        };
+        "PaginationEnvelope<FinanceWithdrawal>": {
+            items: components["schemas"]["FinanceWithdrawal"][];
+            /** @description Total rows matching the query */
+            total: number;
+            page: number;
+            limit: number;
+            /** @description True if there is at least one more page */
+            hasMore: boolean;
+        };
+        /** @description FinanceWithdrawal */
+        FinanceWithdrawal: {
+            id: string;
+            amount: number;
+            currency: string;
+            /** @description pending | approved | rejected */
+            status: string;
+            bankInfo?: string | null;
+            createdAt: string;
+            updatedAt: string;
         };
         "PaginationEnvelope<T>": {
             items: components["schemas"]["AdminOrderListItem"][];

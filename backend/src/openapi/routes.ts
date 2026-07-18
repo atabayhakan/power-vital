@@ -118,6 +118,19 @@ const FinanceTransaction = z.object({
   createdAt: z.string()
 }).openapi('FinanceTransaction');
 
+// Authenticated user's own withdrawal row (safe fields only — no userId leak).
+// `.describe()` doubles as the PaginationEnvelope component suffix so this
+// endpoint gets its own typed envelope instead of the shared `PaginationEnvelope<T>`.
+const FinanceWithdrawal = z.object({
+  id: z.string(),
+  amount: z.number(),
+  currency: z.string(),
+  status: z.string().describe('pending | approved | rejected'),
+  bankInfo: z.string().nullable().optional(),
+  createdAt: z.string(),
+  updatedAt: z.string()
+}).openapi('FinanceWithdrawal').describe('FinanceWithdrawal');
+
 // ─── Trends endpoint schemas ────────────────────────────────────────────────
 const DailyBucket = z.object({
   date: z.string().describe('YYYY-MM-DD'),
@@ -678,6 +691,20 @@ export const registerFinanceRoutes = () => {
     security: [{ bearerAuth: [] }],
     request: { body: { content: { 'application/json': { schema: WithdrawSchema } } } },
     responses: { 201: { description: 'Withdrawal request created' } }
+  });
+
+  registry.registerPath({
+    method: 'get', path: '/api/v1/finance/withdrawals',
+    tags: [tag.name], description: 'List the authenticated user\'s own withdrawal requests (paginated, newest first)',
+    security: [{ bearerAuth: [] }],
+    request: { query: PaginationQuerySchema },
+    responses: {
+      200: {
+        description: 'Paginated envelope',
+        content: { 'application/json': { schema: PaginationEnvelope(FinanceWithdrawal) } }
+      },
+      401: { description: 'Not authenticated' }
+    }
   });
 
   registry.registerPath({

@@ -151,6 +151,36 @@ router.post('/withdraw', authenticateJWT, validate({ body: WithdrawSchema }), as
   }
 });
 
+// GET /api/v1/finance/withdrawals - Authenticated user's OWN withdrawal requests
+router.get('/withdrawals', authenticateJWT, validate({ query: PaginationQuerySchema }), async (req: any, res: Response) => {
+  try {
+    const userId = req.user.id;
+    const { page, limit, skip, take } = parsePagination(req.query as any);
+
+    // 🛡️ Sadece güvenli alanlar döner (select whitelist) ve where koşulundaki
+    // userId sayesinde kullanıcı asla başkasının taleplerini göremez.
+    const safeSelect = {
+      id: true, amount: true, currency: true, status: true,
+      bankInfo: true, createdAt: true, updatedAt: true
+    } as const;
+
+    const [requests, total] = await Promise.all([
+      prisma.withdrawalRequest.findMany({
+        where: { userId },
+        select: safeSelect,
+        orderBy: { createdAt: 'desc' },
+        skip, take
+      }),
+      prisma.withdrawalRequest.count({ where: { userId } })
+    ]);
+
+    res.json(envelope(requests, total, page, limit));
+  } catch (error: any) {
+    logger.error({ err: error }, 'Withdrawals List Error:');
+    res.status(500).json({ error: 'Failed to fetch withdrawal requests' });
+  }
+});
+
 // GET /api/v1/finance/transactions - User transaction history
 router.get('/transactions', authenticateJWT, validate({ query: PaginationQuerySchema }), async (req: any, res: Response) => {
   try {
