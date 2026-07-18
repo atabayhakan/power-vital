@@ -28,8 +28,14 @@ rotate-db-password.cjs
 scripts-archive/
 /*.cjs
 scripts/check-db.cjs
+scripts/generate-new-secrets.mjs
+scripts/smtp-which-password.mjs
+scripts/verify-smtp.mjs
 prod.json
 *.tsbuildinfo
+
+# Stray CI dumps — not project artifacts
+/runs.json
 # Deploy docs currently embed a root password + SSH key — scrub before tracking
 CI-CD.md
 PRODUCTION-DEPLOY.md
