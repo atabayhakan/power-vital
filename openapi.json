@@ -2576,7 +2576,7 @@
                     "anyOf": [
                       {
                         "type": "string",
-                        "format": "uri"
+                        "maxLength": 2000
                       },
                       {
                         "type": "string",
@@ -2588,6 +2588,14 @@
                         "type": "null"
                       }
                     ]
+                  },
+                  "logoScale": {
+                    "type": [
+                      "number",
+                      "null"
+                    ],
+                    "minimum": 0.3,
+                    "maximum": 3
                   },
                   "topbarShippingMsg": {
                     "type": [
@@ -2657,18 +2665,120 @@
                     ]
                   },
                   "homepageBlocks": {
-                    "anyOf": [
-                      {
-                        "type": "string"
+                    "type": [
+                      "object",
+                      "null"
+                    ],
+                    "properties": {
+                      "storefront": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "string",
+                              "minLength": 1,
+                              "maxLength": 200
+                            },
+                            "type": {
+                              "type": "string",
+                              "minLength": 1,
+                              "maxLength": 100
+                            },
+                            "position": {
+                              "type": "integer"
+                            },
+                            "visible": {
+                              "type": "boolean"
+                            },
+                            "data": {
+                              "type": "object",
+                              "additionalProperties": {}
+                            }
+                          },
+                          "required": [
+                            "id",
+                            "type",
+                            "position",
+                            "visible",
+                            "data"
+                          ]
+                        },
+                        "maxItems": 100
                       },
-                      {
-                        "type": "object",
-                        "additionalProperties": {}
+                      "product": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "string",
+                              "minLength": 1,
+                              "maxLength": 200
+                            },
+                            "type": {
+                              "type": "string",
+                              "minLength": 1,
+                              "maxLength": 100
+                            },
+                            "position": {
+                              "type": "integer"
+                            },
+                            "visible": {
+                              "type": "boolean"
+                            },
+                            "data": {
+                              "type": "object",
+                              "additionalProperties": {}
+                            }
+                          },
+                          "required": [
+                            "id",
+                            "type",
+                            "position",
+                            "visible",
+                            "data"
+                          ]
+                        },
+                        "maxItems": 100
                       },
-                      {
-                        "type": "null"
+                      "cart": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "string",
+                              "minLength": 1,
+                              "maxLength": 200
+                            },
+                            "type": {
+                              "type": "string",
+                              "minLength": 1,
+                              "maxLength": 100
+                            },
+                            "position": {
+                              "type": "integer"
+                            },
+                            "visible": {
+                              "type": "boolean"
+                            },
+                            "data": {
+                              "type": "object",
+                              "additionalProperties": {}
+                            }
+                          },
+                          "required": [
+                            "id",
+                            "type",
+                            "position",
+                            "visible",
+                            "data"
+                          ]
+                        },
+                        "maxItems": 100
                       }
-                    ]
+                    }
                   },
                   "financeSettings": {
                     "anyOf": [

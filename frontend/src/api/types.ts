@@ -1007,6 +1007,7 @@ export interface paths {
                         email?: string | "" | null;
                         mapIframeCode?: string | null;
                         logoUrl?: string | "" | null;
+                        logoScale?: number | null;
                         topbarShippingMsg?: string | null;
                         topbarPhone?: string | null;
                         copyrightText?: string | null;
@@ -1015,8 +1016,34 @@ export interface paths {
                         footerLinks?: string | unknown[] | {
                             [key: string]: unknown;
                         } | null;
-                        homepageBlocks?: string | {
-                            [key: string]: unknown;
+                        homepageBlocks?: {
+                            storefront?: {
+                                id: string;
+                                type: string;
+                                position: number;
+                                visible: boolean;
+                                data: {
+                                    [key: string]: unknown;
+                                };
+                            }[];
+                            product?: {
+                                id: string;
+                                type: string;
+                                position: number;
+                                visible: boolean;
+                                data: {
+                                    [key: string]: unknown;
+                                };
+                            }[];
+                            cart?: {
+                                id: string;
+                                type: string;
+                                position: number;
+                                visible: boolean;
+                                data: {
+                                    [key: string]: unknown;
+                                };
+                            }[];
                         } | null;
                         financeSettings?: string | {
                             [key: string]: unknown;
