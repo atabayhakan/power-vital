@@ -424,6 +424,9 @@ onMounted(() => {
         <p class="bc-sub">{{ t('admin.broadcast.subtitle') }}</p>
       </div>
       <div class="bc-meta">
+        <router-link to="/admin-push-analytics" class="bc-link">
+          📊 {{ t('admin.broadcast.viewAnalytics') }} →
+        </router-link>
         <span class="bc-tag">ADMIN</span>
       </div>
     </header>
@@ -895,6 +898,12 @@ onMounted(() => {
   background: var(--pv-red, #BC4A3C); color: #fff; padding: 0.25rem 0.6rem;
   border-radius: 6px; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.5px;
 }
+.bc-meta { display: flex; align-items: center; gap: 12px; }
+.bc-link {
+  font-size: 0.8rem; font-weight: 700; color: #3b82f6; text-decoration: none;
+  white-space: nowrap;
+}
+.bc-link:hover { text-decoration: underline; }
 
 /* Tabs */
 .bc-tabs {

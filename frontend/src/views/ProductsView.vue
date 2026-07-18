@@ -3,6 +3,7 @@ import { ref, computed, onMounted, onUnmounted } from 'vue';
 import axios from 'axios';
 import { useI18n } from 'vue-i18n';
 import { calculatePrice } from '../utils/PriceEngine';
+import { downloadCsv } from '../utils/csvDownload';
 import MediaSelectorModal from '../components/MediaSelectorModal.vue';
 
 interface AccordionEntry {
@@ -264,6 +265,25 @@ const deleteProduct = async (product: Product) => {
 };
 
 const fmtKgs = (n: any) => Math.round(Number(n)).toLocaleString('ru-RU');
+
+// CSV dışa aktarım — OrdersView/UserManagementView ile aynı kalıp:
+// auth header'lı fetch + blob download (utils/csvDownload).
+const isExporting = ref(false);
+const exportProductsCsv = async () => {
+  isExporting.value = true;
+  try {
+    await downloadCsv({
+      url: '/api/v1/admin/bulk/products.csv',
+      filename: 'products.csv',
+      token: token()
+    });
+  } catch (e: any) {
+    alert(t('admin.bulk.error', { msg: e?.response?.data?.error || e.message }));
+  } finally {
+    isExporting.value = false;
+  }
+};
+
 onMounted(fetchProducts);
 </script>
 
@@ -303,7 +323,12 @@ onMounted(fetchProducts);
         <span class="result-count">
           <strong>{{ filteredProducts.length }}</strong> / {{ products.length }} ürün
         </span>
-        <button v-if="productQuery" class="clear-link" @click="productQuery = ''">✕ Aramayı temizle</button>
+        <div class="table-toolbar-actions">
+          <button type="button" class="csv-export-btn" :disabled="isExporting" @click="exportProductsCsv">
+            📥 {{ t('admin.bulk.productsExport') }}
+          </button>
+          <button v-if="productQuery" class="clear-link" @click="productQuery = ''">✕ Aramayı temizle</button>
+        </div>
       </div>
       <div v-if="filteredProducts.length === 0" class="empty-state">
         <p>🔍 "{{ productQuery }}" için ürün bulunamadı.</p>
@@ -522,6 +547,23 @@ onMounted(fetchProducts);
   padding: 0 8px 16px; font-size: 0.85rem; color: rgba(255,255,255,0.6);
 }
 .result-count strong { color: #fff; font-weight: 800; }
+.table-toolbar-actions { display: flex; align-items: center; gap: 14px; }
+.csv-export-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border: 1px solid rgba(59, 130, 246, 0.5);
+  background: rgba(59, 130, 246, 0.15);
+  color: #93c5fd;
+  font-weight: 700;
+  font-size: 13px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.csv-export-btn:hover:not(:disabled) { background: rgba(59, 130, 246, 0.3); }
+.csv-export-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 .clear-link {
   background: none; border: 0; color: var(--pv-red);
   cursor: pointer; font-size: 0.82rem; font-weight: 600;

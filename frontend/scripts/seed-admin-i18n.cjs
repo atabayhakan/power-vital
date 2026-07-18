@@ -63,9 +63,6 @@ const I18N = {
                                     ru: 'В этом продукте нет массивов для перевода.',
                                     kg: 'Бул продуктта которулуучу массив талаалары жок.' },
 
-  // ─── I18n Product (redirect stub) ─────────────────────────────────────
-  'admin.i18nProduct.redirecting': { tr: 'Yönlendiriliyor…',             ru: 'Перенаправление…',                    kg: 'Багытталууда…' },
-
   // ─── I18n UI Strings ──────────────────────────────────────────────────
   'admin.i18nUi.title':          { tr: 'Arayüz Metinleri',              ru: 'UI строки',                           kg: 'UI саптар' },
   'admin.i18nUi.subtitle':       { tr: 'Butonlar, menüler, sistem mesajları — sitedeki tüm sabit yazılar. Düzenle, çık (otomatik kaydedilir). Varsayılana eşitlersen geri döner.',

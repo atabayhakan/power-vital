@@ -950,9 +950,6 @@
       "empty": "• Boş",
       "noArrays": "Bu üründe çevrilecek dizi alanı yok."
     },
-    "i18nProduct": {
-      "redirecting": "Yönlendiriliyor…"
-    },
     "i18nUi": {
       "title": "Arayüz Metinleri",
       "subtitle": "Butonlar, menüler, sistem mesajları — sitedeki tüm sabit yazılar. Düzenle, çık (otomatik kaydedilir). Varsayılana eşitlersen geri döner.",
@@ -962,8 +959,13 @@
       "loading": "Yükleniyor…",
       "noResults": "Sonuç yok"
     },
+    "cms": {
+      "goPageBuilder": "Ana sayfa bölüm sıralaması (Sayfa Kurucu)",
+      "goSliderManage": "Slider içerikleri Slider Yönetimi'nde"
+    },
     "broadcast": {
       "subtitle": "Web Push API ile herhangi bir kullanıcıya özel bildirim gönder veya geçmiş broadcast'ları denetle.",
+      "viewAnalytics": "Hedef kitleyi analizde gör",
       "step1Title": "1. Hedef Kullanıcı",
       "tabMulti": "👥 Çoklu",
       "searching": "⏳ Aranıyor…",
@@ -1025,6 +1027,7 @@
     },
     "pushAnalytics": {
       "subtitle": "Web Push bildirim performansı — event bazlı breakdown, 14 günlük trend, en aktif adminler.",
+      "backToBroadcast": "Broadcast'e dön",
       "paused": "⏸️ duraklatıldı",
       "deliveryRate": "Teslim Oranı",
       "errorRate": "Hata Oranı",

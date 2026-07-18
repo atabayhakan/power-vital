@@ -471,6 +471,12 @@ const previewMode = ref<'desktop' | 'mobile'>('desktop');
           </button>
         </div>
 
+        <!-- Ana sayfa hero slider'ı bir page-builder bloğu değil — içeriği
+             Slider Yönetimi'nde düzenlenir. Çapraz bağlantı burada. -->
+        <router-link v-if="selectedPage === 'storefront'" to="/cms/slider-manage" class="pb-slider-hint">
+          🖼️ {{ t('admin.cms.goSliderManage') }} →
+        </router-link>
+
         <draggable
           :model-value="activeBlocks"
           @change="onDragChange"
@@ -861,6 +867,11 @@ const previewMode = ref<'desktop' | 'mobile'>('desktop');
 .pb-elsewhere-hint p { margin: 0 0 8px; font-size: 13px; color: #6b7280; line-height: 1.5; }
 .pb-elsewhere-hint__link { font-size: 13px; font-weight: 700; color: #BC4A3C; text-decoration: none; }
 .pb-elsewhere-hint__link:hover { text-decoration: underline; }
+.pb-slider-hint {
+  display: inline-block; margin: 0 0 10px; font-size: 12.5px; font-weight: 700;
+  color: #3b82f6; text-decoration: none;
+}
+.pb-slider-hint:hover { text-decoration: underline; }
 
 /* Picker row */
 .pb-picker-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }

@@ -2,8 +2,8 @@
 // AdminI18nView — Çeviri Merkezi ana sayfası (2026-06 redesign).
 //
 // Sadece 6 model kartı + her kartta "Eksik" badge.
-// Kart tıklanınca /i18n/{model} sayfasına yönlendirir (AdminI18nProductView
-// gibi) — orada inline 4-kolon editör var.
+// Kart tıklanınca /i18n/{model} sayfasına yönlendirir — orada inline
+// 4-kolon editör var.
 //
 // Burada liste/inline edit yok — sadece giriş noktası.
 import { ref, onMounted, computed } from 'vue';

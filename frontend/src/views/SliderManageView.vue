@@ -2,6 +2,9 @@
 import { ref, onMounted } from 'vue';
 import api from '../utils/api';
 import MediaSelectorModal from '../components/MediaSelectorModal.vue';
+import { useTranslate } from '../composables/useTranslate';
+
+const { t } = useTranslate();
 
 interface Slide {
   id: string; title: string; subtitle: string | null;
@@ -173,6 +176,9 @@ onMounted(fetchSlides);
         <h2>🖼️ Kurumsal Slider Yönetimi</h2>
         <p class="subtitle">Pazarlama kampanyalarınızı esnek görünümler ve zamanlama ile yönetin.</p>
       </div>
+      <router-link to="/cms/page-builder" class="cross-link">
+        🧱 {{ t('admin.cms.goPageBuilder') }} →
+      </router-link>
     </header>
 
     <div class="admin-panel-grid">
@@ -322,6 +328,11 @@ onMounted(fetchSlides);
 .topbar { margin-bottom: 16px; display: flex; justify-content: space-between; align-items: flex-end; }
 .topbar h2 { font-size: 20px; font-weight: 700; margin:0; color: var(--color-text-main); }
 .subtitle { color: var(--color-text-muted); font-size: 13px; margin-top: 2px; }
+.cross-link {
+  font-size: 13px; font-weight: 700; color: #3b82f6; text-decoration: none;
+  white-space: nowrap; padding-bottom: 2px;
+}
+.cross-link:hover { text-decoration: underline; }
 
 .admin-panel-grid { display: grid; grid-template-columns: 1.2fr 1fr; gap: 20px; align-items: start; }
 

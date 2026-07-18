@@ -220,6 +220,9 @@ onMounted(fetchData);
         <p class="pa-sub">{{ t('admin.pushAnalytics.subtitle') }}</p>
       </div>
       <div class="pa-meta">
+        <router-link to="/admin-broadcast" class="pa-link">
+          📣 {{ t('admin.pushAnalytics.backToBroadcast') }} →
+        </router-link>
         <button class="pa-refresh" :disabled="isLoading" @click="refresh">
           {{ isLoading ? '⏳' : '🔄' }} Yenile
         </button>
@@ -492,6 +495,11 @@ export function rateClass(sent: number, total: number): string {
   background: transparent; cursor: pointer; font-size: 0.85rem; font-weight: 500;
   color: inherit;
 }
+.pa-link {
+  font-size: 0.85rem; font-weight: 600; color: #3b82f6; text-decoration: none;
+  white-space: nowrap; align-self: center;
+}
+.pa-link:hover { text-decoration: underline; }
 .pa-refresh:hover:not(:disabled) { background: rgba(0,0,0,0.04); }
 .pa-refresh:disabled { opacity: 0.5; cursor: not-allowed; }
 .pa-gen { font-size: 0.7rem; opacity: 0.55; display: flex; flex-direction: column; align-items: flex-end; gap: 0.2rem; }
