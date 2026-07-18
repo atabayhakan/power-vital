@@ -1,24 +1,27 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import axios from 'axios';
+import { useTranslate } from '../composables/useTranslate';
 
-// --- Inputs / Sliders ---
+const { t } = useTranslate();
+
+// --- Senaryo girdileri (saf what-if keşfi — canlı config'in parçası DEĞİL) ---
 const totalRevenue = ref(100000); // USD
 const fastStartMix = ref(40); // % of totalRevenue that comes from new signups (Fast Start)
 const unilevelMix = computed(() => 100 - fastStartMix.value); // Remaining % is Unilevel
 
-// Toggles
+// 🛡️ Güvenlik kilidi şalteri de bir what-if kontrolüdür — backend'e YAZILMAZ.
+// Canlı sistemde kilit her zaman maxPayoutLimitPct üzerinden çalışır.
 const isSecurityLockActive = ref(true);
-const maxPayoutLimitPct = ref(30);
 
+// --- Canlı config'e bağlanan alanlar (mount'ta GET /system/config ile dolar) ---
+const maxPayoutLimitPct = ref(30);
 const isFastStartActive = ref(true);
 const isUnilevelActive = ref(true);
 const isOverdriveActive = ref(true);
-
-// Dynamic Rates
-const fastStartRates = ref([10, 5, 2]); // e.g. Depth 1: 10%, Depth 2: 5%, Depth 3: 2%
-const unilevelRates = ref([5, 5, 5, 5, 5]); // e.g. Depths 1-5
-const overdrivePoolPct = ref(5); // Global Pool %
+const fastStartRates = ref<number[]>([10, 5, 2]);
+const unilevelRates = ref<number[]>([5, 5, 5, 5, 5]);
+const overdrivePoolPct = ref(5);
 
 // --- Calculations ---
 
@@ -70,27 +73,120 @@ const chartGradient = computed(() => {
   )`;
 });
 
-const isApplying = ref(false);
-const saveConfig = async () => {
-  if (!confirm('Bu simülasyon ayarlarını CANLI sisteme uygulamak istediğinize emin misiniz? Gerçek bonus hesaplamaları bu değerleri kullanacaktır.')) {
-    return;
-  }
-  isApplying.value = true;
+// ─── Canlı yapılandırma senkronizasyonu ──────────────────────────────────
+// Eskiden simülatör sabit (hardcoded) değerlerle açılır ve "Canlıya Uygula"
+// canlıdaki değerleri KÖRÜNE ezerdi. Artık başlangıç noktası ve yazma işlemi
+// canlı config'e demirli: mount'ta okunur, yazmadan önce diff gösterilir.
+const liveConfig = ref<any>(null);
+const isLoading = ref(true);
+const loadError = ref('');
+
+const parseRates = (raw: unknown, fallback: number[]): number[] => {
   try {
-    await axios.put('/api/v1/system/config', {
-      isFastStartActive: isFastStartActive.value,
-      fastStartRates: JSON.stringify(fastStartRates.value),
-      isUnilevelActive: isUnilevelActive.value,
-      unilevelRates: JSON.stringify(unilevelRates.value),
-      isOverdriveActive: isOverdriveActive.value,
-      overdrivePoolPct: Number(overdrivePoolPct.value),
-      maxPayoutLimitPct: Number(maxPayoutLimitPct.value)
-    }, { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
-    alert('✅ Ayarlar canlı sisteme başarıyla uygulandı.');
+    const v = typeof raw === 'string' ? JSON.parse(raw) : raw;
+    return Array.isArray(v) ? v.map(Number) : fallback;
+  } catch { return fallback; }
+};
+
+// Simülatör girdilerini canlı değerlerle doldur (anchor)
+const applyLiveToInputs = (cfg: any) => {
+  isFastStartActive.value = !!cfg.isFastStartActive;
+  fastStartRates.value = parseRates(cfg.fastStartRates, [10, 5, 2]);
+  isUnilevelActive.value = !!cfg.isUnilevelActive;
+  unilevelRates.value = parseRates(cfg.unilevelRates, [5, 5, 5, 5, 5]);
+  isOverdriveActive.value = !!cfg.isOverdriveActive;
+  overdrivePoolPct.value = Number(cfg.overdrivePoolPct ?? 5);
+  maxPayoutLimitPct.value = Number(cfg.maxPayoutLimitPct ?? 30);
+};
+
+const fetchLiveConfig = async () => {
+  isLoading.value = true;
+  loadError.value = '';
+  try {
+    const res = await axios.get('/api/v1/system/config', { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
+    liveConfig.value = res.data.config;
+    applyLiveToInputs(res.data.config);
+  } catch (e: any) {
+    // 🛡️ Demo/sabit veriye SESSİZCE düşmek yok — gerçek hata + retry gösterilir
+    console.error('Fetch live config error:', e);
+    loadError.value = e?.response?.data?.error || t('sim.loadError');
+  } finally {
+    isLoading.value = false;
+  }
+};
+
+onMounted(fetchLiveConfig);
+
+// ─── Diff önizleme + güvenli yazma ───────────────────────────────────────
+interface DiffRow { key: string; label: string; oldVal: string; newVal: string }
+const showDiff = ref(false);
+const diffs = ref<DiffRow[]>([]);
+const applyError = ref('');
+const applySuccess = ref(false);
+const isApplying = ref(false);
+
+const buildPayload = () => ({
+  isFastStartActive: isFastStartActive.value,
+  fastStartRates: JSON.stringify(fastStartRates.value),
+  isUnilevelActive: isUnilevelActive.value,
+  unilevelRates: JSON.stringify(unilevelRates.value),
+  isOverdriveActive: isOverdriveActive.value,
+  overdrivePoolPct: Number(overdrivePoolPct.value),
+  maxPayoutLimitPct: Number(maxPayoutLimitPct.value)
+});
+
+const fmtBool = (v: unknown) => (v ? t('sim.on') : t('sim.off'));
+const fmtPct = (v: unknown) => `%${Number(v ?? 0)}`;
+const fmtRates = (raw: unknown) => JSON.stringify(parseRates(raw, []));
+
+// Canlı config ile simülatördeki değerleri karşılaştır; sadece DEĞİŞEN
+// anahtarları döndür. Boş liste = yazılacak bir şey yok.
+const computeDiffs = (): DiffRow[] => {
+  const cfg = liveConfig.value;
+  if (!cfg) return [];
+  const rows: DiffRow[] = [];
+  const push = (key: string, labelKey: string, oldVal: string, newVal: string, changed: boolean) => {
+    if (changed) rows.push({ key, label: t(labelKey), oldVal, newVal });
+  };
+
+  push('isFastStartActive', 'sim.keyFastStart', fmtBool(cfg.isFastStartActive), fmtBool(isFastStartActive.value), !!cfg.isFastStartActive !== isFastStartActive.value);
+  const liveFsr = fmtRates(cfg.fastStartRates);
+  const simFsr = fmtRates(fastStartRates.value);
+  push('fastStartRates', 'sim.keyFastStartRates', liveFsr, simFsr, liveFsr !== simFsr);
+  push('isUnilevelActive', 'sim.keyUnilevel', fmtBool(cfg.isUnilevelActive), fmtBool(isUnilevelActive.value), !!cfg.isUnilevelActive !== isUnilevelActive.value);
+  const liveUr = fmtRates(cfg.unilevelRates);
+  const simUr = fmtRates(unilevelRates.value);
+  push('unilevelRates', 'sim.keyUnilevelRates', liveUr, simUr, liveUr !== simUr);
+  push('isOverdriveActive', 'sim.keyOverdrive', fmtBool(cfg.isOverdriveActive), fmtBool(isOverdriveActive.value), !!cfg.isOverdriveActive !== isOverdriveActive.value);
+  push('overdrivePoolPct', 'sim.keyOverdrivePct', fmtPct(cfg.overdrivePoolPct), fmtPct(overdrivePoolPct.value), Number(cfg.overdrivePoolPct ?? 0) !== Number(overdrivePoolPct.value));
+  push('maxPayoutLimitPct', 'sim.keyMaxPayout', fmtPct(cfg.maxPayoutLimitPct), fmtPct(maxPayoutLimitPct.value), Number(cfg.maxPayoutLimitPct ?? 0) !== Number(maxPayoutLimitPct.value));
+
+  return rows;
+};
+
+// İlk tıklama: sadece diff önizlemesini aç — henüz HİÇBİR ŞEY yazılmaz
+const openDiffPreview = () => {
+  applyError.value = '';
+  applySuccess.value = false;
+  diffs.value = computeDiffs();
+  showDiff.value = true;
+};
+
+// Onay: diff listesi boş değilse birleştirilmiş payload'u yaz
+const confirmApply = async () => {
+  if (diffs.value.length === 0) return;
+  isApplying.value = true;
+  applyError.value = '';
+  try {
+    await axios.put('/api/v1/system/config', buildPayload(), { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
+    showDiff.value = false;
+    applySuccess.value = true;
+    // 🚀 Yazma sonrası canlıyı yeniden oku — anchor taze kalsın
+    await fetchLiveConfig();
   } catch (e: any) {
     console.error('Apply config error:', e);
-    const msg = e?.response?.data?.error || e?.message || 'Bilinmeyen hata';
-    alert('❌ Ayarlar uygulanamadı: ' + msg);
+    const msg = e?.response?.data?.error || e?.message || '?';
+    applyError.value = t('sim.applyError', { error: msg });
   } finally {
     isApplying.value = false;
   }
@@ -120,9 +216,49 @@ const closeWeek = async () => {
       </div>
       <div style="display: flex; gap: 12px;">
         <button class="btn-danger" @click="closeWeek" style="background:#ef4444; color:white; border:none; padding:10px 20px; border-radius:8px; cursor:pointer; font-weight:bold;">Hafta Kapanışı Yap 🔒</button>
-        <button class="btn-primary" @click="saveConfig">Geçerli Ayarları Canlıya Al</button>
+        <button class="btn-text" @click="fetchLiveConfig" :disabled="isLoading">{{ t('sim.refreshLive') }}</button>
+        <button class="btn-primary" @click="openDiffPreview" :disabled="isLoading || !!loadError">{{ t('sim.apply') }}</button>
       </div>
     </div>
+
+    <!-- Yükleme / hata durumları: sessiz fallback YOK -->
+    <div v-if="isLoading" class="alert info">
+      ⏳ {{ t('sim.loading') }}
+    </div>
+    <div v-else-if="loadError" class="alert danger">
+      <strong>❌ {{ t('sim.loadError') }}</strong>
+      <div class="error-detail">{{ loadError }}</div>
+      <button class="btn-text" @click="fetchLiveConfig">{{ t('sim.retry') }}</button>
+    </div>
+
+    <template v-else>
+    <!-- Diff önizleme paneli: onay olmadan HİÇBİR ŞEY yazılmaz -->
+    <div v-if="showDiff" class="glass-panel diff-panel">
+      <h3>{{ t('sim.diffTitle') }}</h3>
+      <p class="diff-desc">{{ t('sim.diffDesc') }}</p>
+      <div v-if="diffs.length === 0" class="diff-empty">{{ t('sim.diffEmpty') }}</div>
+      <table v-else class="diff-table">
+        <thead>
+          <tr><th/><th>{{ t('sim.diffOld') }}</th><th>{{ t('sim.diffNew') }}</th></tr>
+        </thead>
+        <tbody>
+          <tr v-for="row in diffs" :key="row.key">
+            <td>{{ row.label }}</td>
+            <td class="diff-old">{{ row.oldVal }}</td>
+            <td class="diff-new">{{ row.newVal }}</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="diff-actions">
+        <button class="btn-text" @click="showDiff = false" :disabled="isApplying">{{ t('sim.cancel') }}</button>
+        <button v-if="diffs.length > 0" class="btn-primary" @click="confirmApply" :disabled="isApplying">
+          {{ isApplying ? t('sim.applying') : t('sim.confirmApply') }}
+        </button>
+      </div>
+      <div v-if="applyError" class="alert danger" style="margin-top:10px;">{{ applyError }}</div>
+    </div>
+
+    <div v-if="applySuccess" class="alert success">✅ {{ t('sim.applySuccess') }}</div>
 
     <!-- Alert -->
     <div v-if="isLockBreached && !isSecurityLockActive" class="alert danger">
@@ -242,6 +378,7 @@ const closeWeek = async () => {
         </div>
       </div>
     </div>
+    </template>
   </div>
 </template>
 
@@ -283,6 +420,58 @@ const closeWeek = async () => {
   background: rgba(234, 179, 8, 0.2);
   border: 1px solid #eab308;
   color: #fde047;
+}
+.alert.info {
+  background: rgba(59, 130, 246, 0.15);
+  border: 1px solid #3b82f6;
+  color: #93c5fd;
+}
+.alert.success {
+  background: rgba(34, 197, 94, 0.15);
+  border: 1px solid #22c55e;
+  color: #86efac;
+}
+.error-detail {
+  margin: 6px 0;
+  font-size: 12px;
+  opacity: 0.85;
+  word-break: break-word;
+}
+
+/* Diff önizleme paneli */
+.diff-panel {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.diff-panel h3 { margin: 0; }
+.diff-desc {
+  margin: 0;
+  font-size: 13px;
+  opacity: 0.8;
+}
+.diff-empty {
+  padding: 12px;
+  text-align: center;
+  opacity: 0.85;
+}
+.diff-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+.diff-table th, .diff-table td {
+  padding: 8px 10px;
+  text-align: left;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+.diff-old { color: #fca5a5; }
+.diff-new { color: #86efac; font-weight: 600; }
+.diff-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
 }
 
 .dashboard-grid {

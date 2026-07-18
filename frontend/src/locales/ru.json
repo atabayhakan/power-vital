@@ -1241,5 +1241,35 @@
     "errUnexpected": "Сервер вернул неожиданный ответ.",
     "errLoginFail": "Не удалось войти",
     "errRegisterFail": "Не удалось зарегистрироваться"
+  },
+  "sim": {
+    "loading": "Загрузка текущей конфигурации...",
+    "loadError": "Не удалось загрузить конфигурацию",
+    "retry": "Повторить",
+    "refreshLive": "Обновить текущие значения",
+    "apply": "Применить настройки к системе",
+    "diffTitle": "Изменения для применения",
+    "diffDesc": "Следующие изменения будут записаны в рабочую систему. Без подтверждения ничего не изменится.",
+    "diffEmpty": "Нет изменений — все настройки уже совпадают с рабочей системой.",
+    "diffOld": "Текущее (Live)",
+    "diffNew": "Симуляция (Новое)",
+    "keyFastStart": "Fast Start",
+    "keyFastStartRates": "Ставки Fast Start",
+    "keyUnilevel": "Unilevel",
+    "keyUnilevelRates": "Ставки Unilevel",
+    "keyOverdrive": "Пул Overdrive",
+    "keyOverdrivePct": "Процент пула Overdrive",
+    "keyMaxPayout": "Лимит Max Payout",
+    "confirmApply": "Подтвердить и записать",
+    "cancel": "Отмена",
+    "applying": "Запись...",
+    "applySuccess": "Настройки успешно записаны в рабочую систему.",
+    "applyError": "Не удалось записать настройки: {error}",
+    "on": "Вкл",
+    "off": "Выкл"
+  },
+  "bonus": {
+    "loadError": "Не удалось загрузить конфигурацию",
+    "retry": "Повторить"
   }
 }

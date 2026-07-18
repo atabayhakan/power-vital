@@ -1239,5 +1239,35 @@
     "errUnexpected": "Sunucu beklenmeyen yanıt döndü.",
     "errLoginFail": "Giriş yapılamadı",
     "errRegisterFail": "Kayıt yapılamadı"
+  },
+  "sim": {
+    "loading": "Canlı yapılandırma yükleniyor...",
+    "loadError": "Canlı yapılandırma yüklenemedi",
+    "retry": "Tekrar Dene",
+    "refreshLive": "Canlı Değerleri Yenile",
+    "apply": "Geçerli Ayarları Canlıya Al",
+    "diffTitle": "Canlıya Alınacak Değişiklikler",
+    "diffDesc": "Aşağıdaki değişiklikler canlı sisteme yazılacak. Onaylamadan hiçbir şey değiştirilmez.",
+    "diffEmpty": "Değişiklik yok — tüm ayarlar zaten canlı sistemle aynı.",
+    "diffOld": "Canlı (Mevcut)",
+    "diffNew": "Simülasyon (Yeni)",
+    "keyFastStart": "Hızlı Başlangıç",
+    "keyFastStartRates": "Hızlı Başlangıç Oranları",
+    "keyUnilevel": "Unilevel",
+    "keyUnilevelRates": "Unilevel Oranları",
+    "keyOverdrive": "Overdrive Havuzu",
+    "keyOverdrivePct": "Overdrive Havuz Oranı",
+    "keyMaxPayout": "Max Payout Limiti",
+    "confirmApply": "Onayla ve Canlıya Yaz",
+    "cancel": "Vazgeç",
+    "applying": "Yazılıyor...",
+    "applySuccess": "Ayarlar canlı sisteme başarıyla yazıldı.",
+    "applyError": "Ayarlar yazılamadı: {error}",
+    "on": "Açık",
+    "off": "Kapalı"
+  },
+  "bonus": {
+    "loadError": "Yapılandırma yüklenemedi",
+    "retry": "Tekrar Dene"
   }
 }

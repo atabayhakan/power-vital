@@ -1239,5 +1239,35 @@
     "errUnexpected": "Сервер күтүлбөгөн жооп кайтарды.",
     "errLoginFail": "Кирүү ишке ашкан жок",
     "errRegisterFail": "Катталуу ишке ашкан жок"
+  },
+  "sim": {
+    "loading": "Учурдагы конфигурация жүктөлүүдө...",
+    "loadError": "Конфигурацияны жүктөө мүмкүн болгон жок",
+    "retry": "Кайра аракет кылуу",
+    "refreshLive": "Учурдагы маанилерди жаңыртуу",
+    "apply": "Жөндөөлөрдү системага колдонуу",
+    "diffTitle": "Колдонула турган өзгөртүүлөр",
+    "diffDesc": "Төмөнкү өзгөртүүлөр иштеген системага жазылат. Тастыктаганга чейин эч нерсе өзгөрбөйт.",
+    "diffEmpty": "Өзгөртүү жок — бардык жөндөөлөр система менен дал келет.",
+    "diffOld": "Учурдагы (Live)",
+    "diffNew": "Симуляция (Жаңы)",
+    "keyFastStart": "Fast Start",
+    "keyFastStartRates": "Fast Start ченемдери",
+    "keyUnilevel": "Unilevel",
+    "keyUnilevelRates": "Unilevel ченемдери",
+    "keyOverdrive": "Overdrive пулу",
+    "keyOverdrivePct": "Overdrive пулунун пайызы",
+    "keyMaxPayout": "Max Payout чеги",
+    "confirmApply": "Тастыктап, системага жазуу",
+    "cancel": "Жокко чыгаруу",
+    "applying": "Жазылууда...",
+    "applySuccess": "Жөндөөлөр системага ийгиликтүү жазылды.",
+    "applyError": "Жөндөөлөрдү жазуу мүмкүн болгон жок: {error}",
+    "on": "Күйүк",
+    "off": "Өчүк"
+  },
+  "bonus": {
+    "loadError": "Конфигурацияны жүктөө мүмкүн болгон жок",
+    "retry": "Кайра аракет кылуу"
   }
 }

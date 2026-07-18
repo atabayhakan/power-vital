@@ -2,23 +2,30 @@
 import { ref, onMounted, computed } from 'vue';
 import axios from 'axios';
 import ConfirmModal from '../components/ConfirmModal.vue';
+import { useTranslate } from '../composables/useTranslate';
+
+const { t } = useTranslate();
 
 const config = ref<any>(null);
 const stats = ref<any>(null);
 const isLoading = ref(true);
 const isSaving = ref(false);
 const showCloseWeekModal = ref(false);
+const fetchError = ref('');
 
 const fetchConfig = async () => {
+  isLoading.value = true;
+  fetchError.value = '';
   try {
     const res = await axios.get('/api/v1/system/config', { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
     config.value = res.data.config;
     stats.value = res.data.stats;
-  } catch (e) {
-    console.error('Failed to fetch config, using demo data:', e);
-    // Demo data
-    config.value = { isReferralActive: true, isUnilevelActive: true, isOverdriveActive: true };
-    stats.value = { totalRevenue: '50000', totalPaid: '14000', currentPayoutRatio: '28' };
+  } catch (e: any) {
+    // 🛡️ Demo veriye SESSİZCE düşmek yok — gerçek hata + retry gösterilir
+    console.error('Failed to fetch config:', e);
+    fetchError.value = e?.response?.data?.error || e?.message || t('bonus.loadError');
+    config.value = null;
+    stats.value = null;
   } finally {
     isLoading.value = false;
   }
@@ -31,7 +38,7 @@ const saveConfig = async () => {
     let ur = typeof config.value.unilevelRates === 'string' ? JSON.parse(config.value.unilevelRates) : config.value.unilevelRates;
     
     await axios.put('/api/v1/system/config', {
-      isReferralActive: config.value.isReferralActive,
+      isFastStartActive: config.value.isFastStartActive,
       fastStartRates: fsr,
       isUnilevelActive: config.value.isUnilevelActive,
       unilevelRates: ur,
@@ -98,7 +105,7 @@ const theoreticalMaxPayout = computed(() => {
   let total = 0;
   
   try {
-    if (config.value.isReferralActive) {
+    if (config.value.isFastStartActive) {
       let fsr = typeof config.value.fastStartRates === 'string' ? JSON.parse(config.value.fastStartRates) : config.value.fastStartRates;
       if (Array.isArray(fsr)) total += fsr.reduce((a, b) => Number(a) + Number(b), 0);
     }
@@ -160,6 +167,12 @@ onMounted(() => {
     </div>
 
     <div v-if="isLoading" class="loading panel">Veriler yükleniyor...</div>
+
+    <div v-else-if="fetchError" class="panel fetch-error-panel">
+      <h3>❌ {{ t('bonus.loadError') }}</h3>
+      <p class="desc">{{ fetchError }}</p>
+      <button class="btn-primary" style="padding: 8px 16px;" @click="fetchConfig">{{ t('bonus.retry') }}</button>
+    </div>
     
     <div v-else-if="config && stats" class="admin-panel-grid">
 
@@ -245,11 +258,11 @@ onMounted(() => {
           </div>
           <button 
             class="toggle-btn" 
-            :class="{ active: config.isReferralActive }"
-            @click="toggleModule('isReferralActive')"
+            :class="{ active: config.isFastStartActive }"
+            @click="toggleModule('isFastStartActive')"
             :disabled="isSaving"
           >
-            {{ config.isReferralActive ? 'AÇIK' : 'KAPALI' }}
+            {{ config.isFastStartActive ? 'AÇIK' : 'KAPALI' }}
           </button>
         </div>
 
@@ -517,6 +530,16 @@ h3 {
 .bankrupt-alert strong {
   color: #ef4444;
   font-size: 16px;
+}
+
+.fetch-error-panel {
+  padding: 24px;
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  background: rgba(239, 68, 68, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: flex-start;
 }
 
 .rate-input {
