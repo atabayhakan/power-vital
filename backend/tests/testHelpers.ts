@@ -29,6 +29,7 @@ export const cleanDatabase = async () => {
     prisma.storeReview.deleteMany(),
     prisma.transaction.deleteMany(),
     prisma.withdrawalRequest.deleteMany(),
+    prisma.contactMessage.deleteMany(),
     prisma.userWeeklyStats.deleteMany(),
     prisma.weeklyCycle.deleteMany(),
     prisma.product.deleteMany(),

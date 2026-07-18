@@ -8,6 +8,7 @@ const { t, locale } = useTranslate();
 const form = ref({ subject: '', message: '' });
 const isSending = ref(false);
 const isSent = ref(false);
+const sendError = ref('');
 const openFaq = ref<number | null>(0);
 
 interface Faq { id: string; q: string; a: string }
@@ -53,15 +54,19 @@ const toggleFaq = (i: number) => { openFaq.value = openFaq.value === i ? null : 
 
 const submitForm = async () => {
   isSending.value = true;
+  sendError.value = '';
   try {
-    await axios.post('/api/v1/contact', { subject: form.value.subject, message: form.value.message });
-  } catch {
-    console.warn('[Support] Simulated submission successful.');
+    // Başarı YALNIZCA 2xx yanıtta gösterilir — hata yutulup sahte başarı
+    // mesajı basılmaz; backend mesajı (validasyon/rate-limit) kullanıcıya iletilir.
+    await axios.post('/api/v1/contact', { subject: form.value.subject, message: form.value.message, source: 'support', locale: locale.value });
+    isSending.value = false;
+    isSent.value = true;
+    form.value = { subject: '', message: '' };
+    setTimeout(() => { isSent.value = false; }, 5000);
+  } catch (err: any) {
+    isSending.value = false;
+    sendError.value = err?.response?.data?.error || t('support.errorSend');
   }
-  isSending.value = false;
-  isSent.value = true;
-  form.value = { subject: '', message: '' };
-  setTimeout(() => { isSent.value = false; }, 5000);
 };
 </script>
 
@@ -102,6 +107,7 @@ const submitForm = async () => {
           <button type="submit" class="sup-btn" :disabled="isSending">
             {{ isSending ? t('support.sending') : t('support.send') }}
           </button>
+          <p v-if="sendError" class="sup-error">⚠️ {{ sendError }}</p>
         </form>
 
         <div v-else class="sup-success">
@@ -174,6 +180,7 @@ textarea.sup-input { resize: vertical; min-height: 110px; }
 .sup-success__icon { font-size: 3rem; margin-bottom: 12px; }
 .sup-success h3 { font-family: 'Outfit', sans-serif; color: #059669; font-size: 1.3rem; margin: 0 0 8px; }
 .sup-success p { color: #6b7280; line-height: 1.6; margin: 0; }
+.sup-error { margin: 0; padding: 10px 13px; background: #fef2f2; border: 1px solid #fecaca; border-radius: 11px; color: #b91c1c; font-size: 0.85rem; line-height: 1.45; }
 
 /* FAQ accordion */
 .sup-faq { display: flex; flex-direction: column; gap: 10px; }

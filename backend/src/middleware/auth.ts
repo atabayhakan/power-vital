@@ -98,6 +98,27 @@ export const authenticateJWT = (req: AuthRequest, res: Response, next: NextFunct
   }
 };
 
+// optionalJWT — attaches req.user when a VALID Bearer access token is present,
+// but never rejects the request. Used by public endpoints that behave slightly
+// better for logged-in users (e.g. /contact derives name/email from the profile).
+// Invalid/expired tokens are ignored (treated as anonymous) — a guest with a
+// stale token must still be able to use the public form.
+export const optionalJWT = (req: AuthRequest, _res: Response, next: NextFunction) => {
+  const authHeader = req.headers.authorization;
+  const token = authHeader?.split(' ')[1];
+  const secret = process.env.JWT_SECRET;
+  if (!token || !secret) return next();
+
+  (jwt.verify as any)(token, secret, (err: any, user: any) => {
+    if (!err && user && (!user.type || user.type === 'access')) {
+      const userId = user.userId || user.id || user.uid;
+      if (userId && !user.userId) user.userId = userId;
+      req.user = user;
+    }
+    next();
+  });
+};
+
 export const requireRole = (...roles: string[]) => {
   return (req: AuthRequest, res: Response, next: NextFunction) => {
     if (!req.user) {

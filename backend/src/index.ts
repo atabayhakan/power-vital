@@ -14,6 +14,7 @@ import sliderRoutes from './routes/slider';
 import categoryRoutes from './routes/category';
 import settingsRoutes from './routes/settings';
 import checkoutRoutes from './routes/checkout';
+import contactRoutes from './routes/contact';
 import uploadRoutes from './routes/upload';
 import adminRoutes from './routes/admin';
 import pagesRoutes from './routes/pages';
@@ -197,6 +198,7 @@ app.use('/api/v1/slides', sliderRoutes);
 app.use('/api/v1/categories', categoryRoutes);
 app.use('/api/v1/settings', settingsRoutes);
 app.use('/api/v1/checkout', checkoutRoutes);
+app.use('/api/v1/contact', contactRoutes);
 app.use('/api/v1/upload', uploadRoutes);
 app.use('/api/v1/pages', pagesRoutes);
 // /api/v1/ai is intentionally not mounted — the admin manually

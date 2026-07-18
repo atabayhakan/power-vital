@@ -36,6 +36,8 @@ export const OrderTypeEnum = z.enum(['ecommerce', 'pos', 'mlm_backoffice', 'b2b'
 export const OrderStatusEnum = z.enum(['pending', 'paid', 'shipped', 'completed', 'cancelled', 'refunded']);
 export const ReviewStatusEnum = z.enum(['published', 'rejected', 'pending']);
 export const WithdrawalStatusEnum = z.enum(['approved', 'rejected']);
+export const ContactMessageStatusEnum = z.enum(['new', 'read', 'resolved']);
+export const ContactMessageSourceEnum = z.enum(['contact', 'support']);
 export const UserRoleEnum = z.enum(['guest', 'customer', 'cashier', 'dealer', 'distributor', 'admin']);
 export const PaymentMethodEnum = z.enum(['qr_transfer', 'wallet', 'cash', 'card']);
 export const DisplayModeEnum = z.enum(['IMAGE_ONLY', 'TEXT_OVERLAY', 'BUTTON_LINK']);
@@ -431,6 +433,40 @@ export const ReviewStatusUpdateSchema = z.object({
   (data) => data.status !== undefined || data.translations !== undefined,
   { message: 'At least one of status or translations must be provided' }
 );
+
+// ────────────────────────────────────────────────────────────────────────────
+// Contact / support inbox
+// ────────────────────────────────────────────────────────────────────────────
+// Accepts BOTH frontend shapes:
+//   • public contact form: { name, email, subject, message } (guest — email required, enforced in the handler since it depends on JWT presence)
+//   • logged-in support form: { subject, message } (JWT — name/email derived from the user record)
+const optionalEmail = z.string().trim().email('Invalid email').max(200)
+  .or(z.literal('').transform(() => undefined));
+
+export const ContactSubmitSchema = z.object({
+  name: z.string().trim().min(1).max(100).optional().nullable(),
+  email: optionalEmail.optional().nullable(),
+  phone: z.string().trim().max(30).optional().nullable(),
+  subject: z.string().trim().max(200).optional().nullable(),
+  message: z.string().trim().min(5, 'Message is too short').max(5000),
+  source: ContactMessageSourceEnum.optional().default('contact'),
+  locale: z.string().trim().min(2).max(10).optional().nullable()
+}).strict();
+export type ContactSubmitInput = z.infer<typeof ContactSubmitSchema>;
+
+export const AdminContactMessageUpdateSchema = z.object({
+  status: ContactMessageStatusEnum.optional(),
+  adminNote: z.string().max(2000).nullable().optional()
+}).strict().refine(
+  (data) => Object.keys(data).length > 0,
+  { message: 'At least one field must be provided' }
+);
+
+export const ContactMessageListQuerySchema = z.object({
+  status: ContactMessageStatusEnum.optional(),
+  page: z.coerce.number().int().min(1).optional().default(1),
+  limit: z.coerce.number().int().min(1).max(200).optional().default(50)
+}).strict();
 
 // ────────────────────────────────────────────────────────────────────────────
 // Checkout (anonymous + authed guest cart)

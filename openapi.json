@@ -537,6 +537,134 @@
           "createdAt"
         ]
       },
+      "PaginationEnvelope<AdminContactMessage>": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdminContactMessage"
+            }
+          },
+          "total": {
+            "type": "integer",
+            "description": "Total rows matching the query"
+          },
+          "page": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "hasMore": {
+            "type": "boolean",
+            "description": "True if there is at least one more page"
+          }
+        },
+        "required": [
+          "items",
+          "total",
+          "page",
+          "limit",
+          "hasMore"
+        ]
+      },
+      "AdminContactMessage": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "userId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "email": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "phone": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "subject": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "message": {
+            "type": "string"
+          },
+          "source": {
+            "type": "string",
+            "description": "contact | support"
+          },
+          "locale": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "description": "new | read | resolved"
+          },
+          "adminNote": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "createdAt": {
+            "type": "string"
+          },
+          "updatedAt": {
+            "type": "string"
+          },
+          "user": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "email": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "name",
+              "email"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "message",
+          "source",
+          "status",
+          "createdAt",
+          "updatedAt"
+        ],
+        "description": "AdminContactMessage"
+      },
       "PaginationEnvelope<FinanceWithdrawal>": {
         "type": "object",
         "properties": {
@@ -3130,6 +3258,240 @@
         }
       }
     },
+    "/api/v1/contact": {
+      "post": {
+        "tags": [
+          "Contact"
+        ],
+        "description": "Submit a contact/support message. Public (rate-limited 5/hour per IP); a valid Bearer JWT is OPTIONAL — when present the message is linked to the user and name/email default from the profile. Guests MUST provide a valid email.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "minLength": 1,
+                    "maxLength": 100
+                  },
+                  "email": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "maxLength": 200,
+                        "format": "email"
+                      },
+                      {
+                        "type": "string",
+                        "enum": [
+                          ""
+                        ]
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "phone": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 30
+                  },
+                  "subject": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 200
+                  },
+                  "message": {
+                    "type": "string",
+                    "minLength": 5,
+                    "maxLength": 5000
+                  },
+                  "source": {
+                    "type": "string",
+                    "enum": [
+                      "contact",
+                      "support"
+                    ],
+                    "default": "contact"
+                  },
+                  "locale": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "minLength": 2,
+                    "maxLength": 10
+                  }
+                },
+                "required": [
+                  "message"
+                ],
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Message received"
+          },
+          "400": {
+            "description": "Validation failed (or guest email missing)"
+          },
+          "429": {
+            "description": "Rate limited"
+          }
+        }
+      }
+    },
+    "/api/v1/admin/contact-messages": {
+      "get": {
+        "tags": [
+          "Contact"
+        ],
+        "description": "List contact/support messages (admin, paginated, ?status=new|read|resolved filter, newest first)",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "new",
+                "read",
+                "resolved"
+              ]
+            },
+            "required": false,
+            "name": "status",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1
+            },
+            "required": false,
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 200,
+              "default": 50
+            },
+            "required": false,
+            "name": "limit",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Paginated envelope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginationEnvelope<AdminContactMessage>"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated"
+          },
+          "403": {
+            "description": "Not an admin"
+          }
+        }
+      }
+    },
+    "/api/v1/admin/contact-messages/{id}": {
+      "put": {
+        "tags": [
+          "Contact"
+        ],
+        "description": "Update a contact message: status transition (new/read/resolved) and/or adminNote (admin)",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "new",
+                      "read",
+                      "resolved"
+                    ]
+                  },
+                  "adminNote": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "maxLength": 2000
+                  }
+                },
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated message",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminContactMessage"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated"
+          },
+          "403": {
+            "description": "Not an admin"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        }
+      }
+    },
     "/api/v1/finance/wallet": {
       "get": {
         "tags": [
@@ -3527,7 +3889,7 @@
         "tags": [
           "Admin"
         ],
-        "description": "Server-Sent Events (SSE) stream of admin-only events. Returns text/event-stream with one frame per event (`event: <type>` + `data: <json>`). Events: new_order, payment_received, ocr_pending, withdrawal_request, withdrawal_approved, withdrawal_rejected, review_pending, low_stock. Auth via Bearer header OR HttpOnly refresh-token cookie (same as other admin routes). Heartbeat every 25s.",
+        "description": "Server-Sent Events (SSE) stream of admin-only events. Returns text/event-stream with one frame per event (`event: <type>` + `data: <json>`). Events: new_order, payment_received, ocr_pending, withdrawal_request, withdrawal_approved, withdrawal_rejected, review_pending, low_stock, new_contact_message. Auth via Bearer header OR HttpOnly refresh-token cookie (same as other admin routes). Heartbeat every 25s.",
         "security": [
           {
             "bearerAuth": []

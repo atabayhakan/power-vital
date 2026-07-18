@@ -14,6 +14,7 @@ import {
   SettingsUpdateSchema, PageCreateSchema, PageUpdateSchema,
   OrderStatusUpdateSchema, WalletPaySchema, WithdrawSchema,
   AdminUserUpdateSchema, WithdrawalUpdateSchema,
+  ContactSubmitSchema, AdminContactMessageUpdateSchema, ContactMessageListQuerySchema,
   SystemConfigUpdateSchema, AITranslateSchema,
   I18nTranslateSchema, I18nTranslateBatchSchema,
   MediaFolderCreateSchema, MediaMoveSchema,
@@ -78,6 +79,26 @@ const AdminWithdrawalSchema = z.object({
   createdAt: z.string(),
   user: z.object({ name: z.string(), email: z.string() }).optional()
 }).openapi('AdminWithdrawal');
+
+// Admin support-inbox row (ContactMessage + nullable submitter).
+// `.describe()` AFTER `.openapi()` — the reverse order silently drops the
+// description, which PaginationEnvelope uses as its component-name suffix.
+const AdminContactMessage = z.object({
+  id: z.string(),
+  userId: z.string().nullable().optional(),
+  name: z.string().nullable().optional(),
+  email: z.string().nullable().optional(),
+  phone: z.string().nullable().optional(),
+  subject: z.string().nullable().optional(),
+  message: z.string(),
+  source: z.string().describe('contact | support'),
+  locale: z.string().nullable().optional(),
+  status: z.string().describe('new | read | resolved'),
+  adminNote: z.string().nullable().optional(),
+  createdAt: z.string(),
+  updatedAt: z.string(),
+  user: z.object({ name: z.string(), email: z.string() }).nullable().optional()
+}).openapi('AdminContactMessage').describe('AdminContactMessage');
 
 // Order list item (lightweight — the dashboard doesn't need items[]).
 const AdminOrderListItem = z.object({
@@ -763,7 +784,7 @@ export const registerAdminRoutes = () => {
   registry.registerPath({
     method: 'get', path: '/api/v1/admin/events',
     tags: [tag.name],
-    description: 'Server-Sent Events (SSE) stream of admin-only events. Returns text/event-stream with one frame per event (`event: <type>` + `data: <json>`). Events: new_order, payment_received, ocr_pending, withdrawal_request, withdrawal_approved, withdrawal_rejected, review_pending, low_stock. Auth via Bearer header OR HttpOnly refresh-token cookie (same as other admin routes). Heartbeat every 25s.',
+    description: 'Server-Sent Events (SSE) stream of admin-only events. Returns text/event-stream with one frame per event (`event: <type>` + `data: <json>`). Events: new_order, payment_received, ocr_pending, withdrawal_request, withdrawal_approved, withdrawal_rejected, review_pending, low_stock, new_contact_message. Auth via Bearer header OR HttpOnly refresh-token cookie (same as other admin routes). Heartbeat every 25s.',
     security: [{ bearerAuth: [] }],
     responses: {
       200: {
@@ -1008,6 +1029,51 @@ export const registerReviewRoutes = () => {
     security: [{ bearerAuth: [] }],
     request: { params: IdParamSchema, body: { content: { 'application/json': { schema: ReviewStatusUpdateSchema } } } },
     responses: { 200: { description: 'Updated' } }
+  });
+};
+
+// ── Contact / support inbox ───────────────────────────────────────────────
+export const registerContactRoutes = () => {
+  const tag = Tag('Contact', 'Contact form + support inbox intake');
+
+  registry.registerPath({
+    method: 'post', path: '/api/v1/contact',
+    tags: [tag.name],
+    description: 'Submit a contact/support message. Public (rate-limited 5/hour per IP); a valid Bearer JWT is OPTIONAL — when present the message is linked to the user and name/email default from the profile. Guests MUST provide a valid email.',
+    request: { body: { content: { 'application/json': { schema: ContactSubmitSchema } } } },
+    responses: {
+      201: { description: 'Message received' },
+      400: { description: 'Validation failed (or guest email missing)' },
+      429: { description: 'Rate limited' }
+    }
+  });
+
+  registry.registerPath({
+    method: 'get', path: '/api/v1/admin/contact-messages',
+    tags: [tag.name], description: 'List contact/support messages (admin, paginated, ?status=new|read|resolved filter, newest first)',
+    security: [{ bearerAuth: [] }],
+    request: { query: ContactMessageListQuerySchema },
+    responses: {
+      200: {
+        description: 'Paginated envelope',
+        content: { 'application/json': { schema: PaginationEnvelope(AdminContactMessage) } }
+      },
+      401: { description: 'Not authenticated' },
+      403: { description: 'Not an admin' }
+    }
+  });
+
+  registry.registerPath({
+    method: 'put', path: '/api/v1/admin/contact-messages/{id}',
+    tags: [tag.name], description: 'Update a contact message: status transition (new/read/resolved) and/or adminNote (admin)',
+    security: [{ bearerAuth: [] }],
+    request: { params: IdParamSchema, body: { content: { 'application/json': { schema: AdminContactMessageUpdateSchema } } } },
+    responses: {
+      200: { description: 'Updated message', content: { 'application/json': { schema: AdminContactMessage } } },
+      401: { description: 'Not authenticated' },
+      403: { description: 'Not an admin' },
+      404: { description: 'Not found' }
+    }
   });
 };
 
@@ -1619,6 +1685,7 @@ export const registerAllRoutes = () => {
   registerPageRoutes();
   registerOrderRoutes();
   registerCheckoutRoutes();
+  registerContactRoutes();          // NEW — support inbox
   registerFinanceRoutes();
   registerSystemRoutes();
   registerAdminRoutes();

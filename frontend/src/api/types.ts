@@ -1536,6 +1536,191 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/contact": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description Submit a contact/support message. Public (rate-limited 5/hour per IP); a valid Bearer JWT is OPTIONAL — when present the message is linked to the user and name/email default from the profile. Guests MUST provide a valid email. */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": {
+                        name?: string | null;
+                        email?: string | "" | null;
+                        phone?: string | null;
+                        subject?: string | null;
+                        message: string;
+                        /**
+                         * @default contact
+                         * @enum {string}
+                         */
+                        source?: "contact" | "support";
+                        locale?: string | null;
+                    };
+                };
+            };
+            responses: {
+                /** @description Message received */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Validation failed (or guest email missing) */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Rate limited */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/contact-messages": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description List contact/support messages (admin, paginated, ?status=new|read|resolved filter, newest first) */
+        get: {
+            parameters: {
+                query?: {
+                    status?: "new" | "read" | "resolved";
+                    page?: number;
+                    limit?: number;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Paginated envelope */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["PaginationEnvelope<AdminContactMessage>"];
+                    };
+                };
+                /** @description Not authenticated */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Not an admin */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/contact-messages/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** @description Update a contact message: status transition (new/read/resolved) and/or adminNote (admin) */
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": {
+                        /** @enum {string} */
+                        status?: "new" | "read" | "resolved";
+                        adminNote?: string | null;
+                    };
+                };
+            };
+            responses: {
+                /** @description Updated message */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["AdminContactMessage"];
+                    };
+                };
+                /** @description Not authenticated */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Not an admin */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Not found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/finance/wallet": {
         parameters: {
             query?: never;
@@ -1935,7 +2120,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** @description Server-Sent Events (SSE) stream of admin-only events. Returns text/event-stream with one frame per event (`event: <type>` + `data: <json>`). Events: new_order, payment_received, ocr_pending, withdrawal_request, withdrawal_approved, withdrawal_rejected, review_pending, low_stock. Auth via Bearer header OR HttpOnly refresh-token cookie (same as other admin routes). Heartbeat every 25s. */
+        /** @description Server-Sent Events (SSE) stream of admin-only events. Returns text/event-stream with one frame per event (`event: <type>` + `data: <json>`). Events: new_order, payment_received, ocr_pending, withdrawal_request, withdrawal_approved, withdrawal_rejected, review_pending, low_stock, new_contact_message. Auth via Bearer header OR HttpOnly refresh-token cookie (same as other admin routes). Heartbeat every 25s. */
         get: {
             parameters: {
                 query?: never;
@@ -4899,6 +5084,37 @@ export interface components {
             address: string | null;
             receiptImageUrl: string | null;
             createdAt: string;
+        };
+        "PaginationEnvelope<AdminContactMessage>": {
+            items: components["schemas"]["AdminContactMessage"][];
+            /** @description Total rows matching the query */
+            total: number;
+            page: number;
+            limit: number;
+            /** @description True if there is at least one more page */
+            hasMore: boolean;
+        };
+        /** @description AdminContactMessage */
+        AdminContactMessage: {
+            id: string;
+            userId?: string | null;
+            name?: string | null;
+            email?: string | null;
+            phone?: string | null;
+            subject?: string | null;
+            message: string;
+            /** @description contact | support */
+            source: string;
+            locale?: string | null;
+            /** @description new | read | resolved */
+            status: string;
+            adminNote?: string | null;
+            createdAt: string;
+            updatedAt: string;
+            user?: {
+                name: string;
+                email: string;
+            } | null;
         };
         "PaginationEnvelope<FinanceWithdrawal>": {
             items: components["schemas"]["FinanceWithdrawal"][];

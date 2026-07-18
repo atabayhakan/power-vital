@@ -109,6 +109,11 @@ export type ProductReview = $Result.DefaultSelection<Prisma.$ProductReviewPayloa
  */
 export type StoreReview = $Result.DefaultSelection<Prisma.$StoreReviewPayload>
 /**
+ * Model ContactMessage
+ * 
+ */
+export type ContactMessage = $Result.DefaultSelection<Prisma.$ContactMessagePayload>
+/**
  * Model RefreshToken
  * 
  */
@@ -456,6 +461,16 @@ export class PrismaClient<
     * ```
     */
   get storeReview(): Prisma.StoreReviewDelegate<ExtArgs>;
+
+  /**
+   * `prisma.contactMessage`: Exposes CRUD operations for the **ContactMessage** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more ContactMessages
+    * const contactMessages = await prisma.contactMessage.findMany()
+    * ```
+    */
+  get contactMessage(): Prisma.ContactMessageDelegate<ExtArgs>;
 
   /**
    * `prisma.refreshToken`: Exposes CRUD operations for the **RefreshToken** model.
@@ -986,6 +1001,7 @@ export namespace Prisma {
     Page: 'Page',
     ProductReview: 'ProductReview',
     StoreReview: 'StoreReview',
+    ContactMessage: 'ContactMessage',
     RefreshToken: 'RefreshToken',
     PushSubscription: 'PushSubscription',
     CartAbandonment: 'CartAbandonment',
@@ -1008,7 +1024,7 @@ export namespace Prisma {
 
   export type TypeMap<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, ClientOptions = {}> = {
     meta: {
-      modelProps: "user" | "withdrawalRequest" | "product" | "priceRule" | "order" | "orderItem" | "transaction" | "systemConfig" | "weeklyCycle" | "userWeeklyStats" | "heroSlide" | "category" | "productImage" | "siteSettings" | "mediaFolder" | "media" | "page" | "productReview" | "storeReview" | "refreshToken" | "pushSubscription" | "cartAbandonment" | "broadcastLog" | "broadcastJob" | "impersonationSession" | "clientError"
+      modelProps: "user" | "withdrawalRequest" | "product" | "priceRule" | "order" | "orderItem" | "transaction" | "systemConfig" | "weeklyCycle" | "userWeeklyStats" | "heroSlide" | "category" | "productImage" | "siteSettings" | "mediaFolder" | "media" | "page" | "productReview" | "storeReview" | "contactMessage" | "refreshToken" | "pushSubscription" | "cartAbandonment" | "broadcastLog" | "broadcastJob" | "impersonationSession" | "clientError"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -2266,6 +2282,72 @@ export namespace Prisma {
           }
         }
       }
+      ContactMessage: {
+        payload: Prisma.$ContactMessagePayload<ExtArgs>
+        fields: Prisma.ContactMessageFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.ContactMessageFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ContactMessagePayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.ContactMessageFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ContactMessagePayload>
+          }
+          findFirst: {
+            args: Prisma.ContactMessageFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ContactMessagePayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.ContactMessageFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ContactMessagePayload>
+          }
+          findMany: {
+            args: Prisma.ContactMessageFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ContactMessagePayload>[]
+          }
+          create: {
+            args: Prisma.ContactMessageCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ContactMessagePayload>
+          }
+          createMany: {
+            args: Prisma.ContactMessageCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          delete: {
+            args: Prisma.ContactMessageDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ContactMessagePayload>
+          }
+          update: {
+            args: Prisma.ContactMessageUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ContactMessagePayload>
+          }
+          deleteMany: {
+            args: Prisma.ContactMessageDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.ContactMessageUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          upsert: {
+            args: Prisma.ContactMessageUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ContactMessagePayload>
+          }
+          aggregate: {
+            args: Prisma.ContactMessageAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateContactMessage>
+          }
+          groupBy: {
+            args: Prisma.ContactMessageGroupByArgs<ExtArgs>
+            result: $Utils.Optional<ContactMessageGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.ContactMessageCountArgs<ExtArgs>
+            result: $Utils.Optional<ContactMessageCountAggregateOutputType> | number
+          }
+        }
+      }
       RefreshToken: {
         payload: Prisma.$RefreshTokenPayload<ExtArgs>
         fields: Prisma.RefreshTokenFieldRefs
@@ -2900,6 +2982,7 @@ export namespace Prisma {
     pushSubscriptions: number
     cartAbandonments: number
     clientErrors: number
+    contactMessages: number
     broadcastLogsSent: number
     broadcastLogsReceived: number
     broadcastJobs: number
@@ -2919,6 +3002,7 @@ export namespace Prisma {
     pushSubscriptions?: boolean | UserCountOutputTypeCountPushSubscriptionsArgs
     cartAbandonments?: boolean | UserCountOutputTypeCountCartAbandonmentsArgs
     clientErrors?: boolean | UserCountOutputTypeCountClientErrorsArgs
+    contactMessages?: boolean | UserCountOutputTypeCountContactMessagesArgs
     broadcastLogsSent?: boolean | UserCountOutputTypeCountBroadcastLogsSentArgs
     broadcastLogsReceived?: boolean | UserCountOutputTypeCountBroadcastLogsReceivedArgs
     broadcastJobs?: boolean | UserCountOutputTypeCountBroadcastJobsArgs
@@ -3012,6 +3096,13 @@ export namespace Prisma {
    */
   export type UserCountOutputTypeCountClientErrorsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: ClientErrorWhereInput
+  }
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountContactMessagesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ContactMessageWhereInput
   }
 
   /**
@@ -3598,6 +3689,7 @@ export namespace Prisma {
     pushSubscriptions?: boolean | User$pushSubscriptionsArgs<ExtArgs>
     cartAbandonments?: boolean | User$cartAbandonmentsArgs<ExtArgs>
     clientErrors?: boolean | User$clientErrorsArgs<ExtArgs>
+    contactMessages?: boolean | User$contactMessagesArgs<ExtArgs>
     broadcastLogsSent?: boolean | User$broadcastLogsSentArgs<ExtArgs>
     broadcastLogsReceived?: boolean | User$broadcastLogsReceivedArgs<ExtArgs>
     broadcastJobs?: boolean | User$broadcastJobsArgs<ExtArgs>
@@ -3645,6 +3737,7 @@ export namespace Prisma {
     pushSubscriptions?: boolean | User$pushSubscriptionsArgs<ExtArgs>
     cartAbandonments?: boolean | User$cartAbandonmentsArgs<ExtArgs>
     clientErrors?: boolean | User$clientErrorsArgs<ExtArgs>
+    contactMessages?: boolean | User$contactMessagesArgs<ExtArgs>
     broadcastLogsSent?: boolean | User$broadcastLogsSentArgs<ExtArgs>
     broadcastLogsReceived?: boolean | User$broadcastLogsReceivedArgs<ExtArgs>
     broadcastJobs?: boolean | User$broadcastJobsArgs<ExtArgs>
@@ -3668,6 +3761,7 @@ export namespace Prisma {
       pushSubscriptions: Prisma.$PushSubscriptionPayload<ExtArgs>[]
       cartAbandonments: Prisma.$CartAbandonmentPayload<ExtArgs>[]
       clientErrors: Prisma.$ClientErrorPayload<ExtArgs>[]
+      contactMessages: Prisma.$ContactMessagePayload<ExtArgs>[]
       broadcastLogsSent: Prisma.$BroadcastLogPayload<ExtArgs>[]
       broadcastLogsReceived: Prisma.$BroadcastLogPayload<ExtArgs>[]
       broadcastJobs: Prisma.$BroadcastJobPayload<ExtArgs>[]
@@ -4049,6 +4143,7 @@ export namespace Prisma {
     pushSubscriptions<T extends User$pushSubscriptionsArgs<ExtArgs> = {}>(args?: Subset<T, User$pushSubscriptionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PushSubscriptionPayload<ExtArgs>, T, "findMany"> | Null>
     cartAbandonments<T extends User$cartAbandonmentsArgs<ExtArgs> = {}>(args?: Subset<T, User$cartAbandonmentsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$CartAbandonmentPayload<ExtArgs>, T, "findMany"> | Null>
     clientErrors<T extends User$clientErrorsArgs<ExtArgs> = {}>(args?: Subset<T, User$clientErrorsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ClientErrorPayload<ExtArgs>, T, "findMany"> | Null>
+    contactMessages<T extends User$contactMessagesArgs<ExtArgs> = {}>(args?: Subset<T, User$contactMessagesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ContactMessagePayload<ExtArgs>, T, "findMany"> | Null>
     broadcastLogsSent<T extends User$broadcastLogsSentArgs<ExtArgs> = {}>(args?: Subset<T, User$broadcastLogsSentArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$BroadcastLogPayload<ExtArgs>, T, "findMany"> | Null>
     broadcastLogsReceived<T extends User$broadcastLogsReceivedArgs<ExtArgs> = {}>(args?: Subset<T, User$broadcastLogsReceivedArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$BroadcastLogPayload<ExtArgs>, T, "findMany"> | Null>
     broadcastJobs<T extends User$broadcastJobsArgs<ExtArgs> = {}>(args?: Subset<T, User$broadcastJobsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$BroadcastJobPayload<ExtArgs>, T, "findMany"> | Null>
@@ -4636,6 +4731,26 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: ClientErrorScalarFieldEnum | ClientErrorScalarFieldEnum[]
+  }
+
+  /**
+   * User.contactMessages
+   */
+  export type User$contactMessagesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ContactMessage
+     */
+    select?: ContactMessageSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ContactMessageInclude<ExtArgs> | null
+    where?: ContactMessageWhereInput
+    orderBy?: ContactMessageOrderByWithRelationInput | ContactMessageOrderByWithRelationInput[]
+    cursor?: ContactMessageWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: ContactMessageScalarFieldEnum | ContactMessageScalarFieldEnum[]
   }
 
   /**
@@ -16325,14 +16440,25 @@ export namespace Prisma {
 
   export type AggregateSiteSettings = {
     _count: SiteSettingsCountAggregateOutputType | null
+    _avg: SiteSettingsAvgAggregateOutputType | null
+    _sum: SiteSettingsSumAggregateOutputType | null
     _min: SiteSettingsMinAggregateOutputType | null
     _max: SiteSettingsMaxAggregateOutputType | null
+  }
+
+  export type SiteSettingsAvgAggregateOutputType = {
+    logoScale: number | null
+  }
+
+  export type SiteSettingsSumAggregateOutputType = {
+    logoScale: number | null
   }
 
   export type SiteSettingsMinAggregateOutputType = {
     id: string | null
     companyName: string | null
     logoUrl: string | null
+    logoScale: number | null
     address: string | null
     phone: string | null
     email: string | null
@@ -16362,6 +16488,7 @@ export namespace Prisma {
     id: string | null
     companyName: string | null
     logoUrl: string | null
+    logoScale: number | null
     address: string | null
     phone: string | null
     email: string | null
@@ -16391,6 +16518,7 @@ export namespace Prisma {
     id: number
     companyName: number
     logoUrl: number
+    logoScale: number
     address: number
     phone: number
     email: number
@@ -16418,10 +16546,19 @@ export namespace Prisma {
   }
 
 
+  export type SiteSettingsAvgAggregateInputType = {
+    logoScale?: true
+  }
+
+  export type SiteSettingsSumAggregateInputType = {
+    logoScale?: true
+  }
+
   export type SiteSettingsMinAggregateInputType = {
     id?: true
     companyName?: true
     logoUrl?: true
+    logoScale?: true
     address?: true
     phone?: true
     email?: true
@@ -16451,6 +16588,7 @@ export namespace Prisma {
     id?: true
     companyName?: true
     logoUrl?: true
+    logoScale?: true
     address?: true
     phone?: true
     email?: true
@@ -16480,6 +16618,7 @@ export namespace Prisma {
     id?: true
     companyName?: true
     logoUrl?: true
+    logoScale?: true
     address?: true
     phone?: true
     email?: true
@@ -16544,6 +16683,18 @@ export namespace Prisma {
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
      * 
+     * Select which fields to average
+    **/
+    _avg?: SiteSettingsAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: SiteSettingsSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
      * Select which fields to find the minimum value
     **/
     _min?: SiteSettingsMinAggregateInputType
@@ -16574,6 +16725,8 @@ export namespace Prisma {
     take?: number
     skip?: number
     _count?: SiteSettingsCountAggregateInputType | true
+    _avg?: SiteSettingsAvgAggregateInputType
+    _sum?: SiteSettingsSumAggregateInputType
     _min?: SiteSettingsMinAggregateInputType
     _max?: SiteSettingsMaxAggregateInputType
   }
@@ -16582,6 +16735,7 @@ export namespace Prisma {
     id: string
     companyName: string
     logoUrl: string | null
+    logoScale: number | null
     address: string | null
     phone: string | null
     email: string | null
@@ -16606,6 +16760,8 @@ export namespace Prisma {
     uiTranslations: string | null
     updatedAt: Date
     _count: SiteSettingsCountAggregateOutputType | null
+    _avg: SiteSettingsAvgAggregateOutputType | null
+    _sum: SiteSettingsSumAggregateOutputType | null
     _min: SiteSettingsMinAggregateOutputType | null
     _max: SiteSettingsMaxAggregateOutputType | null
   }
@@ -16628,6 +16784,7 @@ export namespace Prisma {
     id?: boolean
     companyName?: boolean
     logoUrl?: boolean
+    logoScale?: boolean
     address?: boolean
     phone?: boolean
     email?: boolean
@@ -16658,6 +16815,7 @@ export namespace Prisma {
     id?: boolean
     companyName?: boolean
     logoUrl?: boolean
+    logoScale?: boolean
     address?: boolean
     phone?: boolean
     email?: boolean
@@ -16691,6 +16849,7 @@ export namespace Prisma {
       id: string
       companyName: string
       logoUrl: string | null
+      logoScale: number | null
       address: string | null
       phone: string | null
       email: string | null
@@ -17086,6 +17245,7 @@ export namespace Prisma {
     readonly id: FieldRef<"SiteSettings", 'String'>
     readonly companyName: FieldRef<"SiteSettings", 'String'>
     readonly logoUrl: FieldRef<"SiteSettings", 'String'>
+    readonly logoScale: FieldRef<"SiteSettings", 'Float'>
     readonly address: FieldRef<"SiteSettings", 'String'>
     readonly phone: FieldRef<"SiteSettings", 'String'>
     readonly email: FieldRef<"SiteSettings", 'String'>
@@ -22043,6 +22203,988 @@ export namespace Prisma {
      * Choose, which related nodes to fetch as well
      */
     include?: StoreReviewInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model ContactMessage
+   */
+
+  export type AggregateContactMessage = {
+    _count: ContactMessageCountAggregateOutputType | null
+    _min: ContactMessageMinAggregateOutputType | null
+    _max: ContactMessageMaxAggregateOutputType | null
+  }
+
+  export type ContactMessageMinAggregateOutputType = {
+    id: string | null
+    userId: string | null
+    name: string | null
+    email: string | null
+    phone: string | null
+    subject: string | null
+    message: string | null
+    source: string | null
+    locale: string | null
+    status: string | null
+    adminNote: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type ContactMessageMaxAggregateOutputType = {
+    id: string | null
+    userId: string | null
+    name: string | null
+    email: string | null
+    phone: string | null
+    subject: string | null
+    message: string | null
+    source: string | null
+    locale: string | null
+    status: string | null
+    adminNote: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type ContactMessageCountAggregateOutputType = {
+    id: number
+    userId: number
+    name: number
+    email: number
+    phone: number
+    subject: number
+    message: number
+    source: number
+    locale: number
+    status: number
+    adminNote: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type ContactMessageMinAggregateInputType = {
+    id?: true
+    userId?: true
+    name?: true
+    email?: true
+    phone?: true
+    subject?: true
+    message?: true
+    source?: true
+    locale?: true
+    status?: true
+    adminNote?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type ContactMessageMaxAggregateInputType = {
+    id?: true
+    userId?: true
+    name?: true
+    email?: true
+    phone?: true
+    subject?: true
+    message?: true
+    source?: true
+    locale?: true
+    status?: true
+    adminNote?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type ContactMessageCountAggregateInputType = {
+    id?: true
+    userId?: true
+    name?: true
+    email?: true
+    phone?: true
+    subject?: true
+    message?: true
+    source?: true
+    locale?: true
+    status?: true
+    adminNote?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type ContactMessageAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which ContactMessage to aggregate.
+     */
+    where?: ContactMessageWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ContactMessages to fetch.
+     */
+    orderBy?: ContactMessageOrderByWithRelationInput | ContactMessageOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: ContactMessageWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ContactMessages from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ContactMessages.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned ContactMessages
+    **/
+    _count?: true | ContactMessageCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: ContactMessageMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: ContactMessageMaxAggregateInputType
+  }
+
+  export type GetContactMessageAggregateType<T extends ContactMessageAggregateArgs> = {
+        [P in keyof T & keyof AggregateContactMessage]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateContactMessage[P]>
+      : GetScalarType<T[P], AggregateContactMessage[P]>
+  }
+
+
+
+
+  export type ContactMessageGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ContactMessageWhereInput
+    orderBy?: ContactMessageOrderByWithAggregationInput | ContactMessageOrderByWithAggregationInput[]
+    by: ContactMessageScalarFieldEnum[] | ContactMessageScalarFieldEnum
+    having?: ContactMessageScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: ContactMessageCountAggregateInputType | true
+    _min?: ContactMessageMinAggregateInputType
+    _max?: ContactMessageMaxAggregateInputType
+  }
+
+  export type ContactMessageGroupByOutputType = {
+    id: string
+    userId: string | null
+    name: string | null
+    email: string | null
+    phone: string | null
+    subject: string | null
+    message: string
+    source: string
+    locale: string | null
+    status: string
+    adminNote: string | null
+    createdAt: Date
+    updatedAt: Date
+    _count: ContactMessageCountAggregateOutputType | null
+    _min: ContactMessageMinAggregateOutputType | null
+    _max: ContactMessageMaxAggregateOutputType | null
+  }
+
+  type GetContactMessageGroupByPayload<T extends ContactMessageGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<ContactMessageGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof ContactMessageGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], ContactMessageGroupByOutputType[P]>
+            : GetScalarType<T[P], ContactMessageGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type ContactMessageSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    name?: boolean
+    email?: boolean
+    phone?: boolean
+    subject?: boolean
+    message?: boolean
+    source?: boolean
+    locale?: boolean
+    status?: boolean
+    adminNote?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    user?: boolean | ContactMessage$userArgs<ExtArgs>
+  }, ExtArgs["result"]["contactMessage"]>
+
+
+  export type ContactMessageSelectScalar = {
+    id?: boolean
+    userId?: boolean
+    name?: boolean
+    email?: boolean
+    phone?: boolean
+    subject?: boolean
+    message?: boolean
+    source?: boolean
+    locale?: boolean
+    status?: boolean
+    adminNote?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type ContactMessageInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | ContactMessage$userArgs<ExtArgs>
+  }
+
+  export type $ContactMessagePayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "ContactMessage"
+    objects: {
+      user: Prisma.$UserPayload<ExtArgs> | null
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      userId: string | null
+      name: string | null
+      email: string | null
+      phone: string | null
+      subject: string | null
+      message: string
+      source: string
+      locale: string | null
+      status: string
+      adminNote: string | null
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["contactMessage"]>
+    composites: {}
+  }
+
+  type ContactMessageGetPayload<S extends boolean | null | undefined | ContactMessageDefaultArgs> = $Result.GetResult<Prisma.$ContactMessagePayload, S>
+
+  type ContactMessageCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = 
+    Omit<ContactMessageFindManyArgs, 'select' | 'include' | 'distinct'> & {
+      select?: ContactMessageCountAggregateInputType | true
+    }
+
+  export interface ContactMessageDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['ContactMessage'], meta: { name: 'ContactMessage' } }
+    /**
+     * Find zero or one ContactMessage that matches the filter.
+     * @param {ContactMessageFindUniqueArgs} args - Arguments to find a ContactMessage
+     * @example
+     * // Get one ContactMessage
+     * const contactMessage = await prisma.contactMessage.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends ContactMessageFindUniqueArgs>(args: SelectSubset<T, ContactMessageFindUniqueArgs<ExtArgs>>): Prisma__ContactMessageClient<$Result.GetResult<Prisma.$ContactMessagePayload<ExtArgs>, T, "findUnique"> | null, null, ExtArgs>
+
+    /**
+     * Find one ContactMessage that matches the filter or throw an error with `error.code='P2025'` 
+     * if no matches were found.
+     * @param {ContactMessageFindUniqueOrThrowArgs} args - Arguments to find a ContactMessage
+     * @example
+     * // Get one ContactMessage
+     * const contactMessage = await prisma.contactMessage.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends ContactMessageFindUniqueOrThrowArgs>(args: SelectSubset<T, ContactMessageFindUniqueOrThrowArgs<ExtArgs>>): Prisma__ContactMessageClient<$Result.GetResult<Prisma.$ContactMessagePayload<ExtArgs>, T, "findUniqueOrThrow">, never, ExtArgs>
+
+    /**
+     * Find the first ContactMessage that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ContactMessageFindFirstArgs} args - Arguments to find a ContactMessage
+     * @example
+     * // Get one ContactMessage
+     * const contactMessage = await prisma.contactMessage.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends ContactMessageFindFirstArgs>(args?: SelectSubset<T, ContactMessageFindFirstArgs<ExtArgs>>): Prisma__ContactMessageClient<$Result.GetResult<Prisma.$ContactMessagePayload<ExtArgs>, T, "findFirst"> | null, null, ExtArgs>
+
+    /**
+     * Find the first ContactMessage that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ContactMessageFindFirstOrThrowArgs} args - Arguments to find a ContactMessage
+     * @example
+     * // Get one ContactMessage
+     * const contactMessage = await prisma.contactMessage.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends ContactMessageFindFirstOrThrowArgs>(args?: SelectSubset<T, ContactMessageFindFirstOrThrowArgs<ExtArgs>>): Prisma__ContactMessageClient<$Result.GetResult<Prisma.$ContactMessagePayload<ExtArgs>, T, "findFirstOrThrow">, never, ExtArgs>
+
+    /**
+     * Find zero or more ContactMessages that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ContactMessageFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all ContactMessages
+     * const contactMessages = await prisma.contactMessage.findMany()
+     * 
+     * // Get first 10 ContactMessages
+     * const contactMessages = await prisma.contactMessage.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const contactMessageWithIdOnly = await prisma.contactMessage.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends ContactMessageFindManyArgs>(args?: SelectSubset<T, ContactMessageFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ContactMessagePayload<ExtArgs>, T, "findMany">>
+
+    /**
+     * Create a ContactMessage.
+     * @param {ContactMessageCreateArgs} args - Arguments to create a ContactMessage.
+     * @example
+     * // Create one ContactMessage
+     * const ContactMessage = await prisma.contactMessage.create({
+     *   data: {
+     *     // ... data to create a ContactMessage
+     *   }
+     * })
+     * 
+     */
+    create<T extends ContactMessageCreateArgs>(args: SelectSubset<T, ContactMessageCreateArgs<ExtArgs>>): Prisma__ContactMessageClient<$Result.GetResult<Prisma.$ContactMessagePayload<ExtArgs>, T, "create">, never, ExtArgs>
+
+    /**
+     * Create many ContactMessages.
+     * @param {ContactMessageCreateManyArgs} args - Arguments to create many ContactMessages.
+     * @example
+     * // Create many ContactMessages
+     * const contactMessage = await prisma.contactMessage.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends ContactMessageCreateManyArgs>(args?: SelectSubset<T, ContactMessageCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Delete a ContactMessage.
+     * @param {ContactMessageDeleteArgs} args - Arguments to delete one ContactMessage.
+     * @example
+     * // Delete one ContactMessage
+     * const ContactMessage = await prisma.contactMessage.delete({
+     *   where: {
+     *     // ... filter to delete one ContactMessage
+     *   }
+     * })
+     * 
+     */
+    delete<T extends ContactMessageDeleteArgs>(args: SelectSubset<T, ContactMessageDeleteArgs<ExtArgs>>): Prisma__ContactMessageClient<$Result.GetResult<Prisma.$ContactMessagePayload<ExtArgs>, T, "delete">, never, ExtArgs>
+
+    /**
+     * Update one ContactMessage.
+     * @param {ContactMessageUpdateArgs} args - Arguments to update one ContactMessage.
+     * @example
+     * // Update one ContactMessage
+     * const contactMessage = await prisma.contactMessage.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends ContactMessageUpdateArgs>(args: SelectSubset<T, ContactMessageUpdateArgs<ExtArgs>>): Prisma__ContactMessageClient<$Result.GetResult<Prisma.$ContactMessagePayload<ExtArgs>, T, "update">, never, ExtArgs>
+
+    /**
+     * Delete zero or more ContactMessages.
+     * @param {ContactMessageDeleteManyArgs} args - Arguments to filter ContactMessages to delete.
+     * @example
+     * // Delete a few ContactMessages
+     * const { count } = await prisma.contactMessage.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends ContactMessageDeleteManyArgs>(args?: SelectSubset<T, ContactMessageDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more ContactMessages.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ContactMessageUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many ContactMessages
+     * const contactMessage = await prisma.contactMessage.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends ContactMessageUpdateManyArgs>(args: SelectSubset<T, ContactMessageUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create or update one ContactMessage.
+     * @param {ContactMessageUpsertArgs} args - Arguments to update or create a ContactMessage.
+     * @example
+     * // Update or create a ContactMessage
+     * const contactMessage = await prisma.contactMessage.upsert({
+     *   create: {
+     *     // ... data to create a ContactMessage
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the ContactMessage we want to update
+     *   }
+     * })
+     */
+    upsert<T extends ContactMessageUpsertArgs>(args: SelectSubset<T, ContactMessageUpsertArgs<ExtArgs>>): Prisma__ContactMessageClient<$Result.GetResult<Prisma.$ContactMessagePayload<ExtArgs>, T, "upsert">, never, ExtArgs>
+
+
+    /**
+     * Count the number of ContactMessages.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ContactMessageCountArgs} args - Arguments to filter ContactMessages to count.
+     * @example
+     * // Count the number of ContactMessages
+     * const count = await prisma.contactMessage.count({
+     *   where: {
+     *     // ... the filter for the ContactMessages we want to count
+     *   }
+     * })
+    **/
+    count<T extends ContactMessageCountArgs>(
+      args?: Subset<T, ContactMessageCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], ContactMessageCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a ContactMessage.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ContactMessageAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends ContactMessageAggregateArgs>(args: Subset<T, ContactMessageAggregateArgs>): Prisma.PrismaPromise<GetContactMessageAggregateType<T>>
+
+    /**
+     * Group by ContactMessage.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ContactMessageGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends ContactMessageGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: ContactMessageGroupByArgs['orderBy'] }
+        : { orderBy?: ContactMessageGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, ContactMessageGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetContactMessageGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the ContactMessage model
+   */
+  readonly fields: ContactMessageFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for ContactMessage.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__ContactMessageClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    user<T extends ContactMessage$userArgs<ExtArgs> = {}>(args?: Subset<T, ContactMessage$userArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow"> | null, null, ExtArgs>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the ContactMessage model
+   */ 
+  interface ContactMessageFieldRefs {
+    readonly id: FieldRef<"ContactMessage", 'String'>
+    readonly userId: FieldRef<"ContactMessage", 'String'>
+    readonly name: FieldRef<"ContactMessage", 'String'>
+    readonly email: FieldRef<"ContactMessage", 'String'>
+    readonly phone: FieldRef<"ContactMessage", 'String'>
+    readonly subject: FieldRef<"ContactMessage", 'String'>
+    readonly message: FieldRef<"ContactMessage", 'String'>
+    readonly source: FieldRef<"ContactMessage", 'String'>
+    readonly locale: FieldRef<"ContactMessage", 'String'>
+    readonly status: FieldRef<"ContactMessage", 'String'>
+    readonly adminNote: FieldRef<"ContactMessage", 'String'>
+    readonly createdAt: FieldRef<"ContactMessage", 'DateTime'>
+    readonly updatedAt: FieldRef<"ContactMessage", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * ContactMessage findUnique
+   */
+  export type ContactMessageFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ContactMessage
+     */
+    select?: ContactMessageSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ContactMessageInclude<ExtArgs> | null
+    /**
+     * Filter, which ContactMessage to fetch.
+     */
+    where: ContactMessageWhereUniqueInput
+  }
+
+  /**
+   * ContactMessage findUniqueOrThrow
+   */
+  export type ContactMessageFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ContactMessage
+     */
+    select?: ContactMessageSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ContactMessageInclude<ExtArgs> | null
+    /**
+     * Filter, which ContactMessage to fetch.
+     */
+    where: ContactMessageWhereUniqueInput
+  }
+
+  /**
+   * ContactMessage findFirst
+   */
+  export type ContactMessageFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ContactMessage
+     */
+    select?: ContactMessageSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ContactMessageInclude<ExtArgs> | null
+    /**
+     * Filter, which ContactMessage to fetch.
+     */
+    where?: ContactMessageWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ContactMessages to fetch.
+     */
+    orderBy?: ContactMessageOrderByWithRelationInput | ContactMessageOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for ContactMessages.
+     */
+    cursor?: ContactMessageWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ContactMessages from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ContactMessages.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of ContactMessages.
+     */
+    distinct?: ContactMessageScalarFieldEnum | ContactMessageScalarFieldEnum[]
+  }
+
+  /**
+   * ContactMessage findFirstOrThrow
+   */
+  export type ContactMessageFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ContactMessage
+     */
+    select?: ContactMessageSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ContactMessageInclude<ExtArgs> | null
+    /**
+     * Filter, which ContactMessage to fetch.
+     */
+    where?: ContactMessageWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ContactMessages to fetch.
+     */
+    orderBy?: ContactMessageOrderByWithRelationInput | ContactMessageOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for ContactMessages.
+     */
+    cursor?: ContactMessageWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ContactMessages from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ContactMessages.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of ContactMessages.
+     */
+    distinct?: ContactMessageScalarFieldEnum | ContactMessageScalarFieldEnum[]
+  }
+
+  /**
+   * ContactMessage findMany
+   */
+  export type ContactMessageFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ContactMessage
+     */
+    select?: ContactMessageSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ContactMessageInclude<ExtArgs> | null
+    /**
+     * Filter, which ContactMessages to fetch.
+     */
+    where?: ContactMessageWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ContactMessages to fetch.
+     */
+    orderBy?: ContactMessageOrderByWithRelationInput | ContactMessageOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing ContactMessages.
+     */
+    cursor?: ContactMessageWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ContactMessages from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ContactMessages.
+     */
+    skip?: number
+    distinct?: ContactMessageScalarFieldEnum | ContactMessageScalarFieldEnum[]
+  }
+
+  /**
+   * ContactMessage create
+   */
+  export type ContactMessageCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ContactMessage
+     */
+    select?: ContactMessageSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ContactMessageInclude<ExtArgs> | null
+    /**
+     * The data needed to create a ContactMessage.
+     */
+    data: XOR<ContactMessageCreateInput, ContactMessageUncheckedCreateInput>
+  }
+
+  /**
+   * ContactMessage createMany
+   */
+  export type ContactMessageCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many ContactMessages.
+     */
+    data: ContactMessageCreateManyInput | ContactMessageCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * ContactMessage update
+   */
+  export type ContactMessageUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ContactMessage
+     */
+    select?: ContactMessageSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ContactMessageInclude<ExtArgs> | null
+    /**
+     * The data needed to update a ContactMessage.
+     */
+    data: XOR<ContactMessageUpdateInput, ContactMessageUncheckedUpdateInput>
+    /**
+     * Choose, which ContactMessage to update.
+     */
+    where: ContactMessageWhereUniqueInput
+  }
+
+  /**
+   * ContactMessage updateMany
+   */
+  export type ContactMessageUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update ContactMessages.
+     */
+    data: XOR<ContactMessageUpdateManyMutationInput, ContactMessageUncheckedUpdateManyInput>
+    /**
+     * Filter which ContactMessages to update
+     */
+    where?: ContactMessageWhereInput
+  }
+
+  /**
+   * ContactMessage upsert
+   */
+  export type ContactMessageUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ContactMessage
+     */
+    select?: ContactMessageSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ContactMessageInclude<ExtArgs> | null
+    /**
+     * The filter to search for the ContactMessage to update in case it exists.
+     */
+    where: ContactMessageWhereUniqueInput
+    /**
+     * In case the ContactMessage found by the `where` argument doesn't exist, create a new ContactMessage with this data.
+     */
+    create: XOR<ContactMessageCreateInput, ContactMessageUncheckedCreateInput>
+    /**
+     * In case the ContactMessage was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<ContactMessageUpdateInput, ContactMessageUncheckedUpdateInput>
+  }
+
+  /**
+   * ContactMessage delete
+   */
+  export type ContactMessageDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ContactMessage
+     */
+    select?: ContactMessageSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ContactMessageInclude<ExtArgs> | null
+    /**
+     * Filter which ContactMessage to delete.
+     */
+    where: ContactMessageWhereUniqueInput
+  }
+
+  /**
+   * ContactMessage deleteMany
+   */
+  export type ContactMessageDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which ContactMessages to delete
+     */
+    where?: ContactMessageWhereInput
+  }
+
+  /**
+   * ContactMessage.user
+   */
+  export type ContactMessage$userArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the User
+     */
+    select?: UserSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserInclude<ExtArgs> | null
+    where?: UserWhereInput
+  }
+
+  /**
+   * ContactMessage without action
+   */
+  export type ContactMessageDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ContactMessage
+     */
+    select?: ContactMessageSelect<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ContactMessageInclude<ExtArgs> | null
   }
 
 
@@ -29157,6 +30299,7 @@ export namespace Prisma {
     id: 'id',
     companyName: 'companyName',
     logoUrl: 'logoUrl',
+    logoScale: 'logoScale',
     address: 'address',
     phone: 'phone',
     email: 'email',
@@ -29251,6 +30394,25 @@ export namespace Prisma {
   };
 
   export type StoreReviewScalarFieldEnum = (typeof StoreReviewScalarFieldEnum)[keyof typeof StoreReviewScalarFieldEnum]
+
+
+  export const ContactMessageScalarFieldEnum: {
+    id: 'id',
+    userId: 'userId',
+    name: 'name',
+    email: 'email',
+    phone: 'phone',
+    subject: 'subject',
+    message: 'message',
+    source: 'source',
+    locale: 'locale',
+    status: 'status',
+    adminNote: 'adminNote',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type ContactMessageScalarFieldEnum = (typeof ContactMessageScalarFieldEnum)[keyof typeof ContactMessageScalarFieldEnum]
 
 
   export const RefreshTokenScalarFieldEnum: {
@@ -29488,6 +30650,7 @@ export namespace Prisma {
     pushSubscriptions?: PushSubscriptionListRelationFilter
     cartAbandonments?: CartAbandonmentListRelationFilter
     clientErrors?: ClientErrorListRelationFilter
+    contactMessages?: ContactMessageListRelationFilter
     broadcastLogsSent?: BroadcastLogListRelationFilter
     broadcastLogsReceived?: BroadcastLogListRelationFilter
     broadcastJobs?: BroadcastJobListRelationFilter
@@ -29530,6 +30693,7 @@ export namespace Prisma {
     pushSubscriptions?: PushSubscriptionOrderByRelationAggregateInput
     cartAbandonments?: CartAbandonmentOrderByRelationAggregateInput
     clientErrors?: ClientErrorOrderByRelationAggregateInput
+    contactMessages?: ContactMessageOrderByRelationAggregateInput
     broadcastLogsSent?: BroadcastLogOrderByRelationAggregateInput
     broadcastLogsReceived?: BroadcastLogOrderByRelationAggregateInput
     broadcastJobs?: BroadcastJobOrderByRelationAggregateInput
@@ -29575,6 +30739,7 @@ export namespace Prisma {
     pushSubscriptions?: PushSubscriptionListRelationFilter
     cartAbandonments?: CartAbandonmentListRelationFilter
     clientErrors?: ClientErrorListRelationFilter
+    contactMessages?: ContactMessageListRelationFilter
     broadcastLogsSent?: BroadcastLogListRelationFilter
     broadcastLogsReceived?: BroadcastLogListRelationFilter
     broadcastJobs?: BroadcastJobListRelationFilter
@@ -30558,6 +31723,7 @@ export namespace Prisma {
     id?: StringFilter<"SiteSettings"> | string
     companyName?: StringFilter<"SiteSettings"> | string
     logoUrl?: StringNullableFilter<"SiteSettings"> | string | null
+    logoScale?: FloatNullableFilter<"SiteSettings"> | number | null
     address?: StringNullableFilter<"SiteSettings"> | string | null
     phone?: StringNullableFilter<"SiteSettings"> | string | null
     email?: StringNullableFilter<"SiteSettings"> | string | null
@@ -30587,6 +31753,7 @@ export namespace Prisma {
     id?: SortOrder
     companyName?: SortOrder
     logoUrl?: SortOrderInput | SortOrder
+    logoScale?: SortOrderInput | SortOrder
     address?: SortOrderInput | SortOrder
     phone?: SortOrderInput | SortOrder
     email?: SortOrderInput | SortOrder
@@ -30619,6 +31786,7 @@ export namespace Prisma {
     NOT?: SiteSettingsWhereInput | SiteSettingsWhereInput[]
     companyName?: StringFilter<"SiteSettings"> | string
     logoUrl?: StringNullableFilter<"SiteSettings"> | string | null
+    logoScale?: FloatNullableFilter<"SiteSettings"> | number | null
     address?: StringNullableFilter<"SiteSettings"> | string | null
     phone?: StringNullableFilter<"SiteSettings"> | string | null
     email?: StringNullableFilter<"SiteSettings"> | string | null
@@ -30648,6 +31816,7 @@ export namespace Prisma {
     id?: SortOrder
     companyName?: SortOrder
     logoUrl?: SortOrderInput | SortOrder
+    logoScale?: SortOrderInput | SortOrder
     address?: SortOrderInput | SortOrder
     phone?: SortOrderInput | SortOrder
     email?: SortOrderInput | SortOrder
@@ -30672,8 +31841,10 @@ export namespace Prisma {
     uiTranslations?: SortOrderInput | SortOrder
     updatedAt?: SortOrder
     _count?: SiteSettingsCountOrderByAggregateInput
+    _avg?: SiteSettingsAvgOrderByAggregateInput
     _max?: SiteSettingsMaxOrderByAggregateInput
     _min?: SiteSettingsMinOrderByAggregateInput
+    _sum?: SiteSettingsSumOrderByAggregateInput
   }
 
   export type SiteSettingsScalarWhereWithAggregatesInput = {
@@ -30683,6 +31854,7 @@ export namespace Prisma {
     id?: StringWithAggregatesFilter<"SiteSettings"> | string
     companyName?: StringWithAggregatesFilter<"SiteSettings"> | string
     logoUrl?: StringNullableWithAggregatesFilter<"SiteSettings"> | string | null
+    logoScale?: FloatNullableWithAggregatesFilter<"SiteSettings"> | number | null
     address?: StringNullableWithAggregatesFilter<"SiteSettings"> | string | null
     phone?: StringNullableWithAggregatesFilter<"SiteSettings"> | string | null
     email?: StringNullableWithAggregatesFilter<"SiteSettings"> | string | null
@@ -31052,6 +32224,101 @@ export namespace Prisma {
     status?: StringWithAggregatesFilter<"StoreReview"> | string
     createdAt?: DateTimeWithAggregatesFilter<"StoreReview"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"StoreReview"> | Date | string
+  }
+
+  export type ContactMessageWhereInput = {
+    AND?: ContactMessageWhereInput | ContactMessageWhereInput[]
+    OR?: ContactMessageWhereInput[]
+    NOT?: ContactMessageWhereInput | ContactMessageWhereInput[]
+    id?: StringFilter<"ContactMessage"> | string
+    userId?: StringNullableFilter<"ContactMessage"> | string | null
+    name?: StringNullableFilter<"ContactMessage"> | string | null
+    email?: StringNullableFilter<"ContactMessage"> | string | null
+    phone?: StringNullableFilter<"ContactMessage"> | string | null
+    subject?: StringNullableFilter<"ContactMessage"> | string | null
+    message?: StringFilter<"ContactMessage"> | string
+    source?: StringFilter<"ContactMessage"> | string
+    locale?: StringNullableFilter<"ContactMessage"> | string | null
+    status?: StringFilter<"ContactMessage"> | string
+    adminNote?: StringNullableFilter<"ContactMessage"> | string | null
+    createdAt?: DateTimeFilter<"ContactMessage"> | Date | string
+    updatedAt?: DateTimeFilter<"ContactMessage"> | Date | string
+    user?: XOR<UserNullableRelationFilter, UserWhereInput> | null
+  }
+
+  export type ContactMessageOrderByWithRelationInput = {
+    id?: SortOrder
+    userId?: SortOrderInput | SortOrder
+    name?: SortOrderInput | SortOrder
+    email?: SortOrderInput | SortOrder
+    phone?: SortOrderInput | SortOrder
+    subject?: SortOrderInput | SortOrder
+    message?: SortOrder
+    source?: SortOrder
+    locale?: SortOrderInput | SortOrder
+    status?: SortOrder
+    adminNote?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    user?: UserOrderByWithRelationInput
+  }
+
+  export type ContactMessageWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: ContactMessageWhereInput | ContactMessageWhereInput[]
+    OR?: ContactMessageWhereInput[]
+    NOT?: ContactMessageWhereInput | ContactMessageWhereInput[]
+    userId?: StringNullableFilter<"ContactMessage"> | string | null
+    name?: StringNullableFilter<"ContactMessage"> | string | null
+    email?: StringNullableFilter<"ContactMessage"> | string | null
+    phone?: StringNullableFilter<"ContactMessage"> | string | null
+    subject?: StringNullableFilter<"ContactMessage"> | string | null
+    message?: StringFilter<"ContactMessage"> | string
+    source?: StringFilter<"ContactMessage"> | string
+    locale?: StringNullableFilter<"ContactMessage"> | string | null
+    status?: StringFilter<"ContactMessage"> | string
+    adminNote?: StringNullableFilter<"ContactMessage"> | string | null
+    createdAt?: DateTimeFilter<"ContactMessage"> | Date | string
+    updatedAt?: DateTimeFilter<"ContactMessage"> | Date | string
+    user?: XOR<UserNullableRelationFilter, UserWhereInput> | null
+  }, "id">
+
+  export type ContactMessageOrderByWithAggregationInput = {
+    id?: SortOrder
+    userId?: SortOrderInput | SortOrder
+    name?: SortOrderInput | SortOrder
+    email?: SortOrderInput | SortOrder
+    phone?: SortOrderInput | SortOrder
+    subject?: SortOrderInput | SortOrder
+    message?: SortOrder
+    source?: SortOrder
+    locale?: SortOrderInput | SortOrder
+    status?: SortOrder
+    adminNote?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: ContactMessageCountOrderByAggregateInput
+    _max?: ContactMessageMaxOrderByAggregateInput
+    _min?: ContactMessageMinOrderByAggregateInput
+  }
+
+  export type ContactMessageScalarWhereWithAggregatesInput = {
+    AND?: ContactMessageScalarWhereWithAggregatesInput | ContactMessageScalarWhereWithAggregatesInput[]
+    OR?: ContactMessageScalarWhereWithAggregatesInput[]
+    NOT?: ContactMessageScalarWhereWithAggregatesInput | ContactMessageScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"ContactMessage"> | string
+    userId?: StringNullableWithAggregatesFilter<"ContactMessage"> | string | null
+    name?: StringNullableWithAggregatesFilter<"ContactMessage"> | string | null
+    email?: StringNullableWithAggregatesFilter<"ContactMessage"> | string | null
+    phone?: StringNullableWithAggregatesFilter<"ContactMessage"> | string | null
+    subject?: StringNullableWithAggregatesFilter<"ContactMessage"> | string | null
+    message?: StringWithAggregatesFilter<"ContactMessage"> | string
+    source?: StringWithAggregatesFilter<"ContactMessage"> | string
+    locale?: StringNullableWithAggregatesFilter<"ContactMessage"> | string | null
+    status?: StringWithAggregatesFilter<"ContactMessage"> | string
+    adminNote?: StringNullableWithAggregatesFilter<"ContactMessage"> | string | null
+    createdAt?: DateTimeWithAggregatesFilter<"ContactMessage"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"ContactMessage"> | Date | string
   }
 
   export type RefreshTokenWhereInput = {
@@ -31753,6 +33020,7 @@ export namespace Prisma {
     pushSubscriptions?: PushSubscriptionCreateNestedManyWithoutUserInput
     cartAbandonments?: CartAbandonmentCreateNestedManyWithoutUserInput
     clientErrors?: ClientErrorCreateNestedManyWithoutUserInput
+    contactMessages?: ContactMessageCreateNestedManyWithoutUserInput
     broadcastLogsSent?: BroadcastLogCreateNestedManyWithoutActorInput
     broadcastLogsReceived?: BroadcastLogCreateNestedManyWithoutTargetInput
     broadcastJobs?: BroadcastJobCreateNestedManyWithoutActorInput
@@ -31794,6 +33062,7 @@ export namespace Prisma {
     pushSubscriptions?: PushSubscriptionUncheckedCreateNestedManyWithoutUserInput
     cartAbandonments?: CartAbandonmentUncheckedCreateNestedManyWithoutUserInput
     clientErrors?: ClientErrorUncheckedCreateNestedManyWithoutUserInput
+    contactMessages?: ContactMessageUncheckedCreateNestedManyWithoutUserInput
     broadcastLogsSent?: BroadcastLogUncheckedCreateNestedManyWithoutActorInput
     broadcastLogsReceived?: BroadcastLogUncheckedCreateNestedManyWithoutTargetInput
     broadcastJobs?: BroadcastJobUncheckedCreateNestedManyWithoutActorInput
@@ -31835,6 +33104,7 @@ export namespace Prisma {
     pushSubscriptions?: PushSubscriptionUpdateManyWithoutUserNestedInput
     cartAbandonments?: CartAbandonmentUpdateManyWithoutUserNestedInput
     clientErrors?: ClientErrorUpdateManyWithoutUserNestedInput
+    contactMessages?: ContactMessageUpdateManyWithoutUserNestedInput
     broadcastLogsSent?: BroadcastLogUpdateManyWithoutActorNestedInput
     broadcastLogsReceived?: BroadcastLogUpdateManyWithoutTargetNestedInput
     broadcastJobs?: BroadcastJobUpdateManyWithoutActorNestedInput
@@ -31876,6 +33146,7 @@ export namespace Prisma {
     pushSubscriptions?: PushSubscriptionUncheckedUpdateManyWithoutUserNestedInput
     cartAbandonments?: CartAbandonmentUncheckedUpdateManyWithoutUserNestedInput
     clientErrors?: ClientErrorUncheckedUpdateManyWithoutUserNestedInput
+    contactMessages?: ContactMessageUncheckedUpdateManyWithoutUserNestedInput
     broadcastLogsSent?: BroadcastLogUncheckedUpdateManyWithoutActorNestedInput
     broadcastLogsReceived?: BroadcastLogUncheckedUpdateManyWithoutTargetNestedInput
     broadcastJobs?: BroadcastJobUncheckedUpdateManyWithoutActorNestedInput
@@ -32945,6 +34216,7 @@ export namespace Prisma {
     id?: string
     companyName?: string
     logoUrl?: string | null
+    logoScale?: number | null
     address?: string | null
     phone?: string | null
     email?: string | null
@@ -32974,6 +34246,7 @@ export namespace Prisma {
     id?: string
     companyName?: string
     logoUrl?: string | null
+    logoScale?: number | null
     address?: string | null
     phone?: string | null
     email?: string | null
@@ -33003,6 +34276,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     companyName?: StringFieldUpdateOperationsInput | string
     logoUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    logoScale?: NullableFloatFieldUpdateOperationsInput | number | null
     address?: NullableStringFieldUpdateOperationsInput | string | null
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     email?: NullableStringFieldUpdateOperationsInput | string | null
@@ -33032,6 +34306,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     companyName?: StringFieldUpdateOperationsInput | string
     logoUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    logoScale?: NullableFloatFieldUpdateOperationsInput | number | null
     address?: NullableStringFieldUpdateOperationsInput | string | null
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     email?: NullableStringFieldUpdateOperationsInput | string | null
@@ -33061,6 +34336,7 @@ export namespace Prisma {
     id?: string
     companyName?: string
     logoUrl?: string | null
+    logoScale?: number | null
     address?: string | null
     phone?: string | null
     email?: string | null
@@ -33090,6 +34366,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     companyName?: StringFieldUpdateOperationsInput | string
     logoUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    logoScale?: NullableFloatFieldUpdateOperationsInput | number | null
     address?: NullableStringFieldUpdateOperationsInput | string | null
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     email?: NullableStringFieldUpdateOperationsInput | string | null
@@ -33119,6 +34396,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     companyName?: StringFieldUpdateOperationsInput | string
     logoUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    logoScale?: NullableFloatFieldUpdateOperationsInput | number | null
     address?: NullableStringFieldUpdateOperationsInput | string | null
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     email?: NullableStringFieldUpdateOperationsInput | string | null
@@ -33511,6 +34789,117 @@ export namespace Prisma {
     text?: StringFieldUpdateOperationsInput | string
     translations?: NullableStringFieldUpdateOperationsInput | string | null
     status?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ContactMessageCreateInput = {
+    id?: string
+    name?: string | null
+    email?: string | null
+    phone?: string | null
+    subject?: string | null
+    message: string
+    source?: string
+    locale?: string | null
+    status?: string
+    adminNote?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    user?: UserCreateNestedOneWithoutContactMessagesInput
+  }
+
+  export type ContactMessageUncheckedCreateInput = {
+    id?: string
+    userId?: string | null
+    name?: string | null
+    email?: string | null
+    phone?: string | null
+    subject?: string | null
+    message: string
+    source?: string
+    locale?: string | null
+    status?: string
+    adminNote?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type ContactMessageUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    subject?: NullableStringFieldUpdateOperationsInput | string | null
+    message?: StringFieldUpdateOperationsInput | string
+    source?: StringFieldUpdateOperationsInput | string
+    locale?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    adminNote?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneWithoutContactMessagesNestedInput
+  }
+
+  export type ContactMessageUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: NullableStringFieldUpdateOperationsInput | string | null
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    subject?: NullableStringFieldUpdateOperationsInput | string | null
+    message?: StringFieldUpdateOperationsInput | string
+    source?: StringFieldUpdateOperationsInput | string
+    locale?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    adminNote?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ContactMessageCreateManyInput = {
+    id?: string
+    userId?: string | null
+    name?: string | null
+    email?: string | null
+    phone?: string | null
+    subject?: string | null
+    message: string
+    source?: string
+    locale?: string | null
+    status?: string
+    adminNote?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type ContactMessageUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    subject?: NullableStringFieldUpdateOperationsInput | string | null
+    message?: StringFieldUpdateOperationsInput | string
+    source?: StringFieldUpdateOperationsInput | string
+    locale?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    adminNote?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ContactMessageUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: NullableStringFieldUpdateOperationsInput | string | null
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    subject?: NullableStringFieldUpdateOperationsInput | string | null
+    message?: StringFieldUpdateOperationsInput | string
+    source?: StringFieldUpdateOperationsInput | string
+    locale?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    adminNote?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -34424,6 +35813,12 @@ export namespace Prisma {
     none?: ClientErrorWhereInput
   }
 
+  export type ContactMessageListRelationFilter = {
+    every?: ContactMessageWhereInput
+    some?: ContactMessageWhereInput
+    none?: ContactMessageWhereInput
+  }
+
   export type BroadcastLogListRelationFilter = {
     every?: BroadcastLogWhereInput
     some?: BroadcastLogWhereInput
@@ -34488,6 +35883,10 @@ export namespace Prisma {
   }
 
   export type ClientErrorOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type ContactMessageOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -35299,10 +36698,22 @@ export namespace Prisma {
     sortOrder?: SortOrder
   }
 
+  export type FloatNullableFilter<$PrismaModel = never> = {
+    equals?: number | FloatFieldRefInput<$PrismaModel> | null
+    in?: number[] | null
+    notIn?: number[] | null
+    lt?: number | FloatFieldRefInput<$PrismaModel>
+    lte?: number | FloatFieldRefInput<$PrismaModel>
+    gt?: number | FloatFieldRefInput<$PrismaModel>
+    gte?: number | FloatFieldRefInput<$PrismaModel>
+    not?: NestedFloatNullableFilter<$PrismaModel> | number | null
+  }
+
   export type SiteSettingsCountOrderByAggregateInput = {
     id?: SortOrder
     companyName?: SortOrder
     logoUrl?: SortOrder
+    logoScale?: SortOrder
     address?: SortOrder
     phone?: SortOrder
     email?: SortOrder
@@ -35328,10 +36739,15 @@ export namespace Prisma {
     updatedAt?: SortOrder
   }
 
+  export type SiteSettingsAvgOrderByAggregateInput = {
+    logoScale?: SortOrder
+  }
+
   export type SiteSettingsMaxOrderByAggregateInput = {
     id?: SortOrder
     companyName?: SortOrder
     logoUrl?: SortOrder
+    logoScale?: SortOrder
     address?: SortOrder
     phone?: SortOrder
     email?: SortOrder
@@ -35361,6 +36777,7 @@ export namespace Prisma {
     id?: SortOrder
     companyName?: SortOrder
     logoUrl?: SortOrder
+    logoScale?: SortOrder
     address?: SortOrder
     phone?: SortOrder
     email?: SortOrder
@@ -35384,6 +36801,26 @@ export namespace Prisma {
     translations?: SortOrder
     uiTranslations?: SortOrder
     updatedAt?: SortOrder
+  }
+
+  export type SiteSettingsSumOrderByAggregateInput = {
+    logoScale?: SortOrder
+  }
+
+  export type FloatNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | FloatFieldRefInput<$PrismaModel> | null
+    in?: number[] | null
+    notIn?: number[] | null
+    lt?: number | FloatFieldRefInput<$PrismaModel>
+    lte?: number | FloatFieldRefInput<$PrismaModel>
+    gt?: number | FloatFieldRefInput<$PrismaModel>
+    gte?: number | FloatFieldRefInput<$PrismaModel>
+    not?: NestedFloatNullableWithAggregatesFilter<$PrismaModel> | number | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _avg?: NestedFloatNullableFilter<$PrismaModel>
+    _sum?: NestedFloatNullableFilter<$PrismaModel>
+    _min?: NestedFloatNullableFilter<$PrismaModel>
+    _max?: NestedFloatNullableFilter<$PrismaModel>
   }
 
   export type MediaListRelationFilter = {
@@ -35582,6 +37019,54 @@ export namespace Prisma {
 
   export type StoreReviewSumOrderByAggregateInput = {
     rating?: SortOrder
+  }
+
+  export type ContactMessageCountOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    name?: SortOrder
+    email?: SortOrder
+    phone?: SortOrder
+    subject?: SortOrder
+    message?: SortOrder
+    source?: SortOrder
+    locale?: SortOrder
+    status?: SortOrder
+    adminNote?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type ContactMessageMaxOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    name?: SortOrder
+    email?: SortOrder
+    phone?: SortOrder
+    subject?: SortOrder
+    message?: SortOrder
+    source?: SortOrder
+    locale?: SortOrder
+    status?: SortOrder
+    adminNote?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type ContactMessageMinOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    name?: SortOrder
+    email?: SortOrder
+    phone?: SortOrder
+    subject?: SortOrder
+    message?: SortOrder
+    source?: SortOrder
+    locale?: SortOrder
+    status?: SortOrder
+    adminNote?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
   }
 
   export type RefreshTokenCountOrderByAggregateInput = {
@@ -36044,6 +37529,13 @@ export namespace Prisma {
     connect?: ClientErrorWhereUniqueInput | ClientErrorWhereUniqueInput[]
   }
 
+  export type ContactMessageCreateNestedManyWithoutUserInput = {
+    create?: XOR<ContactMessageCreateWithoutUserInput, ContactMessageUncheckedCreateWithoutUserInput> | ContactMessageCreateWithoutUserInput[] | ContactMessageUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: ContactMessageCreateOrConnectWithoutUserInput | ContactMessageCreateOrConnectWithoutUserInput[]
+    createMany?: ContactMessageCreateManyUserInputEnvelope
+    connect?: ContactMessageWhereUniqueInput | ContactMessageWhereUniqueInput[]
+  }
+
   export type BroadcastLogCreateNestedManyWithoutActorInput = {
     create?: XOR<BroadcastLogCreateWithoutActorInput, BroadcastLogUncheckedCreateWithoutActorInput> | BroadcastLogCreateWithoutActorInput[] | BroadcastLogUncheckedCreateWithoutActorInput[]
     connectOrCreate?: BroadcastLogCreateOrConnectWithoutActorInput | BroadcastLogCreateOrConnectWithoutActorInput[]
@@ -36154,6 +37646,13 @@ export namespace Prisma {
     connectOrCreate?: ClientErrorCreateOrConnectWithoutUserInput | ClientErrorCreateOrConnectWithoutUserInput[]
     createMany?: ClientErrorCreateManyUserInputEnvelope
     connect?: ClientErrorWhereUniqueInput | ClientErrorWhereUniqueInput[]
+  }
+
+  export type ContactMessageUncheckedCreateNestedManyWithoutUserInput = {
+    create?: XOR<ContactMessageCreateWithoutUserInput, ContactMessageUncheckedCreateWithoutUserInput> | ContactMessageCreateWithoutUserInput[] | ContactMessageUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: ContactMessageCreateOrConnectWithoutUserInput | ContactMessageCreateOrConnectWithoutUserInput[]
+    createMany?: ContactMessageCreateManyUserInputEnvelope
+    connect?: ContactMessageWhereUniqueInput | ContactMessageWhereUniqueInput[]
   }
 
   export type BroadcastLogUncheckedCreateNestedManyWithoutActorInput = {
@@ -36391,6 +37890,20 @@ export namespace Prisma {
     deleteMany?: ClientErrorScalarWhereInput | ClientErrorScalarWhereInput[]
   }
 
+  export type ContactMessageUpdateManyWithoutUserNestedInput = {
+    create?: XOR<ContactMessageCreateWithoutUserInput, ContactMessageUncheckedCreateWithoutUserInput> | ContactMessageCreateWithoutUserInput[] | ContactMessageUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: ContactMessageCreateOrConnectWithoutUserInput | ContactMessageCreateOrConnectWithoutUserInput[]
+    upsert?: ContactMessageUpsertWithWhereUniqueWithoutUserInput | ContactMessageUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: ContactMessageCreateManyUserInputEnvelope
+    set?: ContactMessageWhereUniqueInput | ContactMessageWhereUniqueInput[]
+    disconnect?: ContactMessageWhereUniqueInput | ContactMessageWhereUniqueInput[]
+    delete?: ContactMessageWhereUniqueInput | ContactMessageWhereUniqueInput[]
+    connect?: ContactMessageWhereUniqueInput | ContactMessageWhereUniqueInput[]
+    update?: ContactMessageUpdateWithWhereUniqueWithoutUserInput | ContactMessageUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: ContactMessageUpdateManyWithWhereWithoutUserInput | ContactMessageUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: ContactMessageScalarWhereInput | ContactMessageScalarWhereInput[]
+  }
+
   export type BroadcastLogUpdateManyWithoutActorNestedInput = {
     create?: XOR<BroadcastLogCreateWithoutActorInput, BroadcastLogUncheckedCreateWithoutActorInput> | BroadcastLogCreateWithoutActorInput[] | BroadcastLogUncheckedCreateWithoutActorInput[]
     connectOrCreate?: BroadcastLogCreateOrConnectWithoutActorInput | BroadcastLogCreateOrConnectWithoutActorInput[]
@@ -36613,6 +38126,20 @@ export namespace Prisma {
     update?: ClientErrorUpdateWithWhereUniqueWithoutUserInput | ClientErrorUpdateWithWhereUniqueWithoutUserInput[]
     updateMany?: ClientErrorUpdateManyWithWhereWithoutUserInput | ClientErrorUpdateManyWithWhereWithoutUserInput[]
     deleteMany?: ClientErrorScalarWhereInput | ClientErrorScalarWhereInput[]
+  }
+
+  export type ContactMessageUncheckedUpdateManyWithoutUserNestedInput = {
+    create?: XOR<ContactMessageCreateWithoutUserInput, ContactMessageUncheckedCreateWithoutUserInput> | ContactMessageCreateWithoutUserInput[] | ContactMessageUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: ContactMessageCreateOrConnectWithoutUserInput | ContactMessageCreateOrConnectWithoutUserInput[]
+    upsert?: ContactMessageUpsertWithWhereUniqueWithoutUserInput | ContactMessageUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: ContactMessageCreateManyUserInputEnvelope
+    set?: ContactMessageWhereUniqueInput | ContactMessageWhereUniqueInput[]
+    disconnect?: ContactMessageWhereUniqueInput | ContactMessageWhereUniqueInput[]
+    delete?: ContactMessageWhereUniqueInput | ContactMessageWhereUniqueInput[]
+    connect?: ContactMessageWhereUniqueInput | ContactMessageWhereUniqueInput[]
+    update?: ContactMessageUpdateWithWhereUniqueWithoutUserInput | ContactMessageUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: ContactMessageUpdateManyWithWhereWithoutUserInput | ContactMessageUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: ContactMessageScalarWhereInput | ContactMessageScalarWhereInput[]
   }
 
   export type BroadcastLogUncheckedUpdateManyWithoutActorNestedInput = {
@@ -37123,6 +38650,14 @@ export namespace Prisma {
     update?: XOR<XOR<ProductUpdateToOneWithWhereWithoutImagesInput, ProductUpdateWithoutImagesInput>, ProductUncheckedUpdateWithoutImagesInput>
   }
 
+  export type NullableFloatFieldUpdateOperationsInput = {
+    set?: number | null
+    increment?: number
+    decrement?: number
+    multiply?: number
+    divide?: number
+  }
+
   export type MediaCreateNestedManyWithoutFolderInput = {
     create?: XOR<MediaCreateWithoutFolderInput, MediaUncheckedCreateWithoutFolderInput> | MediaCreateWithoutFolderInput[] | MediaUncheckedCreateWithoutFolderInput[]
     connectOrCreate?: MediaCreateOrConnectWithoutFolderInput | MediaCreateOrConnectWithoutFolderInput[]
@@ -37225,6 +38760,22 @@ export namespace Prisma {
     delete?: UserWhereInput | boolean
     connect?: UserWhereUniqueInput
     update?: XOR<XOR<UserUpdateToOneWithWhereWithoutStoreReviewsInput, UserUpdateWithoutStoreReviewsInput>, UserUncheckedUpdateWithoutStoreReviewsInput>
+  }
+
+  export type UserCreateNestedOneWithoutContactMessagesInput = {
+    create?: XOR<UserCreateWithoutContactMessagesInput, UserUncheckedCreateWithoutContactMessagesInput>
+    connectOrCreate?: UserCreateOrConnectWithoutContactMessagesInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type UserUpdateOneWithoutContactMessagesNestedInput = {
+    create?: XOR<UserCreateWithoutContactMessagesInput, UserUncheckedCreateWithoutContactMessagesInput>
+    connectOrCreate?: UserCreateOrConnectWithoutContactMessagesInput
+    upsert?: UserUpsertWithoutContactMessagesInput
+    disconnect?: UserWhereInput | boolean
+    delete?: UserWhereInput | boolean
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutContactMessagesInput, UserUpdateWithoutContactMessagesInput>, UserUncheckedUpdateWithoutContactMessagesInput>
   }
 
   export type UserCreateNestedOneWithoutRefreshTokensInput = {
@@ -37570,6 +39121,33 @@ export namespace Prisma {
     _max?: NestedDateTimeFilter<$PrismaModel>
   }
 
+  export type NestedFloatNullableFilter<$PrismaModel = never> = {
+    equals?: number | FloatFieldRefInput<$PrismaModel> | null
+    in?: number[] | null
+    notIn?: number[] | null
+    lt?: number | FloatFieldRefInput<$PrismaModel>
+    lte?: number | FloatFieldRefInput<$PrismaModel>
+    gt?: number | FloatFieldRefInput<$PrismaModel>
+    gte?: number | FloatFieldRefInput<$PrismaModel>
+    not?: NestedFloatNullableFilter<$PrismaModel> | number | null
+  }
+
+  export type NestedFloatNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | FloatFieldRefInput<$PrismaModel> | null
+    in?: number[] | null
+    notIn?: number[] | null
+    lt?: number | FloatFieldRefInput<$PrismaModel>
+    lte?: number | FloatFieldRefInput<$PrismaModel>
+    gt?: number | FloatFieldRefInput<$PrismaModel>
+    gte?: number | FloatFieldRefInput<$PrismaModel>
+    not?: NestedFloatNullableWithAggregatesFilter<$PrismaModel> | number | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _avg?: NestedFloatNullableFilter<$PrismaModel>
+    _sum?: NestedFloatNullableFilter<$PrismaModel>
+    _min?: NestedFloatNullableFilter<$PrismaModel>
+    _max?: NestedFloatNullableFilter<$PrismaModel>
+  }
+
   export type NestedFloatWithAggregatesFilter<$PrismaModel = never> = {
     equals?: number | FloatFieldRefInput<$PrismaModel>
     in?: number[]
@@ -37619,6 +39197,7 @@ export namespace Prisma {
     pushSubscriptions?: PushSubscriptionCreateNestedManyWithoutUserInput
     cartAbandonments?: CartAbandonmentCreateNestedManyWithoutUserInput
     clientErrors?: ClientErrorCreateNestedManyWithoutUserInput
+    contactMessages?: ContactMessageCreateNestedManyWithoutUserInput
     broadcastLogsSent?: BroadcastLogCreateNestedManyWithoutActorInput
     broadcastLogsReceived?: BroadcastLogCreateNestedManyWithoutTargetInput
     broadcastJobs?: BroadcastJobCreateNestedManyWithoutActorInput
@@ -37659,6 +39238,7 @@ export namespace Prisma {
     pushSubscriptions?: PushSubscriptionUncheckedCreateNestedManyWithoutUserInput
     cartAbandonments?: CartAbandonmentUncheckedCreateNestedManyWithoutUserInput
     clientErrors?: ClientErrorUncheckedCreateNestedManyWithoutUserInput
+    contactMessages?: ContactMessageUncheckedCreateNestedManyWithoutUserInput
     broadcastLogsSent?: BroadcastLogUncheckedCreateNestedManyWithoutActorInput
     broadcastLogsReceived?: BroadcastLogUncheckedCreateNestedManyWithoutTargetInput
     broadcastJobs?: BroadcastJobUncheckedCreateNestedManyWithoutActorInput
@@ -37704,6 +39284,7 @@ export namespace Prisma {
     pushSubscriptions?: PushSubscriptionCreateNestedManyWithoutUserInput
     cartAbandonments?: CartAbandonmentCreateNestedManyWithoutUserInput
     clientErrors?: ClientErrorCreateNestedManyWithoutUserInput
+    contactMessages?: ContactMessageCreateNestedManyWithoutUserInput
     broadcastLogsSent?: BroadcastLogCreateNestedManyWithoutActorInput
     broadcastLogsReceived?: BroadcastLogCreateNestedManyWithoutTargetInput
     broadcastJobs?: BroadcastJobCreateNestedManyWithoutActorInput
@@ -37744,6 +39325,7 @@ export namespace Prisma {
     pushSubscriptions?: PushSubscriptionUncheckedCreateNestedManyWithoutUserInput
     cartAbandonments?: CartAbandonmentUncheckedCreateNestedManyWithoutUserInput
     clientErrors?: ClientErrorUncheckedCreateNestedManyWithoutUserInput
+    contactMessages?: ContactMessageUncheckedCreateNestedManyWithoutUserInput
     broadcastLogsSent?: BroadcastLogUncheckedCreateNestedManyWithoutActorInput
     broadcastLogsReceived?: BroadcastLogUncheckedCreateNestedManyWithoutTargetInput
     broadcastJobs?: BroadcastJobUncheckedCreateNestedManyWithoutActorInput
@@ -38115,6 +39697,46 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type ContactMessageCreateWithoutUserInput = {
+    id?: string
+    name?: string | null
+    email?: string | null
+    phone?: string | null
+    subject?: string | null
+    message: string
+    source?: string
+    locale?: string | null
+    status?: string
+    adminNote?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type ContactMessageUncheckedCreateWithoutUserInput = {
+    id?: string
+    name?: string | null
+    email?: string | null
+    phone?: string | null
+    subject?: string | null
+    message: string
+    source?: string
+    locale?: string | null
+    status?: string
+    adminNote?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type ContactMessageCreateOrConnectWithoutUserInput = {
+    where: ContactMessageWhereUniqueInput
+    create: XOR<ContactMessageCreateWithoutUserInput, ContactMessageUncheckedCreateWithoutUserInput>
+  }
+
+  export type ContactMessageCreateManyUserInputEnvelope = {
+    data: ContactMessageCreateManyUserInput | ContactMessageCreateManyUserInput[]
+    skipDuplicates?: boolean
+  }
+
   export type BroadcastLogCreateWithoutActorInput = {
     id?: string
     eventKey: string
@@ -38345,6 +39967,7 @@ export namespace Prisma {
     pushSubscriptions?: PushSubscriptionUpdateManyWithoutUserNestedInput
     cartAbandonments?: CartAbandonmentUpdateManyWithoutUserNestedInput
     clientErrors?: ClientErrorUpdateManyWithoutUserNestedInput
+    contactMessages?: ContactMessageUpdateManyWithoutUserNestedInput
     broadcastLogsSent?: BroadcastLogUpdateManyWithoutActorNestedInput
     broadcastLogsReceived?: BroadcastLogUpdateManyWithoutTargetNestedInput
     broadcastJobs?: BroadcastJobUpdateManyWithoutActorNestedInput
@@ -38385,6 +40008,7 @@ export namespace Prisma {
     pushSubscriptions?: PushSubscriptionUncheckedUpdateManyWithoutUserNestedInput
     cartAbandonments?: CartAbandonmentUncheckedUpdateManyWithoutUserNestedInput
     clientErrors?: ClientErrorUncheckedUpdateManyWithoutUserNestedInput
+    contactMessages?: ContactMessageUncheckedUpdateManyWithoutUserNestedInput
     broadcastLogsSent?: BroadcastLogUncheckedUpdateManyWithoutActorNestedInput
     broadcastLogsReceived?: BroadcastLogUncheckedUpdateManyWithoutTargetNestedInput
     broadcastJobs?: BroadcastJobUncheckedUpdateManyWithoutActorNestedInput
@@ -38762,6 +40386,41 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"ClientError"> | Date | string
   }
 
+  export type ContactMessageUpsertWithWhereUniqueWithoutUserInput = {
+    where: ContactMessageWhereUniqueInput
+    update: XOR<ContactMessageUpdateWithoutUserInput, ContactMessageUncheckedUpdateWithoutUserInput>
+    create: XOR<ContactMessageCreateWithoutUserInput, ContactMessageUncheckedCreateWithoutUserInput>
+  }
+
+  export type ContactMessageUpdateWithWhereUniqueWithoutUserInput = {
+    where: ContactMessageWhereUniqueInput
+    data: XOR<ContactMessageUpdateWithoutUserInput, ContactMessageUncheckedUpdateWithoutUserInput>
+  }
+
+  export type ContactMessageUpdateManyWithWhereWithoutUserInput = {
+    where: ContactMessageScalarWhereInput
+    data: XOR<ContactMessageUpdateManyMutationInput, ContactMessageUncheckedUpdateManyWithoutUserInput>
+  }
+
+  export type ContactMessageScalarWhereInput = {
+    AND?: ContactMessageScalarWhereInput | ContactMessageScalarWhereInput[]
+    OR?: ContactMessageScalarWhereInput[]
+    NOT?: ContactMessageScalarWhereInput | ContactMessageScalarWhereInput[]
+    id?: StringFilter<"ContactMessage"> | string
+    userId?: StringNullableFilter<"ContactMessage"> | string | null
+    name?: StringNullableFilter<"ContactMessage"> | string | null
+    email?: StringNullableFilter<"ContactMessage"> | string | null
+    phone?: StringNullableFilter<"ContactMessage"> | string | null
+    subject?: StringNullableFilter<"ContactMessage"> | string | null
+    message?: StringFilter<"ContactMessage"> | string
+    source?: StringFilter<"ContactMessage"> | string
+    locale?: StringNullableFilter<"ContactMessage"> | string | null
+    status?: StringFilter<"ContactMessage"> | string
+    adminNote?: StringNullableFilter<"ContactMessage"> | string | null
+    createdAt?: DateTimeFilter<"ContactMessage"> | Date | string
+    updatedAt?: DateTimeFilter<"ContactMessage"> | Date | string
+  }
+
   export type BroadcastLogUpsertWithWhereUniqueWithoutActorInput = {
     where: BroadcastLogWhereUniqueInput
     update: XOR<BroadcastLogUpdateWithoutActorInput, BroadcastLogUncheckedUpdateWithoutActorInput>
@@ -38931,6 +40590,7 @@ export namespace Prisma {
     pushSubscriptions?: PushSubscriptionCreateNestedManyWithoutUserInput
     cartAbandonments?: CartAbandonmentCreateNestedManyWithoutUserInput
     clientErrors?: ClientErrorCreateNestedManyWithoutUserInput
+    contactMessages?: ContactMessageCreateNestedManyWithoutUserInput
     broadcastLogsSent?: BroadcastLogCreateNestedManyWithoutActorInput
     broadcastLogsReceived?: BroadcastLogCreateNestedManyWithoutTargetInput
     broadcastJobs?: BroadcastJobCreateNestedManyWithoutActorInput
@@ -38971,6 +40631,7 @@ export namespace Prisma {
     pushSubscriptions?: PushSubscriptionUncheckedCreateNestedManyWithoutUserInput
     cartAbandonments?: CartAbandonmentUncheckedCreateNestedManyWithoutUserInput
     clientErrors?: ClientErrorUncheckedCreateNestedManyWithoutUserInput
+    contactMessages?: ContactMessageUncheckedCreateNestedManyWithoutUserInput
     broadcastLogsSent?: BroadcastLogUncheckedCreateNestedManyWithoutActorInput
     broadcastLogsReceived?: BroadcastLogUncheckedCreateNestedManyWithoutTargetInput
     broadcastJobs?: BroadcastJobUncheckedCreateNestedManyWithoutActorInput
@@ -39027,6 +40688,7 @@ export namespace Prisma {
     pushSubscriptions?: PushSubscriptionUpdateManyWithoutUserNestedInput
     cartAbandonments?: CartAbandonmentUpdateManyWithoutUserNestedInput
     clientErrors?: ClientErrorUpdateManyWithoutUserNestedInput
+    contactMessages?: ContactMessageUpdateManyWithoutUserNestedInput
     broadcastLogsSent?: BroadcastLogUpdateManyWithoutActorNestedInput
     broadcastLogsReceived?: BroadcastLogUpdateManyWithoutTargetNestedInput
     broadcastJobs?: BroadcastJobUpdateManyWithoutActorNestedInput
@@ -39067,6 +40729,7 @@ export namespace Prisma {
     pushSubscriptions?: PushSubscriptionUncheckedUpdateManyWithoutUserNestedInput
     cartAbandonments?: CartAbandonmentUncheckedUpdateManyWithoutUserNestedInput
     clientErrors?: ClientErrorUncheckedUpdateManyWithoutUserNestedInput
+    contactMessages?: ContactMessageUncheckedUpdateManyWithoutUserNestedInput
     broadcastLogsSent?: BroadcastLogUncheckedUpdateManyWithoutActorNestedInput
     broadcastLogsReceived?: BroadcastLogUncheckedUpdateManyWithoutTargetNestedInput
     broadcastJobs?: BroadcastJobUncheckedUpdateManyWithoutActorNestedInput
@@ -39459,6 +41122,7 @@ export namespace Prisma {
     pushSubscriptions?: PushSubscriptionCreateNestedManyWithoutUserInput
     cartAbandonments?: CartAbandonmentCreateNestedManyWithoutUserInput
     clientErrors?: ClientErrorCreateNestedManyWithoutUserInput
+    contactMessages?: ContactMessageCreateNestedManyWithoutUserInput
     broadcastLogsSent?: BroadcastLogCreateNestedManyWithoutActorInput
     broadcastLogsReceived?: BroadcastLogCreateNestedManyWithoutTargetInput
     broadcastJobs?: BroadcastJobCreateNestedManyWithoutActorInput
@@ -39499,6 +41163,7 @@ export namespace Prisma {
     pushSubscriptions?: PushSubscriptionUncheckedCreateNestedManyWithoutUserInput
     cartAbandonments?: CartAbandonmentUncheckedCreateNestedManyWithoutUserInput
     clientErrors?: ClientErrorUncheckedCreateNestedManyWithoutUserInput
+    contactMessages?: ContactMessageUncheckedCreateNestedManyWithoutUserInput
     broadcastLogsSent?: BroadcastLogUncheckedCreateNestedManyWithoutActorInput
     broadcastLogsReceived?: BroadcastLogUncheckedCreateNestedManyWithoutTargetInput
     broadcastJobs?: BroadcastJobUncheckedCreateNestedManyWithoutActorInput
@@ -39581,6 +41246,7 @@ export namespace Prisma {
     pushSubscriptions?: PushSubscriptionUpdateManyWithoutUserNestedInput
     cartAbandonments?: CartAbandonmentUpdateManyWithoutUserNestedInput
     clientErrors?: ClientErrorUpdateManyWithoutUserNestedInput
+    contactMessages?: ContactMessageUpdateManyWithoutUserNestedInput
     broadcastLogsSent?: BroadcastLogUpdateManyWithoutActorNestedInput
     broadcastLogsReceived?: BroadcastLogUpdateManyWithoutTargetNestedInput
     broadcastJobs?: BroadcastJobUpdateManyWithoutActorNestedInput
@@ -39621,6 +41287,7 @@ export namespace Prisma {
     pushSubscriptions?: PushSubscriptionUncheckedUpdateManyWithoutUserNestedInput
     cartAbandonments?: CartAbandonmentUncheckedUpdateManyWithoutUserNestedInput
     clientErrors?: ClientErrorUncheckedUpdateManyWithoutUserNestedInput
+    contactMessages?: ContactMessageUncheckedUpdateManyWithoutUserNestedInput
     broadcastLogsSent?: BroadcastLogUncheckedUpdateManyWithoutActorNestedInput
     broadcastLogsReceived?: BroadcastLogUncheckedUpdateManyWithoutTargetNestedInput
     broadcastJobs?: BroadcastJobUncheckedUpdateManyWithoutActorNestedInput
@@ -39857,6 +41524,7 @@ export namespace Prisma {
     pushSubscriptions?: PushSubscriptionCreateNestedManyWithoutUserInput
     cartAbandonments?: CartAbandonmentCreateNestedManyWithoutUserInput
     clientErrors?: ClientErrorCreateNestedManyWithoutUserInput
+    contactMessages?: ContactMessageCreateNestedManyWithoutUserInput
     broadcastLogsSent?: BroadcastLogCreateNestedManyWithoutActorInput
     broadcastLogsReceived?: BroadcastLogCreateNestedManyWithoutTargetInput
     broadcastJobs?: BroadcastJobCreateNestedManyWithoutActorInput
@@ -39897,6 +41565,7 @@ export namespace Prisma {
     pushSubscriptions?: PushSubscriptionUncheckedCreateNestedManyWithoutUserInput
     cartAbandonments?: CartAbandonmentUncheckedCreateNestedManyWithoutUserInput
     clientErrors?: ClientErrorUncheckedCreateNestedManyWithoutUserInput
+    contactMessages?: ContactMessageUncheckedCreateNestedManyWithoutUserInput
     broadcastLogsSent?: BroadcastLogUncheckedCreateNestedManyWithoutActorInput
     broadcastLogsReceived?: BroadcastLogUncheckedCreateNestedManyWithoutTargetInput
     broadcastJobs?: BroadcastJobUncheckedCreateNestedManyWithoutActorInput
@@ -39953,6 +41622,7 @@ export namespace Prisma {
     pushSubscriptions?: PushSubscriptionUpdateManyWithoutUserNestedInput
     cartAbandonments?: CartAbandonmentUpdateManyWithoutUserNestedInput
     clientErrors?: ClientErrorUpdateManyWithoutUserNestedInput
+    contactMessages?: ContactMessageUpdateManyWithoutUserNestedInput
     broadcastLogsSent?: BroadcastLogUpdateManyWithoutActorNestedInput
     broadcastLogsReceived?: BroadcastLogUpdateManyWithoutTargetNestedInput
     broadcastJobs?: BroadcastJobUpdateManyWithoutActorNestedInput
@@ -39993,6 +41663,7 @@ export namespace Prisma {
     pushSubscriptions?: PushSubscriptionUncheckedUpdateManyWithoutUserNestedInput
     cartAbandonments?: CartAbandonmentUncheckedUpdateManyWithoutUserNestedInput
     clientErrors?: ClientErrorUncheckedUpdateManyWithoutUserNestedInput
+    contactMessages?: ContactMessageUncheckedUpdateManyWithoutUserNestedInput
     broadcastLogsSent?: BroadcastLogUncheckedUpdateManyWithoutActorNestedInput
     broadcastLogsReceived?: BroadcastLogUncheckedUpdateManyWithoutTargetNestedInput
     broadcastJobs?: BroadcastJobUncheckedUpdateManyWithoutActorNestedInput
@@ -40075,6 +41746,7 @@ export namespace Prisma {
     pushSubscriptions?: PushSubscriptionCreateNestedManyWithoutUserInput
     cartAbandonments?: CartAbandonmentCreateNestedManyWithoutUserInput
     clientErrors?: ClientErrorCreateNestedManyWithoutUserInput
+    contactMessages?: ContactMessageCreateNestedManyWithoutUserInput
     broadcastLogsSent?: BroadcastLogCreateNestedManyWithoutActorInput
     broadcastLogsReceived?: BroadcastLogCreateNestedManyWithoutTargetInput
     broadcastJobs?: BroadcastJobCreateNestedManyWithoutActorInput
@@ -40115,6 +41787,7 @@ export namespace Prisma {
     pushSubscriptions?: PushSubscriptionUncheckedCreateNestedManyWithoutUserInput
     cartAbandonments?: CartAbandonmentUncheckedCreateNestedManyWithoutUserInput
     clientErrors?: ClientErrorUncheckedCreateNestedManyWithoutUserInput
+    contactMessages?: ContactMessageUncheckedCreateNestedManyWithoutUserInput
     broadcastLogsSent?: BroadcastLogUncheckedCreateNestedManyWithoutActorInput
     broadcastLogsReceived?: BroadcastLogUncheckedCreateNestedManyWithoutTargetInput
     broadcastJobs?: BroadcastJobUncheckedCreateNestedManyWithoutActorInput
@@ -40194,6 +41867,7 @@ export namespace Prisma {
     pushSubscriptions?: PushSubscriptionUpdateManyWithoutUserNestedInput
     cartAbandonments?: CartAbandonmentUpdateManyWithoutUserNestedInput
     clientErrors?: ClientErrorUpdateManyWithoutUserNestedInput
+    contactMessages?: ContactMessageUpdateManyWithoutUserNestedInput
     broadcastLogsSent?: BroadcastLogUpdateManyWithoutActorNestedInput
     broadcastLogsReceived?: BroadcastLogUpdateManyWithoutTargetNestedInput
     broadcastJobs?: BroadcastJobUpdateManyWithoutActorNestedInput
@@ -40234,6 +41908,7 @@ export namespace Prisma {
     pushSubscriptions?: PushSubscriptionUncheckedUpdateManyWithoutUserNestedInput
     cartAbandonments?: CartAbandonmentUncheckedUpdateManyWithoutUserNestedInput
     clientErrors?: ClientErrorUncheckedUpdateManyWithoutUserNestedInput
+    contactMessages?: ContactMessageUncheckedUpdateManyWithoutUserNestedInput
     broadcastLogsSent?: BroadcastLogUncheckedUpdateManyWithoutActorNestedInput
     broadcastLogsReceived?: BroadcastLogUncheckedUpdateManyWithoutTargetNestedInput
     broadcastJobs?: BroadcastJobUncheckedUpdateManyWithoutActorNestedInput
@@ -40621,6 +42296,7 @@ export namespace Prisma {
     pushSubscriptions?: PushSubscriptionCreateNestedManyWithoutUserInput
     cartAbandonments?: CartAbandonmentCreateNestedManyWithoutUserInput
     clientErrors?: ClientErrorCreateNestedManyWithoutUserInput
+    contactMessages?: ContactMessageCreateNestedManyWithoutUserInput
     broadcastLogsSent?: BroadcastLogCreateNestedManyWithoutActorInput
     broadcastLogsReceived?: BroadcastLogCreateNestedManyWithoutTargetInput
     broadcastJobs?: BroadcastJobCreateNestedManyWithoutActorInput
@@ -40661,6 +42337,7 @@ export namespace Prisma {
     pushSubscriptions?: PushSubscriptionUncheckedCreateNestedManyWithoutUserInput
     cartAbandonments?: CartAbandonmentUncheckedCreateNestedManyWithoutUserInput
     clientErrors?: ClientErrorUncheckedCreateNestedManyWithoutUserInput
+    contactMessages?: ContactMessageUncheckedCreateNestedManyWithoutUserInput
     broadcastLogsSent?: BroadcastLogUncheckedCreateNestedManyWithoutActorInput
     broadcastLogsReceived?: BroadcastLogUncheckedCreateNestedManyWithoutTargetInput
     broadcastJobs?: BroadcastJobUncheckedCreateNestedManyWithoutActorInput
@@ -40766,6 +42443,7 @@ export namespace Prisma {
     pushSubscriptions?: PushSubscriptionUpdateManyWithoutUserNestedInput
     cartAbandonments?: CartAbandonmentUpdateManyWithoutUserNestedInput
     clientErrors?: ClientErrorUpdateManyWithoutUserNestedInput
+    contactMessages?: ContactMessageUpdateManyWithoutUserNestedInput
     broadcastLogsSent?: BroadcastLogUpdateManyWithoutActorNestedInput
     broadcastLogsReceived?: BroadcastLogUpdateManyWithoutTargetNestedInput
     broadcastJobs?: BroadcastJobUpdateManyWithoutActorNestedInput
@@ -40806,6 +42484,7 @@ export namespace Prisma {
     pushSubscriptions?: PushSubscriptionUncheckedUpdateManyWithoutUserNestedInput
     cartAbandonments?: CartAbandonmentUncheckedUpdateManyWithoutUserNestedInput
     clientErrors?: ClientErrorUncheckedUpdateManyWithoutUserNestedInput
+    contactMessages?: ContactMessageUncheckedUpdateManyWithoutUserNestedInput
     broadcastLogsSent?: BroadcastLogUncheckedUpdateManyWithoutActorNestedInput
     broadcastLogsReceived?: BroadcastLogUncheckedUpdateManyWithoutTargetNestedInput
     broadcastJobs?: BroadcastJobUncheckedUpdateManyWithoutActorNestedInput
@@ -40846,6 +42525,7 @@ export namespace Prisma {
     pushSubscriptions?: PushSubscriptionCreateNestedManyWithoutUserInput
     cartAbandonments?: CartAbandonmentCreateNestedManyWithoutUserInput
     clientErrors?: ClientErrorCreateNestedManyWithoutUserInput
+    contactMessages?: ContactMessageCreateNestedManyWithoutUserInput
     broadcastLogsSent?: BroadcastLogCreateNestedManyWithoutActorInput
     broadcastLogsReceived?: BroadcastLogCreateNestedManyWithoutTargetInput
     broadcastJobs?: BroadcastJobCreateNestedManyWithoutActorInput
@@ -40886,6 +42566,7 @@ export namespace Prisma {
     pushSubscriptions?: PushSubscriptionUncheckedCreateNestedManyWithoutUserInput
     cartAbandonments?: CartAbandonmentUncheckedCreateNestedManyWithoutUserInput
     clientErrors?: ClientErrorUncheckedCreateNestedManyWithoutUserInput
+    contactMessages?: ContactMessageUncheckedCreateNestedManyWithoutUserInput
     broadcastLogsSent?: BroadcastLogUncheckedCreateNestedManyWithoutActorInput
     broadcastLogsReceived?: BroadcastLogUncheckedCreateNestedManyWithoutTargetInput
     broadcastJobs?: BroadcastJobUncheckedCreateNestedManyWithoutActorInput
@@ -40942,6 +42623,7 @@ export namespace Prisma {
     pushSubscriptions?: PushSubscriptionUpdateManyWithoutUserNestedInput
     cartAbandonments?: CartAbandonmentUpdateManyWithoutUserNestedInput
     clientErrors?: ClientErrorUpdateManyWithoutUserNestedInput
+    contactMessages?: ContactMessageUpdateManyWithoutUserNestedInput
     broadcastLogsSent?: BroadcastLogUpdateManyWithoutActorNestedInput
     broadcastLogsReceived?: BroadcastLogUpdateManyWithoutTargetNestedInput
     broadcastJobs?: BroadcastJobUpdateManyWithoutActorNestedInput
@@ -40978,6 +42660,187 @@ export namespace Prisma {
     userWeeklyStats?: UserWeeklyStatsUncheckedUpdateManyWithoutUserNestedInput
     withdrawals?: WithdrawalRequestUncheckedUpdateManyWithoutUserNestedInput
     reviews?: ProductReviewUncheckedUpdateManyWithoutUserNestedInput
+    refreshTokens?: RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
+    pushSubscriptions?: PushSubscriptionUncheckedUpdateManyWithoutUserNestedInput
+    cartAbandonments?: CartAbandonmentUncheckedUpdateManyWithoutUserNestedInput
+    clientErrors?: ClientErrorUncheckedUpdateManyWithoutUserNestedInput
+    contactMessages?: ContactMessageUncheckedUpdateManyWithoutUserNestedInput
+    broadcastLogsSent?: BroadcastLogUncheckedUpdateManyWithoutActorNestedInput
+    broadcastLogsReceived?: BroadcastLogUncheckedUpdateManyWithoutTargetNestedInput
+    broadcastJobs?: BroadcastJobUncheckedUpdateManyWithoutActorNestedInput
+    impersonationsAsAdmin?: ImpersonationSessionUncheckedUpdateManyWithoutAdminNestedInput
+    impersonationsAsTarget?: ImpersonationSessionUncheckedUpdateManyWithoutTargetNestedInput
+  }
+
+  export type UserCreateWithoutContactMessagesInput = {
+    id?: string
+    role?: string
+    placementId?: string | null
+    legPosition?: string | null
+    name: string
+    email: string
+    passwordHash: string
+    phone?: string | null
+    address?: string | null
+    city?: string | null
+    birthDate?: Date | string | null
+    walletBalanceKgs?: Decimal | DecimalJsLike | number | string
+    walletBalanceUsd?: Decimal | DecimalJsLike | number | string
+    cumulativeSpendKgs?: Decimal | DecimalJsLike | number | string
+    loyaltyLevel?: number
+    dynamicDiscountRate?: Decimal | DecimalJsLike | number | string
+    isMonthlyActive?: boolean
+    preferredLocale?: string
+    deletedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    sponsor?: UserCreateNestedOneWithoutSponsoredUsersInput
+    sponsoredUsers?: UserCreateNestedManyWithoutSponsorInput
+    orders?: OrderCreateNestedManyWithoutUserInput
+    transactions?: TransactionCreateNestedManyWithoutUserInput
+    userWeeklyStats?: UserWeeklyStatsCreateNestedManyWithoutUserInput
+    withdrawals?: WithdrawalRequestCreateNestedManyWithoutUserInput
+    reviews?: ProductReviewCreateNestedManyWithoutUserInput
+    storeReviews?: StoreReviewCreateNestedManyWithoutUserInput
+    refreshTokens?: RefreshTokenCreateNestedManyWithoutUserInput
+    pushSubscriptions?: PushSubscriptionCreateNestedManyWithoutUserInput
+    cartAbandonments?: CartAbandonmentCreateNestedManyWithoutUserInput
+    clientErrors?: ClientErrorCreateNestedManyWithoutUserInput
+    broadcastLogsSent?: BroadcastLogCreateNestedManyWithoutActorInput
+    broadcastLogsReceived?: BroadcastLogCreateNestedManyWithoutTargetInput
+    broadcastJobs?: BroadcastJobCreateNestedManyWithoutActorInput
+    impersonationsAsAdmin?: ImpersonationSessionCreateNestedManyWithoutAdminInput
+    impersonationsAsTarget?: ImpersonationSessionCreateNestedManyWithoutTargetInput
+  }
+
+  export type UserUncheckedCreateWithoutContactMessagesInput = {
+    id?: string
+    role?: string
+    sponsorId?: string | null
+    placementId?: string | null
+    legPosition?: string | null
+    name: string
+    email: string
+    passwordHash: string
+    phone?: string | null
+    address?: string | null
+    city?: string | null
+    birthDate?: Date | string | null
+    walletBalanceKgs?: Decimal | DecimalJsLike | number | string
+    walletBalanceUsd?: Decimal | DecimalJsLike | number | string
+    cumulativeSpendKgs?: Decimal | DecimalJsLike | number | string
+    loyaltyLevel?: number
+    dynamicDiscountRate?: Decimal | DecimalJsLike | number | string
+    isMonthlyActive?: boolean
+    preferredLocale?: string
+    deletedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    sponsoredUsers?: UserUncheckedCreateNestedManyWithoutSponsorInput
+    orders?: OrderUncheckedCreateNestedManyWithoutUserInput
+    transactions?: TransactionUncheckedCreateNestedManyWithoutUserInput
+    userWeeklyStats?: UserWeeklyStatsUncheckedCreateNestedManyWithoutUserInput
+    withdrawals?: WithdrawalRequestUncheckedCreateNestedManyWithoutUserInput
+    reviews?: ProductReviewUncheckedCreateNestedManyWithoutUserInput
+    storeReviews?: StoreReviewUncheckedCreateNestedManyWithoutUserInput
+    refreshTokens?: RefreshTokenUncheckedCreateNestedManyWithoutUserInput
+    pushSubscriptions?: PushSubscriptionUncheckedCreateNestedManyWithoutUserInput
+    cartAbandonments?: CartAbandonmentUncheckedCreateNestedManyWithoutUserInput
+    clientErrors?: ClientErrorUncheckedCreateNestedManyWithoutUserInput
+    broadcastLogsSent?: BroadcastLogUncheckedCreateNestedManyWithoutActorInput
+    broadcastLogsReceived?: BroadcastLogUncheckedCreateNestedManyWithoutTargetInput
+    broadcastJobs?: BroadcastJobUncheckedCreateNestedManyWithoutActorInput
+    impersonationsAsAdmin?: ImpersonationSessionUncheckedCreateNestedManyWithoutAdminInput
+    impersonationsAsTarget?: ImpersonationSessionUncheckedCreateNestedManyWithoutTargetInput
+  }
+
+  export type UserCreateOrConnectWithoutContactMessagesInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutContactMessagesInput, UserUncheckedCreateWithoutContactMessagesInput>
+  }
+
+  export type UserUpsertWithoutContactMessagesInput = {
+    update: XOR<UserUpdateWithoutContactMessagesInput, UserUncheckedUpdateWithoutContactMessagesInput>
+    create: XOR<UserCreateWithoutContactMessagesInput, UserUncheckedCreateWithoutContactMessagesInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutContactMessagesInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutContactMessagesInput, UserUncheckedUpdateWithoutContactMessagesInput>
+  }
+
+  export type UserUpdateWithoutContactMessagesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    role?: StringFieldUpdateOperationsInput | string
+    placementId?: NullableStringFieldUpdateOperationsInput | string | null
+    legPosition?: NullableStringFieldUpdateOperationsInput | string | null
+    name?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    passwordHash?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    city?: NullableStringFieldUpdateOperationsInput | string | null
+    birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    walletBalanceKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    walletBalanceUsd?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    cumulativeSpendKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    loyaltyLevel?: IntFieldUpdateOperationsInput | number
+    dynamicDiscountRate?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    isMonthlyActive?: BoolFieldUpdateOperationsInput | boolean
+    preferredLocale?: StringFieldUpdateOperationsInput | string
+    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    sponsor?: UserUpdateOneWithoutSponsoredUsersNestedInput
+    sponsoredUsers?: UserUpdateManyWithoutSponsorNestedInput
+    orders?: OrderUpdateManyWithoutUserNestedInput
+    transactions?: TransactionUpdateManyWithoutUserNestedInput
+    userWeeklyStats?: UserWeeklyStatsUpdateManyWithoutUserNestedInput
+    withdrawals?: WithdrawalRequestUpdateManyWithoutUserNestedInput
+    reviews?: ProductReviewUpdateManyWithoutUserNestedInput
+    storeReviews?: StoreReviewUpdateManyWithoutUserNestedInput
+    refreshTokens?: RefreshTokenUpdateManyWithoutUserNestedInput
+    pushSubscriptions?: PushSubscriptionUpdateManyWithoutUserNestedInput
+    cartAbandonments?: CartAbandonmentUpdateManyWithoutUserNestedInput
+    clientErrors?: ClientErrorUpdateManyWithoutUserNestedInput
+    broadcastLogsSent?: BroadcastLogUpdateManyWithoutActorNestedInput
+    broadcastLogsReceived?: BroadcastLogUpdateManyWithoutTargetNestedInput
+    broadcastJobs?: BroadcastJobUpdateManyWithoutActorNestedInput
+    impersonationsAsAdmin?: ImpersonationSessionUpdateManyWithoutAdminNestedInput
+    impersonationsAsTarget?: ImpersonationSessionUpdateManyWithoutTargetNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutContactMessagesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    role?: StringFieldUpdateOperationsInput | string
+    sponsorId?: NullableStringFieldUpdateOperationsInput | string | null
+    placementId?: NullableStringFieldUpdateOperationsInput | string | null
+    legPosition?: NullableStringFieldUpdateOperationsInput | string | null
+    name?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    passwordHash?: StringFieldUpdateOperationsInput | string
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    city?: NullableStringFieldUpdateOperationsInput | string | null
+    birthDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    walletBalanceKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    walletBalanceUsd?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    cumulativeSpendKgs?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    loyaltyLevel?: IntFieldUpdateOperationsInput | number
+    dynamicDiscountRate?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    isMonthlyActive?: BoolFieldUpdateOperationsInput | boolean
+    preferredLocale?: StringFieldUpdateOperationsInput | string
+    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    sponsoredUsers?: UserUncheckedUpdateManyWithoutSponsorNestedInput
+    orders?: OrderUncheckedUpdateManyWithoutUserNestedInput
+    transactions?: TransactionUncheckedUpdateManyWithoutUserNestedInput
+    userWeeklyStats?: UserWeeklyStatsUncheckedUpdateManyWithoutUserNestedInput
+    withdrawals?: WithdrawalRequestUncheckedUpdateManyWithoutUserNestedInput
+    reviews?: ProductReviewUncheckedUpdateManyWithoutUserNestedInput
+    storeReviews?: StoreReviewUncheckedUpdateManyWithoutUserNestedInput
     refreshTokens?: RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
     pushSubscriptions?: PushSubscriptionUncheckedUpdateManyWithoutUserNestedInput
     cartAbandonments?: CartAbandonmentUncheckedUpdateManyWithoutUserNestedInput
@@ -41022,6 +42885,7 @@ export namespace Prisma {
     pushSubscriptions?: PushSubscriptionCreateNestedManyWithoutUserInput
     cartAbandonments?: CartAbandonmentCreateNestedManyWithoutUserInput
     clientErrors?: ClientErrorCreateNestedManyWithoutUserInput
+    contactMessages?: ContactMessageCreateNestedManyWithoutUserInput
     broadcastLogsSent?: BroadcastLogCreateNestedManyWithoutActorInput
     broadcastLogsReceived?: BroadcastLogCreateNestedManyWithoutTargetInput
     broadcastJobs?: BroadcastJobCreateNestedManyWithoutActorInput
@@ -41062,6 +42926,7 @@ export namespace Prisma {
     pushSubscriptions?: PushSubscriptionUncheckedCreateNestedManyWithoutUserInput
     cartAbandonments?: CartAbandonmentUncheckedCreateNestedManyWithoutUserInput
     clientErrors?: ClientErrorUncheckedCreateNestedManyWithoutUserInput
+    contactMessages?: ContactMessageUncheckedCreateNestedManyWithoutUserInput
     broadcastLogsSent?: BroadcastLogUncheckedCreateNestedManyWithoutActorInput
     broadcastLogsReceived?: BroadcastLogUncheckedCreateNestedManyWithoutTargetInput
     broadcastJobs?: BroadcastJobUncheckedCreateNestedManyWithoutActorInput
@@ -41118,6 +42983,7 @@ export namespace Prisma {
     pushSubscriptions?: PushSubscriptionUpdateManyWithoutUserNestedInput
     cartAbandonments?: CartAbandonmentUpdateManyWithoutUserNestedInput
     clientErrors?: ClientErrorUpdateManyWithoutUserNestedInput
+    contactMessages?: ContactMessageUpdateManyWithoutUserNestedInput
     broadcastLogsSent?: BroadcastLogUpdateManyWithoutActorNestedInput
     broadcastLogsReceived?: BroadcastLogUpdateManyWithoutTargetNestedInput
     broadcastJobs?: BroadcastJobUpdateManyWithoutActorNestedInput
@@ -41158,6 +43024,7 @@ export namespace Prisma {
     pushSubscriptions?: PushSubscriptionUncheckedUpdateManyWithoutUserNestedInput
     cartAbandonments?: CartAbandonmentUncheckedUpdateManyWithoutUserNestedInput
     clientErrors?: ClientErrorUncheckedUpdateManyWithoutUserNestedInput
+    contactMessages?: ContactMessageUncheckedUpdateManyWithoutUserNestedInput
     broadcastLogsSent?: BroadcastLogUncheckedUpdateManyWithoutActorNestedInput
     broadcastLogsReceived?: BroadcastLogUncheckedUpdateManyWithoutTargetNestedInput
     broadcastJobs?: BroadcastJobUncheckedUpdateManyWithoutActorNestedInput
@@ -41198,6 +43065,7 @@ export namespace Prisma {
     refreshTokens?: RefreshTokenCreateNestedManyWithoutUserInput
     cartAbandonments?: CartAbandonmentCreateNestedManyWithoutUserInput
     clientErrors?: ClientErrorCreateNestedManyWithoutUserInput
+    contactMessages?: ContactMessageCreateNestedManyWithoutUserInput
     broadcastLogsSent?: BroadcastLogCreateNestedManyWithoutActorInput
     broadcastLogsReceived?: BroadcastLogCreateNestedManyWithoutTargetInput
     broadcastJobs?: BroadcastJobCreateNestedManyWithoutActorInput
@@ -41238,6 +43106,7 @@ export namespace Prisma {
     refreshTokens?: RefreshTokenUncheckedCreateNestedManyWithoutUserInput
     cartAbandonments?: CartAbandonmentUncheckedCreateNestedManyWithoutUserInput
     clientErrors?: ClientErrorUncheckedCreateNestedManyWithoutUserInput
+    contactMessages?: ContactMessageUncheckedCreateNestedManyWithoutUserInput
     broadcastLogsSent?: BroadcastLogUncheckedCreateNestedManyWithoutActorInput
     broadcastLogsReceived?: BroadcastLogUncheckedCreateNestedManyWithoutTargetInput
     broadcastJobs?: BroadcastJobUncheckedCreateNestedManyWithoutActorInput
@@ -41294,6 +43163,7 @@ export namespace Prisma {
     refreshTokens?: RefreshTokenUpdateManyWithoutUserNestedInput
     cartAbandonments?: CartAbandonmentUpdateManyWithoutUserNestedInput
     clientErrors?: ClientErrorUpdateManyWithoutUserNestedInput
+    contactMessages?: ContactMessageUpdateManyWithoutUserNestedInput
     broadcastLogsSent?: BroadcastLogUpdateManyWithoutActorNestedInput
     broadcastLogsReceived?: BroadcastLogUpdateManyWithoutTargetNestedInput
     broadcastJobs?: BroadcastJobUpdateManyWithoutActorNestedInput
@@ -41334,6 +43204,7 @@ export namespace Prisma {
     refreshTokens?: RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
     cartAbandonments?: CartAbandonmentUncheckedUpdateManyWithoutUserNestedInput
     clientErrors?: ClientErrorUncheckedUpdateManyWithoutUserNestedInput
+    contactMessages?: ContactMessageUncheckedUpdateManyWithoutUserNestedInput
     broadcastLogsSent?: BroadcastLogUncheckedUpdateManyWithoutActorNestedInput
     broadcastLogsReceived?: BroadcastLogUncheckedUpdateManyWithoutTargetNestedInput
     broadcastJobs?: BroadcastJobUncheckedUpdateManyWithoutActorNestedInput
@@ -41374,6 +43245,7 @@ export namespace Prisma {
     refreshTokens?: RefreshTokenCreateNestedManyWithoutUserInput
     pushSubscriptions?: PushSubscriptionCreateNestedManyWithoutUserInput
     clientErrors?: ClientErrorCreateNestedManyWithoutUserInput
+    contactMessages?: ContactMessageCreateNestedManyWithoutUserInput
     broadcastLogsSent?: BroadcastLogCreateNestedManyWithoutActorInput
     broadcastLogsReceived?: BroadcastLogCreateNestedManyWithoutTargetInput
     broadcastJobs?: BroadcastJobCreateNestedManyWithoutActorInput
@@ -41414,6 +43286,7 @@ export namespace Prisma {
     refreshTokens?: RefreshTokenUncheckedCreateNestedManyWithoutUserInput
     pushSubscriptions?: PushSubscriptionUncheckedCreateNestedManyWithoutUserInput
     clientErrors?: ClientErrorUncheckedCreateNestedManyWithoutUserInput
+    contactMessages?: ContactMessageUncheckedCreateNestedManyWithoutUserInput
     broadcastLogsSent?: BroadcastLogUncheckedCreateNestedManyWithoutActorInput
     broadcastLogsReceived?: BroadcastLogUncheckedCreateNestedManyWithoutTargetInput
     broadcastJobs?: BroadcastJobUncheckedCreateNestedManyWithoutActorInput
@@ -41470,6 +43343,7 @@ export namespace Prisma {
     refreshTokens?: RefreshTokenUpdateManyWithoutUserNestedInput
     pushSubscriptions?: PushSubscriptionUpdateManyWithoutUserNestedInput
     clientErrors?: ClientErrorUpdateManyWithoutUserNestedInput
+    contactMessages?: ContactMessageUpdateManyWithoutUserNestedInput
     broadcastLogsSent?: BroadcastLogUpdateManyWithoutActorNestedInput
     broadcastLogsReceived?: BroadcastLogUpdateManyWithoutTargetNestedInput
     broadcastJobs?: BroadcastJobUpdateManyWithoutActorNestedInput
@@ -41510,6 +43384,7 @@ export namespace Prisma {
     refreshTokens?: RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
     pushSubscriptions?: PushSubscriptionUncheckedUpdateManyWithoutUserNestedInput
     clientErrors?: ClientErrorUncheckedUpdateManyWithoutUserNestedInput
+    contactMessages?: ContactMessageUncheckedUpdateManyWithoutUserNestedInput
     broadcastLogsSent?: BroadcastLogUncheckedUpdateManyWithoutActorNestedInput
     broadcastLogsReceived?: BroadcastLogUncheckedUpdateManyWithoutTargetNestedInput
     broadcastJobs?: BroadcastJobUncheckedUpdateManyWithoutActorNestedInput
@@ -41551,6 +43426,7 @@ export namespace Prisma {
     pushSubscriptions?: PushSubscriptionCreateNestedManyWithoutUserInput
     cartAbandonments?: CartAbandonmentCreateNestedManyWithoutUserInput
     clientErrors?: ClientErrorCreateNestedManyWithoutUserInput
+    contactMessages?: ContactMessageCreateNestedManyWithoutUserInput
     broadcastLogsReceived?: BroadcastLogCreateNestedManyWithoutTargetInput
     broadcastJobs?: BroadcastJobCreateNestedManyWithoutActorInput
     impersonationsAsAdmin?: ImpersonationSessionCreateNestedManyWithoutAdminInput
@@ -41591,6 +43467,7 @@ export namespace Prisma {
     pushSubscriptions?: PushSubscriptionUncheckedCreateNestedManyWithoutUserInput
     cartAbandonments?: CartAbandonmentUncheckedCreateNestedManyWithoutUserInput
     clientErrors?: ClientErrorUncheckedCreateNestedManyWithoutUserInput
+    contactMessages?: ContactMessageUncheckedCreateNestedManyWithoutUserInput
     broadcastLogsReceived?: BroadcastLogUncheckedCreateNestedManyWithoutTargetInput
     broadcastJobs?: BroadcastJobUncheckedCreateNestedManyWithoutActorInput
     impersonationsAsAdmin?: ImpersonationSessionUncheckedCreateNestedManyWithoutAdminInput
@@ -41636,6 +43513,7 @@ export namespace Prisma {
     pushSubscriptions?: PushSubscriptionCreateNestedManyWithoutUserInput
     cartAbandonments?: CartAbandonmentCreateNestedManyWithoutUserInput
     clientErrors?: ClientErrorCreateNestedManyWithoutUserInput
+    contactMessages?: ContactMessageCreateNestedManyWithoutUserInput
     broadcastLogsSent?: BroadcastLogCreateNestedManyWithoutActorInput
     broadcastJobs?: BroadcastJobCreateNestedManyWithoutActorInput
     impersonationsAsAdmin?: ImpersonationSessionCreateNestedManyWithoutAdminInput
@@ -41676,6 +43554,7 @@ export namespace Prisma {
     pushSubscriptions?: PushSubscriptionUncheckedCreateNestedManyWithoutUserInput
     cartAbandonments?: CartAbandonmentUncheckedCreateNestedManyWithoutUserInput
     clientErrors?: ClientErrorUncheckedCreateNestedManyWithoutUserInput
+    contactMessages?: ContactMessageUncheckedCreateNestedManyWithoutUserInput
     broadcastLogsSent?: BroadcastLogUncheckedCreateNestedManyWithoutActorInput
     broadcastJobs?: BroadcastJobUncheckedCreateNestedManyWithoutActorInput
     impersonationsAsAdmin?: ImpersonationSessionUncheckedCreateNestedManyWithoutAdminInput
@@ -41732,6 +43611,7 @@ export namespace Prisma {
     pushSubscriptions?: PushSubscriptionUpdateManyWithoutUserNestedInput
     cartAbandonments?: CartAbandonmentUpdateManyWithoutUserNestedInput
     clientErrors?: ClientErrorUpdateManyWithoutUserNestedInput
+    contactMessages?: ContactMessageUpdateManyWithoutUserNestedInput
     broadcastLogsReceived?: BroadcastLogUpdateManyWithoutTargetNestedInput
     broadcastJobs?: BroadcastJobUpdateManyWithoutActorNestedInput
     impersonationsAsAdmin?: ImpersonationSessionUpdateManyWithoutAdminNestedInput
@@ -41772,6 +43652,7 @@ export namespace Prisma {
     pushSubscriptions?: PushSubscriptionUncheckedUpdateManyWithoutUserNestedInput
     cartAbandonments?: CartAbandonmentUncheckedUpdateManyWithoutUserNestedInput
     clientErrors?: ClientErrorUncheckedUpdateManyWithoutUserNestedInput
+    contactMessages?: ContactMessageUncheckedUpdateManyWithoutUserNestedInput
     broadcastLogsReceived?: BroadcastLogUncheckedUpdateManyWithoutTargetNestedInput
     broadcastJobs?: BroadcastJobUncheckedUpdateManyWithoutActorNestedInput
     impersonationsAsAdmin?: ImpersonationSessionUncheckedUpdateManyWithoutAdminNestedInput
@@ -41823,6 +43704,7 @@ export namespace Prisma {
     pushSubscriptions?: PushSubscriptionUpdateManyWithoutUserNestedInput
     cartAbandonments?: CartAbandonmentUpdateManyWithoutUserNestedInput
     clientErrors?: ClientErrorUpdateManyWithoutUserNestedInput
+    contactMessages?: ContactMessageUpdateManyWithoutUserNestedInput
     broadcastLogsSent?: BroadcastLogUpdateManyWithoutActorNestedInput
     broadcastJobs?: BroadcastJobUpdateManyWithoutActorNestedInput
     impersonationsAsAdmin?: ImpersonationSessionUpdateManyWithoutAdminNestedInput
@@ -41863,6 +43745,7 @@ export namespace Prisma {
     pushSubscriptions?: PushSubscriptionUncheckedUpdateManyWithoutUserNestedInput
     cartAbandonments?: CartAbandonmentUncheckedUpdateManyWithoutUserNestedInput
     clientErrors?: ClientErrorUncheckedUpdateManyWithoutUserNestedInput
+    contactMessages?: ContactMessageUncheckedUpdateManyWithoutUserNestedInput
     broadcastLogsSent?: BroadcastLogUncheckedUpdateManyWithoutActorNestedInput
     broadcastJobs?: BroadcastJobUncheckedUpdateManyWithoutActorNestedInput
     impersonationsAsAdmin?: ImpersonationSessionUncheckedUpdateManyWithoutAdminNestedInput
@@ -41903,6 +43786,7 @@ export namespace Prisma {
     pushSubscriptions?: PushSubscriptionCreateNestedManyWithoutUserInput
     cartAbandonments?: CartAbandonmentCreateNestedManyWithoutUserInput
     clientErrors?: ClientErrorCreateNestedManyWithoutUserInput
+    contactMessages?: ContactMessageCreateNestedManyWithoutUserInput
     broadcastLogsSent?: BroadcastLogCreateNestedManyWithoutActorInput
     broadcastLogsReceived?: BroadcastLogCreateNestedManyWithoutTargetInput
     impersonationsAsAdmin?: ImpersonationSessionCreateNestedManyWithoutAdminInput
@@ -41943,6 +43827,7 @@ export namespace Prisma {
     pushSubscriptions?: PushSubscriptionUncheckedCreateNestedManyWithoutUserInput
     cartAbandonments?: CartAbandonmentUncheckedCreateNestedManyWithoutUserInput
     clientErrors?: ClientErrorUncheckedCreateNestedManyWithoutUserInput
+    contactMessages?: ContactMessageUncheckedCreateNestedManyWithoutUserInput
     broadcastLogsSent?: BroadcastLogUncheckedCreateNestedManyWithoutActorInput
     broadcastLogsReceived?: BroadcastLogUncheckedCreateNestedManyWithoutTargetInput
     impersonationsAsAdmin?: ImpersonationSessionUncheckedCreateNestedManyWithoutAdminInput
@@ -41999,6 +43884,7 @@ export namespace Prisma {
     pushSubscriptions?: PushSubscriptionUpdateManyWithoutUserNestedInput
     cartAbandonments?: CartAbandonmentUpdateManyWithoutUserNestedInput
     clientErrors?: ClientErrorUpdateManyWithoutUserNestedInput
+    contactMessages?: ContactMessageUpdateManyWithoutUserNestedInput
     broadcastLogsSent?: BroadcastLogUpdateManyWithoutActorNestedInput
     broadcastLogsReceived?: BroadcastLogUpdateManyWithoutTargetNestedInput
     impersonationsAsAdmin?: ImpersonationSessionUpdateManyWithoutAdminNestedInput
@@ -42039,6 +43925,7 @@ export namespace Prisma {
     pushSubscriptions?: PushSubscriptionUncheckedUpdateManyWithoutUserNestedInput
     cartAbandonments?: CartAbandonmentUncheckedUpdateManyWithoutUserNestedInput
     clientErrors?: ClientErrorUncheckedUpdateManyWithoutUserNestedInput
+    contactMessages?: ContactMessageUncheckedUpdateManyWithoutUserNestedInput
     broadcastLogsSent?: BroadcastLogUncheckedUpdateManyWithoutActorNestedInput
     broadcastLogsReceived?: BroadcastLogUncheckedUpdateManyWithoutTargetNestedInput
     impersonationsAsAdmin?: ImpersonationSessionUncheckedUpdateManyWithoutAdminNestedInput
@@ -42079,6 +43966,7 @@ export namespace Prisma {
     pushSubscriptions?: PushSubscriptionCreateNestedManyWithoutUserInput
     cartAbandonments?: CartAbandonmentCreateNestedManyWithoutUserInput
     clientErrors?: ClientErrorCreateNestedManyWithoutUserInput
+    contactMessages?: ContactMessageCreateNestedManyWithoutUserInput
     broadcastLogsSent?: BroadcastLogCreateNestedManyWithoutActorInput
     broadcastLogsReceived?: BroadcastLogCreateNestedManyWithoutTargetInput
     broadcastJobs?: BroadcastJobCreateNestedManyWithoutActorInput
@@ -42119,6 +44007,7 @@ export namespace Prisma {
     pushSubscriptions?: PushSubscriptionUncheckedCreateNestedManyWithoutUserInput
     cartAbandonments?: CartAbandonmentUncheckedCreateNestedManyWithoutUserInput
     clientErrors?: ClientErrorUncheckedCreateNestedManyWithoutUserInput
+    contactMessages?: ContactMessageUncheckedCreateNestedManyWithoutUserInput
     broadcastLogsSent?: BroadcastLogUncheckedCreateNestedManyWithoutActorInput
     broadcastLogsReceived?: BroadcastLogUncheckedCreateNestedManyWithoutTargetInput
     broadcastJobs?: BroadcastJobUncheckedCreateNestedManyWithoutActorInput
@@ -42164,6 +44053,7 @@ export namespace Prisma {
     pushSubscriptions?: PushSubscriptionCreateNestedManyWithoutUserInput
     cartAbandonments?: CartAbandonmentCreateNestedManyWithoutUserInput
     clientErrors?: ClientErrorCreateNestedManyWithoutUserInput
+    contactMessages?: ContactMessageCreateNestedManyWithoutUserInput
     broadcastLogsSent?: BroadcastLogCreateNestedManyWithoutActorInput
     broadcastLogsReceived?: BroadcastLogCreateNestedManyWithoutTargetInput
     broadcastJobs?: BroadcastJobCreateNestedManyWithoutActorInput
@@ -42204,6 +44094,7 @@ export namespace Prisma {
     pushSubscriptions?: PushSubscriptionUncheckedCreateNestedManyWithoutUserInput
     cartAbandonments?: CartAbandonmentUncheckedCreateNestedManyWithoutUserInput
     clientErrors?: ClientErrorUncheckedCreateNestedManyWithoutUserInput
+    contactMessages?: ContactMessageUncheckedCreateNestedManyWithoutUserInput
     broadcastLogsSent?: BroadcastLogUncheckedCreateNestedManyWithoutActorInput
     broadcastLogsReceived?: BroadcastLogUncheckedCreateNestedManyWithoutTargetInput
     broadcastJobs?: BroadcastJobUncheckedCreateNestedManyWithoutActorInput
@@ -42260,6 +44151,7 @@ export namespace Prisma {
     pushSubscriptions?: PushSubscriptionUpdateManyWithoutUserNestedInput
     cartAbandonments?: CartAbandonmentUpdateManyWithoutUserNestedInput
     clientErrors?: ClientErrorUpdateManyWithoutUserNestedInput
+    contactMessages?: ContactMessageUpdateManyWithoutUserNestedInput
     broadcastLogsSent?: BroadcastLogUpdateManyWithoutActorNestedInput
     broadcastLogsReceived?: BroadcastLogUpdateManyWithoutTargetNestedInput
     broadcastJobs?: BroadcastJobUpdateManyWithoutActorNestedInput
@@ -42300,6 +44192,7 @@ export namespace Prisma {
     pushSubscriptions?: PushSubscriptionUncheckedUpdateManyWithoutUserNestedInput
     cartAbandonments?: CartAbandonmentUncheckedUpdateManyWithoutUserNestedInput
     clientErrors?: ClientErrorUncheckedUpdateManyWithoutUserNestedInput
+    contactMessages?: ContactMessageUncheckedUpdateManyWithoutUserNestedInput
     broadcastLogsSent?: BroadcastLogUncheckedUpdateManyWithoutActorNestedInput
     broadcastLogsReceived?: BroadcastLogUncheckedUpdateManyWithoutTargetNestedInput
     broadcastJobs?: BroadcastJobUncheckedUpdateManyWithoutActorNestedInput
@@ -42351,6 +44244,7 @@ export namespace Prisma {
     pushSubscriptions?: PushSubscriptionUpdateManyWithoutUserNestedInput
     cartAbandonments?: CartAbandonmentUpdateManyWithoutUserNestedInput
     clientErrors?: ClientErrorUpdateManyWithoutUserNestedInput
+    contactMessages?: ContactMessageUpdateManyWithoutUserNestedInput
     broadcastLogsSent?: BroadcastLogUpdateManyWithoutActorNestedInput
     broadcastLogsReceived?: BroadcastLogUpdateManyWithoutTargetNestedInput
     broadcastJobs?: BroadcastJobUpdateManyWithoutActorNestedInput
@@ -42391,6 +44285,7 @@ export namespace Prisma {
     pushSubscriptions?: PushSubscriptionUncheckedUpdateManyWithoutUserNestedInput
     cartAbandonments?: CartAbandonmentUncheckedUpdateManyWithoutUserNestedInput
     clientErrors?: ClientErrorUncheckedUpdateManyWithoutUserNestedInput
+    contactMessages?: ContactMessageUncheckedUpdateManyWithoutUserNestedInput
     broadcastLogsSent?: BroadcastLogUncheckedUpdateManyWithoutActorNestedInput
     broadcastLogsReceived?: BroadcastLogUncheckedUpdateManyWithoutTargetNestedInput
     broadcastJobs?: BroadcastJobUncheckedUpdateManyWithoutActorNestedInput
@@ -42430,6 +44325,7 @@ export namespace Prisma {
     refreshTokens?: RefreshTokenCreateNestedManyWithoutUserInput
     pushSubscriptions?: PushSubscriptionCreateNestedManyWithoutUserInput
     cartAbandonments?: CartAbandonmentCreateNestedManyWithoutUserInput
+    contactMessages?: ContactMessageCreateNestedManyWithoutUserInput
     broadcastLogsSent?: BroadcastLogCreateNestedManyWithoutActorInput
     broadcastLogsReceived?: BroadcastLogCreateNestedManyWithoutTargetInput
     broadcastJobs?: BroadcastJobCreateNestedManyWithoutActorInput
@@ -42470,6 +44366,7 @@ export namespace Prisma {
     refreshTokens?: RefreshTokenUncheckedCreateNestedManyWithoutUserInput
     pushSubscriptions?: PushSubscriptionUncheckedCreateNestedManyWithoutUserInput
     cartAbandonments?: CartAbandonmentUncheckedCreateNestedManyWithoutUserInput
+    contactMessages?: ContactMessageUncheckedCreateNestedManyWithoutUserInput
     broadcastLogsSent?: BroadcastLogUncheckedCreateNestedManyWithoutActorInput
     broadcastLogsReceived?: BroadcastLogUncheckedCreateNestedManyWithoutTargetInput
     broadcastJobs?: BroadcastJobUncheckedCreateNestedManyWithoutActorInput
@@ -42526,6 +44423,7 @@ export namespace Prisma {
     refreshTokens?: RefreshTokenUpdateManyWithoutUserNestedInput
     pushSubscriptions?: PushSubscriptionUpdateManyWithoutUserNestedInput
     cartAbandonments?: CartAbandonmentUpdateManyWithoutUserNestedInput
+    contactMessages?: ContactMessageUpdateManyWithoutUserNestedInput
     broadcastLogsSent?: BroadcastLogUpdateManyWithoutActorNestedInput
     broadcastLogsReceived?: BroadcastLogUpdateManyWithoutTargetNestedInput
     broadcastJobs?: BroadcastJobUpdateManyWithoutActorNestedInput
@@ -42566,6 +44464,7 @@ export namespace Prisma {
     refreshTokens?: RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
     pushSubscriptions?: PushSubscriptionUncheckedUpdateManyWithoutUserNestedInput
     cartAbandonments?: CartAbandonmentUncheckedUpdateManyWithoutUserNestedInput
+    contactMessages?: ContactMessageUncheckedUpdateManyWithoutUserNestedInput
     broadcastLogsSent?: BroadcastLogUncheckedUpdateManyWithoutActorNestedInput
     broadcastLogsReceived?: BroadcastLogUncheckedUpdateManyWithoutTargetNestedInput
     broadcastJobs?: BroadcastJobUncheckedUpdateManyWithoutActorNestedInput
@@ -42723,6 +44622,21 @@ export namespace Prisma {
     createdAt?: Date | string
   }
 
+  export type ContactMessageCreateManyUserInput = {
+    id?: string
+    name?: string | null
+    email?: string | null
+    phone?: string | null
+    subject?: string | null
+    message: string
+    source?: string
+    locale?: string | null
+    status?: string
+    adminNote?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
   export type BroadcastLogCreateManyActorInput = {
     id?: string
     targetId: string
@@ -42824,6 +44738,7 @@ export namespace Prisma {
     pushSubscriptions?: PushSubscriptionUpdateManyWithoutUserNestedInput
     cartAbandonments?: CartAbandonmentUpdateManyWithoutUserNestedInput
     clientErrors?: ClientErrorUpdateManyWithoutUserNestedInput
+    contactMessages?: ContactMessageUpdateManyWithoutUserNestedInput
     broadcastLogsSent?: BroadcastLogUpdateManyWithoutActorNestedInput
     broadcastLogsReceived?: BroadcastLogUpdateManyWithoutTargetNestedInput
     broadcastJobs?: BroadcastJobUpdateManyWithoutActorNestedInput
@@ -42864,6 +44779,7 @@ export namespace Prisma {
     pushSubscriptions?: PushSubscriptionUncheckedUpdateManyWithoutUserNestedInput
     cartAbandonments?: CartAbandonmentUncheckedUpdateManyWithoutUserNestedInput
     clientErrors?: ClientErrorUncheckedUpdateManyWithoutUserNestedInput
+    contactMessages?: ContactMessageUncheckedUpdateManyWithoutUserNestedInput
     broadcastLogsSent?: BroadcastLogUncheckedUpdateManyWithoutActorNestedInput
     broadcastLogsReceived?: BroadcastLogUncheckedUpdateManyWithoutTargetNestedInput
     broadcastJobs?: BroadcastJobUncheckedUpdateManyWithoutActorNestedInput
@@ -43273,6 +45189,51 @@ export namespace Prisma {
     resolvedBy?: NullableStringFieldUpdateOperationsInput | string | null
     resolvedNote?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ContactMessageUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    subject?: NullableStringFieldUpdateOperationsInput | string | null
+    message?: StringFieldUpdateOperationsInput | string
+    source?: StringFieldUpdateOperationsInput | string
+    locale?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    adminNote?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ContactMessageUncheckedUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    subject?: NullableStringFieldUpdateOperationsInput | string | null
+    message?: StringFieldUpdateOperationsInput | string
+    source?: StringFieldUpdateOperationsInput | string
+    locale?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    adminNote?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ContactMessageUncheckedUpdateManyWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    subject?: NullableStringFieldUpdateOperationsInput | string | null
+    message?: StringFieldUpdateOperationsInput | string
+    source?: StringFieldUpdateOperationsInput | string
+    locale?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: StringFieldUpdateOperationsInput | string
+    adminNote?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type BroadcastLogUpdateWithoutActorInput = {
@@ -43884,6 +45845,10 @@ export namespace Prisma {
      * @deprecated Use StoreReviewDefaultArgs instead
      */
     export type StoreReviewArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = StoreReviewDefaultArgs<ExtArgs>
+    /**
+     * @deprecated Use ContactMessageDefaultArgs instead
+     */
+    export type ContactMessageArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = ContactMessageDefaultArgs<ExtArgs>
     /**
      * @deprecated Use RefreshTokenDefaultArgs instead
      */

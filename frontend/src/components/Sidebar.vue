@@ -162,6 +162,10 @@ watch(() => route.path, (p) => {
             <span class="icon">💸</span>
             <span class="label">{{ t('sidebar.payouts') }}</span>
           </router-link>
+          <router-link v-if="isAdmin" to="/support-inbox" class="nav-item" :class="{ active: isActive('/support-inbox') }">
+            <span class="icon">🎧</span>
+            <span class="label">{{ t('sidebar.supportInbox') }}</span>
+          </router-link>
           <router-link to="/pos" class="nav-item" :class="{ active: isActive('/pos') }">
             <span class="icon">💵</span>
             <span class="label">{{ t('sidebar.pos') }}</span>

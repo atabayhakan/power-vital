@@ -16,6 +16,7 @@
 //   • withdrawal_*     — request / approved / rejected
 //   • review_pending   — a customer review needs moderation
 //   • low_stock        — product stock fell below the alert threshold
+//   • new_contact_message — a contact/support form message arrived
 //
 // Each event is a tiny JSON payload: { type, data, ts }
 import { Request, Response, Router } from 'express';

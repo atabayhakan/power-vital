@@ -1,7 +1,7 @@
 import { Router, Request, Response } from 'express';
 import prisma from '../lib/prisma';
 import { authenticateJWT, requireRole } from '../middleware/auth';
-import { validate, AdminUserUpdateSchema, WithdrawalUpdateSchema, IdParamSchema } from '../validators';
+import { validate, AdminUserUpdateSchema, WithdrawalUpdateSchema, IdParamSchema, ContactMessageListQuerySchema, AdminContactMessageUpdateSchema } from '../validators';
 import { notifyWithdrawalApproved, notifyWithdrawalRejected } from '../services/notificationService';
 import { sendToUser } from '../services/pushService';
 import { adminEvents } from './adminEvents';
@@ -304,6 +304,58 @@ router.put('/withdrawals/:id', authenticateJWT, requireRole('admin'), validate({
   } catch (error) {
     logger.error({ err: error }, 'Update withdrawal error:');
     res.status(500).json({ error: 'Failed to update withdrawal' });
+  }
+});
+
+// GET /api/v1/admin/contact-messages — support inbox (paginated, ?status= filter)
+router.get('/contact-messages', authenticateJWT, requireRole('admin'), validate({ query: ContactMessageListQuerySchema }), async (req: Request, res: Response) => {
+  try {
+    const { status } = req.query as { status?: 'new' | 'read' | 'resolved' };
+    const { page, limit, skip, take } = parsePagination(req.query as any, { limit: 50 });
+
+    const where: any = {};
+    if (status) where.status = status;
+
+    const [items, total] = await Promise.all([
+      prisma.contactMessage.findMany({
+        where,
+        include: { user: { select: { name: true, email: true } } },
+        orderBy: { createdAt: 'desc' },
+        skip, take
+      }),
+      prisma.contactMessage.count({ where })
+    ]);
+
+    res.json(envelope(items, total, page, limit));
+  } catch (error) {
+    logger.error({ err: error }, 'Contact messages list error:');
+    res.status(500).json({ error: 'Failed to load contact messages' });
+  }
+});
+
+// PUT /api/v1/admin/contact-messages/:id — status transitions (new/read/resolved) + admin note
+router.put('/contact-messages/:id', authenticateJWT, requireRole('admin'), validate({ body: AdminContactMessageUpdateSchema, params: IdParamSchema }), async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params as { id: string };
+    const { status, adminNote } = req.body as { status?: 'new' | 'read' | 'resolved'; adminNote?: string | null };
+
+    const existing = await prisma.contactMessage.findUnique({ where: { id } });
+    if (!existing) return res.status(404).json({ error: 'Not found' });
+
+    const updated = await prisma.contactMessage.update({
+      where: { id },
+      data: {
+        ...(status ? { status } : {}),
+        // adminNote: undefined alan dokunulmaz; null → notu temizler
+        ...(adminNote !== undefined ? { adminNote } : {})
+      },
+      include: { user: { select: { name: true, email: true } } }
+    });
+
+    res.json(updated);
+  } catch (error) {
+    logger.error({ err: error }, 'Contact message update error:');
+    res.status(500).json({ error: 'Failed to update contact message' });
   }
 });
 

@@ -124,6 +124,10 @@ export const RATE_LIMITS = {
   reviews: {
     submit:       { name: 'reviews:submit',    max: 3,   windowSeconds: 60 * 60, perUser: true  },
   },
+  /** Contact/support form — public unauthenticated endpoint, spam guard per IP */
+  contact: {
+    submit:       { name: 'contact:submit',    max: 5,   windowSeconds: 60 * 60, perUser: false },
+  },
   /** Generic public read protection (e.g. search abuse) */
   public: {
     search:       { name: 'public:search',     max: 60,  windowSeconds: 60,      perUser: false }

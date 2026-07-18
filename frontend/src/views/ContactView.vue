@@ -4,7 +4,7 @@ import axios from 'axios';
 import { useTranslate } from '../composables/useTranslate';
 import { buildSafeMapIframe } from '../utils/safeMapEmbed';
 
-const { t } = useTranslate();
+const { t, locale } = useTranslate();
 
 const settings = ref({
   companyName: 'Power Vital',
@@ -23,6 +23,7 @@ const form = ref({
 
 const isSending = ref(false);
 const isSent = ref(false);
+const sendError = ref('');
 
 onMounted(async () => {
   try {
@@ -46,21 +47,24 @@ const sanitizedMap = computed(() => buildSafeMapIframe(settings.value.mapIframeC
 
 const submitForm = async () => {
   isSending.value = true;
+  sendError.value = '';
   try {
     await axios.post('/api/v1/contact', {
       name: form.value.name,
       email: form.value.email,
       subject: form.value.subject,
-      message: form.value.message
+      message: form.value.message,
+      locale: locale.value
     });
-  } catch {
-    // Graceful fallback — endpoint may not exist yet
-    console.warn('[Contact] API endpoint not available, form submitted locally.');
+    // Başarı yalnızca 2xx yanıtta — hata artık "yerel gönderim" gibi gizlenmez
+    isSending.value = false;
+    isSent.value = true;
+    form.value = { name: '', email: '', subject: '', message: '' };
+    setTimeout(() => { isSent.value = false; }, 5000);
+  } catch (err: any) {
+    isSending.value = false;
+    sendError.value = err?.response?.data?.error || t('contact.errorSend');
   }
-  isSending.value = false;
-  isSent.value = true;
-  form.value = { name: '', email: '', subject: '', message: '' };
-  setTimeout(() => { isSent.value = false; }, 5000);
 };
 </script>
 
@@ -136,6 +140,9 @@ const submitForm = async () => {
 
           <div v-if="isSent" class="success-msg">
             ✅ {{ t('contact.sent') }}
+          </div>
+          <div v-if="sendError" class="error-msg">
+            ⚠️ {{ sendError }}
           </div>
         </form>
       </div>
@@ -318,6 +325,17 @@ const submitForm = async () => {
 .success-msg {
   background: rgba(16, 185, 129, 0.1);
   color: var(--color-success, #059669);
+  padding: 16px;
+  border-radius: 12px;
+  font-weight: 600;
+  text-align: center;
+  margin-top: 8px;
+}
+
+.error-msg {
+  background: rgba(239, 68, 68, 0.08);
+  color: #b91c1c;
+  border: 1px solid rgba(239, 68, 68, 0.25);
   padding: 16px;
   border-radius: 12px;
   font-weight: 600;

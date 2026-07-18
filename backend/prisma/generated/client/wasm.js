@@ -289,6 +289,7 @@ exports.Prisma.SiteSettingsScalarFieldEnum = {
   id: 'id',
   companyName: 'companyName',
   logoUrl: 'logoUrl',
+  logoScale: 'logoScale',
   address: 'address',
   phone: 'phone',
   email: 'email',
@@ -363,6 +364,22 @@ exports.Prisma.StoreReviewScalarFieldEnum = {
   text: 'text',
   translations: 'translations',
   status: 'status',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.ContactMessageScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  name: 'name',
+  email: 'email',
+  phone: 'phone',
+  subject: 'subject',
+  message: 'message',
+  source: 'source',
+  locale: 'locale',
+  status: 'status',
+  adminNote: 'adminNote',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -508,6 +525,7 @@ exports.Prisma.ModelName = {
   Page: 'Page',
   ProductReview: 'ProductReview',
   StoreReview: 'StoreReview',
+  ContactMessage: 'ContactMessage',
   RefreshToken: 'RefreshToken',
   PushSubscription: 'PushSubscription',
   CartAbandonment: 'CartAbandonment',

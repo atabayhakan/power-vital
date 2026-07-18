@@ -63,6 +63,7 @@ model User {
   pushSubscriptions PushSubscription[]
   cartAbandonments  CartAbandonment[]
   clientErrors    ClientError[]
+  contactMessages ContactMessage[]
   broadcastLogsSent BroadcastLog[] @relation("BroadcastSender")
   broadcastLogsReceived BroadcastLog[] @relation("BroadcastTarget")
   broadcastJobs BroadcastJob[] @relation("BroadcastJobActor")
@@ -404,6 +405,32 @@ model StoreReview {
 
   @@index([status])
   @@index([userId])
+}
+
+// Contact/support inbox — one row per message from the public contact form
+// (source='contact', guests allowed) or the logged-in support form
+// (source='support'). Admins triage via status: new → read → resolved.
+model ContactMessage {
+  id        String  @id @default(uuid())
+  userId    String?
+  user      User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  name      String?
+  email     String?
+  phone     String?
+  subject   String?
+  message   String  @db.Text
+  source    String  @default("contact") // contact | support
+  locale    String?
+  status    String  @default("new")     // new | read | resolved
+  adminNote String? @db.Text
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status])
+  @@index([userId])
+  @@index([createdAt])
 }
 
 // Refresh tokens — short-lived access tokens (15 min) + long-lived refresh

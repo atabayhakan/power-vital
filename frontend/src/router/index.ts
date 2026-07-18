@@ -86,6 +86,7 @@ const routes = [
   // --- 💰 FINANCE & PAYMENTS (admin) ---
   { path: '/finance-payouts', name: 'FinancePayouts', component: FinancePayoutsView, meta: { layout: 'dashboard', role: 'admin', group: 'finance', title: 'Çekim Talepleri' } },
   { path: '/finance-settings', name: 'FinanceSettings', component: () => import('../views/AdminFinanceSettings.vue'), meta: { layout: 'dashboard', role: 'admin', group: 'finance', title: 'Finansal Ayarlar' } },
+  { path: '/support-inbox', name: 'SupportInbox', component: () => import('../views/SupportInboxView.vue'), meta: { layout: 'dashboard', role: 'admin', group: 'system', title: 'Destek Kutusu' } },
 
   // --- 🏢 SYSTEM (admin) ---
   { path: '/site-settings', name: 'SiteSettings', component: SiteSettingsView, meta: { layout: 'dashboard', role: 'admin', group: 'system', title: 'Site Ayarları' } },
