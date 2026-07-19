@@ -58,7 +58,7 @@ const addToCart = (p: any) => {
     <h2 class="section-title">{{ title || 'Çok Satanlar' }}</h2>
 
     <div v-if="shouldRender" class="xsell-grid">
-      <article v-for="xs in crossSells" :key="xs.id" class="xsell-card clay-surface">
+      <article v-for="xs in crossSells" :key="xs.id" class="xsell-card clay-surface clay-lift">
         <div class="xs-img-box clay-inset">
           <LazyImage :src="xs.images?.[0]?.imageUrl || xs.images?.[0] || ''" :alt="tField(xs, 'name') || xs.name" width="1080" height="1080" class="xs-img" />
         </div>

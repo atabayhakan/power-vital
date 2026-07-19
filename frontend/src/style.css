@@ -316,11 +316,23 @@ h1, h2, h3, h4, h5, h6 {
 }
 .clay-surface:hover {
   box-shadow: var(--clay-shadow-lg);
-  transform: translateY(-3px);
 }
-.clay-surface:active {
-  transform: translateY(0) scale(0.99);
-  box-shadow: var(--clay-shadow-sm);
+/* Motion is opt-in via .clay-lift. :hover/:active on a surface also match
+   while the cursor/press is on controls INSIDE it (CSS ancestor matching),
+   so an ungated transform moved whole admin panels under the cursor on
+   mousedown — mouseup then landed on a different element and the click
+   retargeted to an ancestor, swallowing button clicks. Press feedback
+   belongs on the pressed element itself (see .is-pressed below), never
+   on a container. The transition is re-declared here because the
+   theme-transition rule further down resets .clay-surface's transition
+   to background/color/box-shadow only, which would make this snap. */
+.clay-surface.clay-lift {
+  transition: background-color 0.3s ease, color 0.2s ease,
+              box-shadow var(--duration-normal) var(--ease-smooth),
+              transform var(--duration-normal) var(--ease-spring);
+}
+.clay-surface.clay-lift:hover {
+  transform: translateY(-3px);
 }
 
 .clay-inset {
