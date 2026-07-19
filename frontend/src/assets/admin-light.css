@@ -95,8 +95,12 @@
   padding: 16px !important;
   font-size: 0.95rem !important;
 }
+/* Cell skins must use background-color, never the background shorthand:
+   gradient-clipped text (.text-gradient) paints its glyphs from the cell's
+   background-image, and the shorthand resets that to none — which made the
+   order-total column vanish on row hover. */
 .admin-light-mode table tr:hover td {
-  background: rgba(0,0,0,0.01) !important;
+  background-color: rgba(0,0,0,0.01) !important;
 }
 .admin-light-mode table .empty-state { color: #6B7280 !important; }
 
@@ -162,8 +166,8 @@
 .admin-light-mode .page-manage-view .header-section h1 { color: #111827 !important; }
 .admin-light-mode .page-manage-view .subtitle { color: #6B7280 !important; }
 .admin-light-mode .page-manage-view .modern-table th { color: #6B7280 !important; border-bottom-color: #E5E7EB !important; background: #F9FAFB !important; }
-.admin-light-mode .page-manage-view .modern-table td { border-color: #E5E7EB !important; background: #FFFFFF !important; }
-.admin-light-mode .page-manage-view .modern-table tbody tr:hover td { background: #F9FAFB !important; }
+.admin-light-mode .page-manage-view .modern-table td { border-color: #E5E7EB !important; background-color: #FFFFFF !important; }
+.admin-light-mode .page-manage-view .modern-table tbody tr:hover td { background-color: #F9FAFB !important; }
 .admin-light-mode .page-manage-view .text-white { color: #111827 !important; }
 .admin-light-mode .page-manage-view .mono-text { color: #4B5563 !important; }
 .admin-light-mode .page-manage-view .icon-btn { color: #4B5563 !important; background: #F3F4F6 !important; border: 1px solid #E5E7EB !important; }
@@ -197,8 +201,8 @@
 .admin-light-mode .dashboard-content .alert-action:hover { background: #E5E7EB !important; color: #111827 !important; }
 .admin-light-mode .dashboard-content .glass-panel { background: #FFFFFF !important; border: 1px solid #E5E7EB !important; box-shadow: 0 2px 4px rgba(0,0,0,0.02) !important; }
 .admin-light-mode .dashboard-content .modern-table th { color: #6B7280 !important; border-bottom-color: #E5E7EB !important; background: #F9FAFB !important; }
-.admin-light-mode .dashboard-content .modern-table td { border-color: #E5E7EB !important; background: #FFFFFF !important; }
-.admin-light-mode .dashboard-content .modern-table tbody tr:hover td { background: #F9FAFB !important; }
+.admin-light-mode .dashboard-content .modern-table td { border-color: #E5E7EB !important; background-color: #FFFFFF !important; }
+.admin-light-mode .dashboard-content .modern-table tbody tr:hover td { background-color: #F9FAFB !important; }
 .admin-light-mode .dashboard-content .mono-text { color: #4B5563 !important; }
 .admin-light-mode .dashboard-content .font-medium { color: #374151 !important; }
 .admin-light-mode .dashboard-content .text-white { color: #111827 !important; }
@@ -209,7 +213,7 @@
 .admin-light-mode .orders-content .panel { background-color: #FFFFFF !important; border: 1px solid #E5E7EB !important; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05) !important; }
 .admin-light-mode .orders-content .orders-table th { background: #F9FAFB !important; color: #6B7280 !important; border-bottom: 1px solid #E5E7EB !important; }
 .admin-light-mode .orders-content .orders-table td { border-bottom: 1px solid #F3F4F6 !important; color: #1F2937 !important; }
-.admin-light-mode .orders-content .orders-table tbody tr:hover { background: #F9FAFB !important; }
+.admin-light-mode .orders-content .orders-table tbody tr:hover { background-color: #F9FAFB !important; }
 .admin-light-mode .orders-content .orders-table .text-white { color: #111827 !important; }
 .admin-light-mode .orders-content .orders-table .order-id { color: #4B5563 !important; }
 .admin-light-mode .orders-content .filter-tabs { background: #F3F4F6 !important; border: 1px solid #E5E7EB !important; }
@@ -254,7 +258,7 @@
 .admin-light-mode .data-table td {
   border: none !important;
   border-bottom: 1px solid #F3F4F6 !important;
-  background: #FFFFFF !important;
+  background-color: #FFFFFF !important;
   color: #1F2937 !important;
 }
 
@@ -263,7 +267,7 @@
 .admin-light-mode .data-table tbody tr:hover td,
 .admin-light-mode .admin-data-table tbody tr:hover,
 .admin-light-mode .data-table tbody tr:hover {
-  background: #F9FAFB !important;
+  background-color: #F9FAFB !important;
 }
 
 /* Typography */
@@ -339,14 +343,14 @@
 .admin-light-mode.app-layout--dashboard .data-table td {
   border: none !important;
   border-bottom: 1px solid #F3F4F6 !important;
-  background: #FFFFFF !important;
+  background-color: #FFFFFF !important;
   color: #1F2937 !important;
 }
 
 .admin-light-mode.app-layout--dashboard .modern-table tbody tr:hover td,
 .admin-light-mode.app-layout--dashboard .admin-data-table tbody tr:hover td,
 .admin-light-mode.app-layout--dashboard .data-table tbody tr:hover td {
-  background: #F9FAFB !important;
+  background-color: #F9FAFB !important;
 }
 
 .admin-light-mode.app-layout--dashboard .empty-state {
