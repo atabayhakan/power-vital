@@ -463,6 +463,11 @@ h1, h2, h3, h4, h5, h6 {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  /* Forces its own compositing layer so a nearby :hover repaint (e.g. a
+     parent table row's background change) doesn't invalidate the clipped
+     text and make it flash blank — a known Chromium background-clip:text bug. */
+  transform: translateZ(0);
+  will-change: background;
 }
 
 /* ═══ PRIMARY BUTTON — 2026 Glow Ring Edition ═══ */

@@ -341,62 +341,6 @@ onMounted(() => fetchOrders());
         <span class="co-order__chev" aria-hidden="true">›</span>
       </div>
     </div>
-
-    <!-- ════ Order + payment detail modal ════ -->
-    <Transition name="od-fade">
-      <div v-if="selectedOrder" class="od-overlay" @click.self="closeDetail">
-        <div class="od-modal" role="dialog" aria-modal="true">
-          <button class="od-close" @click="closeDetail" :aria-label="t('orders.close')">✕</button>
-
-          <div v-if="detailLoading" class="od-state">{{ t('orders.loading') }}</div>
-          <div v-else-if="selectedOrder.__error" class="od-state od-state--err">⚠️ {{ detailError }}</div>
-
-          <template v-else>
-            <header class="od-head">
-              <h3>{{ t('orders.detailTitle') }}</h3>
-              <span class="od-id">#{{ String(selectedOrder.id).slice(0, 8).toUpperCase() }}</span>
-            </header>
-            <div class="od-meta">
-              <span class="co-order__status" :class="getStatusColor(selectedOrder.status)">{{ statusLabel(selectedOrder.status) }}</span>
-              <span class="od-date">{{ fmtDate(selectedOrder.createdAt) }}</span>
-            </div>
-
-            <!-- Products -->
-            <div class="od-section">
-              <div class="od-section__title">{{ t('orders.products') }}</div>
-              <div v-for="it in selectedOrder.items" :key="it.id" class="od-item">
-                <img v-if="it.productImage" :src="it.productImage" class="od-item__img" alt="" />
-                <div v-else class="od-item__img od-item__img--ph">📦</div>
-                <div class="od-item__info">
-                  <span class="od-item__name">{{ it.productName || '—' }}</span>
-                  <span class="od-item__sub">{{ it.quantity }} × {{ fmtPrice(it.unitPriceKgs) }}</span>
-                </div>
-                <span class="od-item__total">{{ fmtPrice(it.totalPriceKgs) }}</span>
-              </div>
-            </div>
-
-            <!-- Payment -->
-            <div class="od-section">
-              <div class="od-section__title">{{ t('checkout.paymentTitle') }}</div>
-              <div class="od-row"><span>{{ t('orders.paymentMethod') }}</span><strong>{{ paymentLabel(selectedOrder.paymentMethod) }}</strong></div>
-              <div class="od-row"><span>{{ t('orders.status') }}</span><strong>{{ selectedOrder.verifiedAt ? t('orders.paymentVerified') : t('orders.paymentPending') }}</strong></div>
-              <div v-if="selectedOrder.address" class="od-row"><span>{{ t('orders.deliveryAddress') }}</span><strong class="od-addr">{{ selectedOrder.address }}</strong></div>
-              <div class="od-row od-row--total"><span>{{ t('orders.total') }}</span><strong>{{ fmtPrice(selectedOrder.totalKgs) }}</strong></div>
-
-              <div v-if="selectedOrder.paymentMethod === 'qr_transfer'" class="od-receipt">
-                <div class="od-section__title">{{ t('orders.receipt') }}</div>
-                <a v-if="selectedOrder.receiptImageUrl" :href="selectedOrder.receiptImageUrl" target="_blank" rel="noopener noreferrer">
-                  <img :src="selectedOrder.receiptImageUrl" class="od-receipt__img" alt="receipt" />
-                </a>
-                <p v-else class="od-noreceipt">{{ t('orders.noReceipt') }}</p>
-              </div>
-            </div>
-
-            <button class="od-done" @click="closeDetail">{{ t('orders.close') }}</button>
-          </template>
-        </div>
-      </div>
-    </Transition>
    </div>
   </div>
 
@@ -537,6 +481,11 @@ onMounted(() => fetchOrders());
                   @click="revertOrder(order)"
                 >↩ Geri Al</button>
                 <button
+                  class="btn-action btn-receipt"
+                  title="Sipariş detayını ve dekontu görüntüle"
+                  @click="openOrder(order.id)"
+                >🧾 Dekont</button>
+                <button
                   class="btn-action btn-dark"
                   title="Siparişi kalıcı olarak sil (geri alınamaz)"
                   @click="deleteOrder(order)"
@@ -560,6 +509,62 @@ onMounted(() => fetchOrders());
       <div v-if="showToast" class="toast-orders">✓ {{ showToast }}</div>
     </Transition>
   </div>
+
+  <!-- ════ Order + payment detail modal (shared: customer + staff "Dekont" button) ════ -->
+  <Transition name="od-fade">
+    <div v-if="selectedOrder" class="od-overlay" @click.self="closeDetail">
+      <div class="od-modal" role="dialog" aria-modal="true">
+        <button class="od-close" @click="closeDetail" :aria-label="t('orders.close')">✕</button>
+
+        <div v-if="detailLoading" class="od-state">{{ t('orders.loading') }}</div>
+        <div v-else-if="selectedOrder.__error" class="od-state od-state--err">⚠️ {{ detailError }}</div>
+
+        <template v-else>
+          <header class="od-head">
+            <h3>{{ t('orders.detailTitle') }}</h3>
+            <span class="od-id">#{{ String(selectedOrder.id).slice(0, 8).toUpperCase() }}</span>
+          </header>
+          <div class="od-meta">
+            <span class="co-order__status" :class="getStatusColor(selectedOrder.status)">{{ statusLabel(selectedOrder.status) }}</span>
+            <span class="od-date">{{ fmtDate(selectedOrder.createdAt) }}</span>
+          </div>
+
+          <!-- Products -->
+          <div class="od-section">
+            <div class="od-section__title">{{ t('orders.products') }}</div>
+            <div v-for="it in selectedOrder.items" :key="it.id" class="od-item">
+              <img v-if="it.productImage" :src="it.productImage" class="od-item__img" alt="" />
+              <div v-else class="od-item__img od-item__img--ph">📦</div>
+              <div class="od-item__info">
+                <span class="od-item__name">{{ it.productName || '—' }}</span>
+                <span class="od-item__sub">{{ it.quantity }} × {{ fmtPrice(it.unitPriceKgs) }}</span>
+              </div>
+              <span class="od-item__total">{{ fmtPrice(it.totalPriceKgs) }}</span>
+            </div>
+          </div>
+
+          <!-- Payment -->
+          <div class="od-section">
+            <div class="od-section__title">{{ t('checkout.paymentTitle') }}</div>
+            <div class="od-row"><span>{{ t('orders.paymentMethod') }}</span><strong>{{ paymentLabel(selectedOrder.paymentMethod) }}</strong></div>
+            <div class="od-row"><span>{{ t('orders.status') }}</span><strong>{{ selectedOrder.verifiedAt ? t('orders.paymentVerified') : t('orders.paymentPending') }}</strong></div>
+            <div v-if="selectedOrder.address" class="od-row"><span>{{ t('orders.deliveryAddress') }}</span><strong class="od-addr">{{ selectedOrder.address }}</strong></div>
+            <div class="od-row od-row--total"><span>{{ t('orders.total') }}</span><strong>{{ fmtPrice(selectedOrder.totalKgs) }}</strong></div>
+
+            <div v-if="selectedOrder.paymentMethod === 'qr_transfer'" class="od-receipt">
+              <div class="od-section__title">{{ t('orders.receipt') }}</div>
+              <a v-if="selectedOrder.receiptImageUrl" :href="selectedOrder.receiptImageUrl" target="_blank" rel="noopener noreferrer">
+                <img :src="selectedOrder.receiptImageUrl" class="od-receipt__img" alt="receipt" />
+              </a>
+              <p v-else class="od-noreceipt">{{ t('orders.noReceipt') }}</p>
+            </div>
+          </div>
+
+          <button class="od-done" @click="closeDetail">{{ t('orders.close') }}</button>
+        </template>
+      </div>
+    </div>
+  </Transition>
 </template>
 
 <style scoped>
@@ -711,6 +716,8 @@ onMounted(() => fetchOrders());
 .btn-red:hover { background: #dc2626; }
 .btn-amber { background: #f59e0b; }
 .btn-amber:hover { background: #d97706; }
+.btn-receipt { background: #7c3aed; }
+.btn-receipt:hover { background: #6d28d9; }
 .btn-dark { background: #4b5563; }
 .btn-dark:hover { background: #b91c1c; }
 .empty-state { text-align: center; padding: 40px !important; color: var(--color-text-muted); }
