@@ -20,11 +20,16 @@ const router = useRouter();
 
 let removeBefore: (() => void) | null = null;
 let removeAfter: (() => void) | null = null;
+let removeError: (() => void) | null = null;
+let hideTimer: ReturnType<typeof setTimeout> | null = null;
 
 onMounted(() => {
   removeBefore = router.beforeEach((to, from, next) => {
     // Only trigger loader on actual path changes
     if (to.path !== from.path) {
+      // A hide scheduled by the previous navigation must not fire into
+      // this one, or the loader vanishes mid-load.
+      if (hideTimer) { clearTimeout(hideTimer); hideTimer = null; }
       isLoading.value = true;
     }
     next();
@@ -32,15 +37,25 @@ onMounted(() => {
 
   removeAfter = router.afterEach(() => {
     // Small deliberate delay for a smoother premium feel
-    setTimeout(() => {
+    hideTimer = setTimeout(() => {
       isLoading.value = false;
     }, 600);
+  });
+
+  // afterEach never runs when a navigation throws (e.g. a failed dynamic
+  // chunk import — these show up regularly in the client error log), so
+  // without this the loader stayed mounted forever on top of the page.
+  removeError = router.onError(() => {
+    if (hideTimer) { clearTimeout(hideTimer); hideTimer = null; }
+    isLoading.value = false;
   });
 });
 
 onUnmounted(() => {
   if (removeBefore) removeBefore();
   if (removeAfter) removeAfter();
+  if (removeError) removeError();
+  if (hideTimer) clearTimeout(hideTimer);
 });
 </script>
 
@@ -59,6 +74,10 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
+  /* Purely visual — must never eat clicks. It sits over the page for the
+     600ms hide delay + 0.5s fade-out (near-invisible but still hit-testable
+     without this), which made every page feel dead right after navigating. */
+  pointer-events: none;
 }
 
 :global(:root[data-theme="light"]) .page-loader {
